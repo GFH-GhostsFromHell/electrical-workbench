@@ -44,3 +44,18 @@ a,button{touch-action:manipulation}
  #view-dashboard .stats{grid-template-columns:repeat(2,minmax(0,1fr))}
 }
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
+
+/* A horizontally scrollable navigation must never force the whole CSS grid wider
+   than a narrow phone. Use minmax(0,1fr), not the grid item's min-content width. */
+@media(max-width:1000px){
+  .shell{grid-template-columns:minmax(0,1fr)!important;width:100%;max-width:100%}
+  .sidebar,.main,.wrap{min-width:0;max-width:100%}
+  .sidebar{overflow:hidden}
+  .sidebar .nav{min-width:0;max-width:100%;width:100%;overflow-x:auto;overflow-y:hidden}
+  .topbar{min-width:0}
+}
+@media(max-width:460px){
+  .topbar h1{font-size:17px}
+  #view-dashboard .hero{min-width:0}
+  #view-dashboard .tool-finder{min-width:0}
+}
