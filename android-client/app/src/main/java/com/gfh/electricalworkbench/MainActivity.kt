@@ -46,6 +46,8 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -76,6 +78,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextOverflow
@@ -91,21 +94,22 @@ import java.util.Base64
 
 private const val PORTAL_BASE_URL = "https://remote-javafx-portal.onrender.com"
 
-private val Navy = EWColors.background
-private val Navy2 = EWColors.raised
-private val Steel = EWColors.card
-private val Steel2 = EWColors.card
-private val ElectricCyan = EWColors.primary
-private val ElectricBlue = EWColors.secondary
-private val SafetyAmber = EWColors.warning
-private val TextPrimary = EWColors.text
-private val TextSecondary = EWColors.muted
-private val TextMuted = EWColors.muted
-private val Good = EWColors.good
+private val Navy get() = EWColors.background
+private val Navy2 get() = EWColors.raised
+private val Steel get() = EWColors.card
+private val Steel2 get() = EWColors.card
+private val ElectricCyan get() = EWColors.primary
+private val ElectricBlue get() = EWColors.secondary
+private val SafetyAmber get() = EWColors.warning
+private val TextPrimary get() = EWColors.text
+private val TextSecondary get() = EWColors.muted
+private val TextMuted get() = EWColors.muted
+private val Good get() = EWColors.good
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        EWColors.load(this)
         setContent {
             WorkbenchTheme {
                 WorkbenchApp()
@@ -222,7 +226,7 @@ private fun LoginScreen(
             .fillMaxSize()
             .background(
                 Brush.linearGradient(
-                    listOf(Color(0xFFF8FAFD), Navy, Color(0xFFE6EFFA))
+                    listOf(EWColors.raised, Navy, EWColors.card)
                 )
             )
             .statusBarsPadding()
@@ -580,6 +584,8 @@ private fun CalculatorsScreen(onOpenWeb: (String) -> Unit) {
 
 @Composable
 private fun ProfileScreen(session: Session, onOpenWeb: (String) -> Unit, onLogout: () -> Unit) {
+    val context = LocalContext.current
+    var themeMenu by remember { mutableStateOf(false) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -588,6 +594,22 @@ private fun ProfileScreen(session: Session, onOpenWeb: (String) -> Unit, onLogou
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
         Text("Profile & Settings", fontSize = 26.sp, fontWeight = FontWeight.Black)
+        ElectricalCard {
+            Text("APPEARANCE", color = ElectricCyan, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+            Text("Choose a readable colour theme. The setting is saved on this Android device.",
+                color = TextSecondary, fontSize = 13.sp, lineHeight = 19.sp)
+            Box {
+                OutlinedButton(onClick = { themeMenu = true }, modifier = Modifier.fillMaxWidth()) {
+                    Text("Theme: " + (EWColors.options.firstOrNull { it.first == EWColors.selectedTheme }?.second ?: "Daylight") + " ▾")
+                }
+                DropdownMenu(expanded = themeMenu, onDismissRequest = { themeMenu = false }) {
+                    EWColors.options.forEach { (id, label) ->
+                        DropdownMenuItem(text = { Text(label + if (EWColors.selectedTheme == id) " ✓" else "") },
+                            onClick = { EWColors.choose(context, id); themeMenu = false })
+                    }
+                }
+            }
+        }
         ElectricalCard {
             ProfileLine("Display name", session.displayName)
             ProfileLine("Username", session.username)

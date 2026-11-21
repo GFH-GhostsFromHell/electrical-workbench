@@ -41,14 +41,14 @@ import org.json.JSONArray
 import org.json.JSONObject
 import java.time.LocalDate
 
-internal val MWCard = EWColors.card
-internal val MWCard2 = EWColors.raised
-internal val MWCyan = EWColors.primary
-internal val MWAmber = EWColors.warning
-internal val MWText = EWColors.text
-internal val MWMuted = EWColors.muted
-internal val MWGood = EWColors.good
-internal val MWDanger = EWColors.danger
+internal val MWCard get() = EWColors.card
+internal val MWCard2 get() = EWColors.raised
+internal val MWCyan get() = EWColors.primary
+internal val MWAmber get() = EWColors.warning
+internal val MWText get() = EWColors.text
+internal val MWMuted get() = EWColors.muted
+internal val MWGood get() = EWColors.good
+internal val MWDanger get() = EWColors.danger
 
 internal class MobileWorkspaceStore(private val context: Context, username: String) {
     private val safeUser = username.ifBlank { "default" }.replace(Regex("[^A-Za-z0-9._-]"), "_")
