@@ -23,12 +23,13 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
 @media(max-width:850px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:590px){main{padding:15px 12px 42px}.cards,.shortlists{grid-template-columns:1fr}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:14px}.step{min-height:73px}}
 </style>
+<link rel="stylesheet" href="/workbench-flow.css">
 </head>
 <body>
 <header><strong>⚡ Electrical Workbench</strong><nav><a href="/portal.html">Dashboard</a><a href="/account-records.html">Saved cloud records</a></nav></header>
 <main>
-<h1>What do you need to do?</h1>
-<p class="lead">Search by a jobsite task, not by Code section or app name. Open the right tool, enter its inputs, verify the result and save your work.</p>
+<h1>Find the right tool for your job</h1>
+<p class="lead">One clear starting point for each job. Search by what you need to do, then follow the three-step guide. Specialist or alternate views are available on request.</p>
 <div class="steps" aria-label="Recommended work sequence">
 <div class="step active"><b>1 · Find a task</b>Search or choose below</div>
 <div class="step"><b>2 · Enter values</b>Only the required measurements</div>
@@ -48,12 +49,12 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
 </div>
 <div id="count" class="muted" role="status" aria-live="polite"></div>
 </section>
-<section class="panel shortlists" aria-label="Your tools">
+<details class="panel shortlists" aria-label="Your tools"><summary>★ My shortcuts — favourites and recent tools</summary><div class="shortlists-inner">
 <div><h2>★ Favourites</h2><p id="accountStatus" class="muted">Checking your account…</p><ul id="favourites"></ul></div>
 <div><h2>Recently opened</h2><ul id="recent"></ul><button id="clearRecent" class="secondary" type="button">Clear recent tools</button></div>
-</section>
+</div></details>
 <section id="selectedTask" class="panel selected" hidden aria-live="polite"></section>
-<section aria-label="Available electrical tools"><h2>Choose a tool</h2><div id="catalog" class="cards"></div><button class="secondary" id="showAllTools" type="button">Show all tools</button><div id="none" hidden>No matching tools. Try a simpler task name or select All tools.</div></section>
+<section aria-label="Available electrical tools"><h2>Choose your next step</h2><div id="catalog" class="cards"></div><button class="secondary" id="showAllTools" type="button">Show all tools</button><div id="none" hidden>No matching tools. Try a simpler task name or select All tools.</div></section>
 <footer>Favourites and recently opened tools use only task identifiers and are stored on this device, separately for each signed-in account. They are not cloud-synced. Electrical calculations remain advisory: confirm the applicable CEC/OESC edition, equipment ratings and site requirements.</footer>
 </main>
 <script src="/tool-catalog.js"></script><script src="/tool-state.js"></script>
@@ -63,6 +64,7 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
  var tasks=window.EWBTaskCatalog||[];
  var store=window.EWBToolState;
  var input=document.getElementById('query'), category='all', current=null, viewAll=false;
+ var alternateIds=new Set(["bend-guide","advanced-code","cec-sections"]);
  var featured=['conduit-marks','conductor-drop','motor','service-demand','pull-box','fault','jobsite','saved'];
  var filters=Array.from(document.querySelectorAll('button.filter'));
  function el(name,cls,txt){var n=document.createElement(name);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;}
@@ -94,9 +96,10 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
   var q=input.value,shown=0,zone=document.getElementById('catalog');
   zone.replaceChildren();
   var state=store.snapshot();
-  var filtered=tasks.filter(function(task){return(category==='all'||task.category===category)&&match(task,q);}).sort(function(a,b){
+  var filtered=tasks.filter(function(task){return(category==='all'||task.category===category)&&match(task,q)&&(viewAll||!!q.trim()||!alternateIds.has(task.id)||state.favourites.includes(task.id));}).sort(function(a,b){
    var af=state.favourites.includes(a.id)?0:1,bf=state.favourites.includes(b.id)?0:1;
-   return af-bf||a.name.localeCompare(b.name);
+   var ai=featured.indexOf(a.id),bi=featured.indexOf(b.id);ai=ai<0?999:ai;bi=bi<0?999:bi;
+   return af-bf||ai-bi||a.name.localeCompare(b.name);
   });
   var compact=category==='all'&&!q.trim()&&!viewAll;
   var display=compact?filtered.filter(function(task){return state.favourites.includes(task.id)||featured.includes(task.id);}).slice(0,8):filtered;
@@ -104,25 +107,27 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
    shown++;
    var card=el('article','task'),heading=el('h3',null,item.name),desc=el('p',null,item.description);
    card.append(el('div','tag',item.category),heading,desc);
-   var buttons=el('div','buttons'),open=link(item,'Open tool'),star=el('button','star',state.favourites.includes(item.id)?'★':'☆');
+   var buttons=el('div','buttons'),open=link(item,'Start task'),star=el('button','star',state.favourites.includes(item.id)?'★':'☆');
    open.className='open';star.type='button';star.setAttribute('aria-pressed',String(state.favourites.includes(item.id)));
    star.setAttribute('aria-label',(state.favourites.includes(item.id)?'Remove from':'Add to')+' favourites: '+item.name);
    star.title='Favourite tool';
    star.disabled=!state.ready;
    star.addEventListener('click',function(){store.favourite(item.id);renderShortlists();render();});
    buttons.append(open,star);card.append(buttons);
-   var explain=el('button','secondary','How to use');explain.type='button';
+   var explain=el('button','secondary','Preview steps');explain.type='button';
    explain.addEventListener('click',function(){choose(item);document.getElementById('selectedTask').scrollIntoView({behavior:'smooth',block:'start'});});
    card.append(explain);zone.append(card);
   });
   document.getElementById('none').hidden=shown!==0;
   document.getElementById('count').textContent=shown+' of '+filtered.length+' tools shown';
   var showAll=document.getElementById('showAllTools');
-  showAll.hidden=category!=='all'||!!q.trim();
-  showAll.textContent=viewAll?'Show common tools':'Show all '+tasks.length+' tools';
+  showAll.hidden=!!q.trim();
+  showAll.textContent=viewAll?'Hide specialist and alternate tools':'Show specialist and alternate tools';
  }
  filters.forEach(function(btn){btn.addEventListener('click',function(){category=btn.dataset.category;filters.forEach(function(b){b.setAttribute('aria-pressed',String(b===btn));});render();});});
  input.addEventListener('input',render);
+ var initialQuery=new URLSearchParams(window.location.search).get('q');
+ if(initialQuery){input.value=initialQuery.slice(0,160);}
  document.getElementById('showAllTools').addEventListener('click',function(){viewAll=!viewAll;render();});
  document.getElementById('clearRecent').addEventListener('click',function(){store.clearRecent();renderShortlists();});
  window.addEventListener('ewb-tool-state-change',function(){renderShortlists();render();});
