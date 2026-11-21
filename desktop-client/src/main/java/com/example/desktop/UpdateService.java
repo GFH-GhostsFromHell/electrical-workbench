@@ -19,7 +19,7 @@ import java.util.HexFormat;
 
 public final class UpdateService {
     private static final String DEFAULT_PORTAL = "https://remote-javafx-portal.onrender.com";
-    private static final String GITHUB_RELEASES_API = "https://api.github.com/repos/GFH-GhostsFromHell/jhipster-javafx-remote-platform/releases?per_page=40";
+    private static final String GITHUB_RELEASES_API = "https://api.github.com/repos/GFH-GhostsFromHell/electrical-workbench/releases?per_page=40";
     private static final String DESKTOP_ASSET = "RemoteJavaFXClient-Setup.msi";
 
     private final HttpClient http = HttpClient.newBuilder()
