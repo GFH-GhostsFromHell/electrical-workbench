@@ -227,6 +227,7 @@ const server = http.createServer((req, res) => {
     }
     await page.locator('#height').fill('120');
     await page.locator('#distance').fill('600');
+    await page.waitForFunction(()=>Boolean(document.querySelector('#quickSummary .quick-mark')),{timeout:5000});
     assert.ok((await page.locator('#quickSummary').innerText()).includes('A'),'Live tape marks appear');
     await page.locator('#goSteps').click();
     await visible('#stepBrief');
