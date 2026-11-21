@@ -229,7 +229,14 @@ const server = http.createServer((req, res) => {
     await page.locator('#distance').fill('600');
     await page.waitForFunction(()=>Boolean(document.querySelector('#quickSummary .quick-mark')),{timeout:5000});
     assert.ok((await page.locator('#quickSummary').innerText()).includes('A'),'Live tape marks appear');
+    await page.evaluate(()=>{
+      window.__bendClickTrace=[];
+      for(const type of ['pointerdown','pointerup','click'])document.addEventListener(type,e=>{
+        if(window.__bendClickTrace.length<20)window.__bendClickTrace.push({type,target:e.target.id,closest:e.target.closest('button,summary')?.id||''});
+      },true);
+    });
     await page.locator('#goSteps').click();
+    console.log('BEND POINTER DEBUG '+JSON.stringify(await page.evaluate(()=>window.__bendClickTrace)));
     const bendPanelState=await page.evaluate(()=>{
       const panel=document.getElementById('bendSteps'),brief=document.getElementById('stepBrief');
       return {open:panel.open,display:getComputedStyle(panel).display,briefDisplay:getComputedStyle(brief).display,
@@ -261,6 +268,7 @@ const server = http.createServer((req, res) => {
       return {width:bounds.width,height:bounds.height,backing:canvas.width,backingHeight:canvas.height,dpr,light,hash};
     });
     let frame=await snapshot();
+    console.log('BEND CANVAS DEBUG '+JSON.stringify(frame));
     assert.ok(frame.width>180&&frame.height>=230,'3D viewer visible on a phone');
     assert.ok(Math.abs(frame.backing-frame.width*frame.dpr)<3,'Canvas is resolution-matched to the display width');
     assert.ok(Math.abs(frame.backingHeight-frame.height*frame.dpr)<3,'Canvas is resolution-matched to the display height');
