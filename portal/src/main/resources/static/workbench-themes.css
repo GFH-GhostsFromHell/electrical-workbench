@@ -553,3 +553,29 @@ html[data-ewb-theme] body p:has(> a[href="/bend-instruction-lab.html"]) {
 html[data-ewb-theme] body p:has(> a[href="/bend-instruction-lab.html"]) > a {
  color:var(--ewb-accent)!important;
 }
+
+/* The bend-menu is rendered dynamically at #menu. Its original generic button
+   rule carries several classes of specificity, so use the concrete menu ID to
+   keep all readable children paired with their exact surface. */
+html[data-ewb-theme] body #menu :is(button,a).bendbtn {
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;
+ border:2px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body #menu :is(button,a).bendbtn :is(strong,b) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body #menu :is(button,a).bendbtn span {
+ color:var(--ewb-muted)!important;
+}
+/* The new lab announcement sits within a gradient hero, but its own rectangle
+   is intentionally opaque. Pair its explicit background with dark/light ink. */
+html[data-ewb-theme] body #menuScreen .hero p:has(> a[href="/bend-instruction-lab.html"]) {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+html[data-ewb-theme] body #menuScreen .hero p:has(> a[href="/bend-instruction-lab.html"]) > strong {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body #menuScreen .hero p:has(> a[href="/bend-instruction-lab.html"]) > a {
+ color:var(--ewb-accent)!important;
+}
