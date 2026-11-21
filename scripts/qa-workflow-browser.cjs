@@ -251,14 +251,14 @@ const server = http.createServer((req, res) => {
     await visible('#stepList');
     assert.equal(await page.locator('#marks').innerText(),regularMarks,'Guided mode never changes the physical mark calculation');
     await page.locator('#toolScreen .back').click();
-    await page.locator('button.bendbtn').filter({hasText:'Three-bend saddle'}).click();
+    await page.locator('button.bendbtn').filter({hasText:'Three-bend saddle'}).first().click();
     await visible('#toolScreen.screen.active');
     const saddleMarks=await page.locator('#marks').innerText();
     for(const note of ['B FIRST','A SECOND','C THIRD','HOOK TOWARD FAR END','FLIP bender handle DOWN']){
       assert.ok(saddleMarks.includes(note),'Saddle must identify correct three-bend sequence: '+note);
     }
     await page.locator('#toolScreen .back').click();
-    await page.locator('button.bendbtn').filter({hasText:'Four-bend saddle'}).click();
+    await page.locator('button.bendbtn').filter({hasText:'Four-bend saddle'}).first().click();
     await visible('#toolScreen.screen.active');
     const fourMarks=await page.locator('#marks').innerText();
     for(const note of ['A FIRST','B SECOND','C THIRD','D FOURTH','HOOK TOWARD FAR END','TURN bender AROUND']){
