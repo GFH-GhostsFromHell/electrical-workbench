@@ -77,6 +77,7 @@
     if(acMotor&&x.supply==='dc')warnings.push('AC motor on a DC source requires a correctly rated inverter/controller; no direct AC starter may be connected to DC.');
     if(dcBrush&&acSupply)warnings.push('A brushed DC motor needs a correctly rated DC output supply/drive; direct connection to AC is not suitable.');
     if(x.supply==='ac1'&&(is3||sync))warnings.push('Single-phase input for a three-phase motor requires a manufacturer-approved drive with single-phase input ratings and derating; contactor/soft-starter approaches do not create three-phase power.');
+    if(x.motorDuty==='intermittent')warnings.push('Cyclic/intermittent service: verify motor duty, contactor utilization, drive/softstarter thermal capacity and repeated-start ratings.');
     if(freq>10||seconds>15)warnings.push('Frequent or extended starts: validate starter thermal capacity, motor heating, duty cycle and allowable starts per hour against the exact equipment data.');
     if(high)warnings.push('High starting torque/inertia: obtain a motor/load torque-versus-speed and acceleration study. A reduced-voltage starter may stall or overheat the motor.');
     if(x.braking)warnings.push('Stopping/braking is requested: confirm safe stopping category, coast versus controlled stop, load energy, braking resistor/regeneration and machine safety requirements.');
@@ -98,9 +99,9 @@
         'Interlocked forward/reverse contactors for a motor permitted to reverse.',
         ['Mechanical and electrical contactor interlocks and permitted reversing duty',
          'Deceleration and stop before reversing where required by equipment'],x.goal==='reverse'?105:8);
-      const ydPossible=!severeVoltageMismatch&&Number(x.leads)>=6&&delta&&Math.abs(volts-delta)/delta<=.055;
+      const ydPossible=!severeVoltageMismatch&&Number(x.leads)===6&&delta&&Math.abs(volts-delta)/delta<=.055;
       add('wye_delta',ydPossible?(high?'conditional':'eligible'):'not_suitable',
-        ydPossible?'Reduced-voltage start with approximately one-third DOL starting torque (idealized).':'Requires six accessible leads AND a nameplate delta RUN winding voltage matching the line supply; dual-voltage alone is not proof.',
+        ydPossible?'Reduced-voltage start with approximately one-third DOL starting torque (idealized).':'Requires a manufacturer-verified six-lead wye–delta winding diagram AND delta RUN voltage matching the supply; nine-/twelve-lead motors need their own OEM-approved configuration.',
         ['Confirm six-lead winding schematic and line-voltage delta run rating',
          'Three appropriately coordinated contactors, transition control, interlocks and overload',
          'Low-load/low-inertia start; verify transition surge and acceleration torque'],x.goal==='inrush'&&!high&&ydPossible?75:5);
@@ -198,7 +199,7 @@
       motorOutputKw:hp?rounded(hp*0.745699872):null,
       motorRatedRpm:rpm?rpm:null,
       suppliedLraA:lra?rounded(motorAmps*lra):null,
-      idealWyeDeltaStartingLineA:lra&&is3&&phaseOK&&Number(x.leads)>=6&&delta&&!severeVoltageMismatch?rounded(motorAmps*lra/3):null,
+      idealWyeDeltaStartingLineA:lra&&is3&&phaseOK&&Number(x.leads)===6&&delta&&!severeVoltageMismatch?rounded(motorAmps*lra/3):null,
       insideDeltaWindingA:is3&&phaseOK&&delta&&!severeVoltageMismatch?rounded(motorAmps/Math.sqrt(3)):null,
       enteredCandidateCurrentA:candidateAmps?rounded(candidateAmps):null,
       afterDeratingCurrentA:candidateAmps?rounded(candidateAmps*deratingPct/100):null,
