@@ -237,6 +237,12 @@ const server = http.createServer((req, res) => {
         summary:document.getElementById('quickSummary').textContent.slice(0,200)};
     });
     console.log('BEND PANEL DEBUG '+JSON.stringify(bendPanelState));
+    console.log('BEND CLICK DEBUG '+JSON.stringify(await page.evaluate(()=>{
+      const b=document.getElementById('goSteps'),d=document.getElementById('bendSteps');
+      const before=d.open; b.click();
+      return {buttonParent:b.closest('details')?.id,handler:String(b.onclick),before,after:d.open,
+       attributes:Array.from(d.attributes).map(x=>x.name+'='+x.value)};
+    })));
     await visible('#stepBrief');
     assert.equal(await page.locator('#bendSteps').getAttribute('open'),'','Bend steps open in one tap');
     await page.locator('#open3D').click();
