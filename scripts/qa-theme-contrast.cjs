@@ -3,7 +3,8 @@
 const assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require('playwright-core');
 const root=path.resolve('portal/src/main/resources/static');
-const pages=['index.html','portal.html','start.html','guided-calculators.html','calculators.html','advanced-calculations.html','bend-instruction-lab.html','circuit-sizing.html','field-suite.html','troubleshooting-kb.html','account-records.html','pull-box-calcs.html'];
+const pages=['index.html','portal.html','start.html','guided-calculators.html','calculators.html','advanced-calculations.html','bend-instruction-lab.html','bend-calcs.html','bender-calibration.html','circuit-sizing.html','field-suite.html','troubleshooting-kb.html','account-records.html','account.html','pull-box-calcs.html','cec-reference-status.html','chatgpt.html','industrial-commissioning.html','news.html'];
+const mobilePages=['index.html','portal.html','start.html','bend-instruction-lab.html','circuit-sizing.html','field-suite.html','troubleshooting-kb.html','account-records.html'];
 const themes=['daylight','midnight','workshop','contrast'];
 const server=http.createServer((req,res)=>{
  const pathname=new URL(req.url,'http://127.0.0.1').pathname;
@@ -73,7 +74,17 @@ async function inspect(page){
     if(r.count)findings.push({page:name,theme,checked:r.checked,count:r.count,worst:r.worst});
    }
   }
-  console.log('Audited '+checked+' text elements across '+pages.length+' pages and '+themes.length+' themes');
+  await page.setViewportSize({width:390,height:860});
+  for(const name of mobilePages){
+   await page.goto('http://127.0.0.1:'+server.address().port+'/'+name,{waitUntil:'domcontentloaded',timeout:30000});
+   await page.waitForTimeout(90);
+   for(const theme of themes){
+    await page.evaluate(t=>window.EWBTheme.set(t),theme);
+    const r=await inspect(page);checked+=r.checked;
+    if(r.count)findings.push({page:name+' @390px',theme,checked:r.checked,count:r.count,worst:r.worst});
+   }
+  }
+  console.log('Audited '+checked+' text elements across '+pages.length+' pages in four themes + '+mobilePages.length+' small-screen checks');
   if(findings.length)console.error('Contrast failures: '+JSON.stringify(findings,null,2));
   assert.equal(findings.length,0,'Low contrast on '+findings.length+' page/theme pairs');
   console.log('Contrast checks pass.');
