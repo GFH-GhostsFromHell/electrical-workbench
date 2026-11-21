@@ -92,162 +92,89 @@ struct WorkbenchRoot: View {
 struct WorkbenchHome: View {
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 16) {
-                VStack(alignment: .leading, spacing: 9) {
+            VStack(alignment: .leading, spacing: 14) {
+                VStack(alignment: .leading, spacing: 8) {
                     Label("ELECTRICAL WORKBENCH", systemImage: "bolt.fill")
                         .font(.caption.weight(.heavy))
                         .foregroundStyle(WorkbenchStyle.cyan)
-                    Text("What do you need to do today?")
+                    Text("What are you working on?")
                         .font(.title2.bold())
                         .foregroundStyle(.white)
-                    Text("Start with a field task, or open Tools for electrical sizing, troubleshooting, projects and study. Cloud tools use your Electrical Workbench account.")
+                    Text("Choose one task. Enter measurements, check the result, then save or export. Specialist tools are in Find a Tool.")
                         .font(.subheadline)
                         .foregroundStyle(WorkbenchStyle.muted)
-                        .fixedSize(horizontal: false, vertical: true)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(18)
-                .background(WorkbenchStyle.surface, in: RoundedRectangle(cornerRadius: 17))
+                .background(WorkbenchStyle.surface, in: RoundedRectangle(cornerRadius: 16))
 
-                Text("QUICK FIELD TASKS").font(.caption.weight(.bold)).foregroundStyle(WorkbenchStyle.muted)
                 NavigationLink {
-                    QuickBenderView()
+                    WorkbenchTools()
                 } label: {
                     HomeDestination(
-                        icon: "ruler",
-                        title: "Conduit Bend Marks",
-                        detail: "Offline offsets, rolling offsets, and 90° stub marks",
+                        icon: "magnifyingglass",
+                        title: "Find a Tool",
+                        detail: "One searchable directory for electrical, jobsite and study tasks",
                         emphasis: true
                     )
                 }
                 .buttonStyle(.plain)
 
+                Text("COMMON JOBS")
+                    .font(.caption.weight(.bold))
+                    .foregroundStyle(WorkbenchStyle.muted)
+
                 NavigationLink {
-                    PortalScreen(title: "Advanced conduit bender", path: "/bend-instruction-lab.html")
+                    QuickBenderView()
                 } label: {
-                    HomeDestination(
-                        icon: "cube.transparent",
-                        title: "Conduit Bends + 3D Preview",
-                        detail: "All bend types, diagrams, hook directions, and a rotatable result"
-                    )
+                    HomeDestination(icon: "ruler", title: "Bend conduit", detail: "Offline tape marks, offsets and stub-ups")
+                }
+                .buttonStyle(.plain)
+
+                NavigationLink {
+                    FeatureGate(feature: "ELECTRICAL_CALCULATORS", title: "Circuit sizing") {
+                        UnifiedCircuitSizingView()
+                    }
+                } label: {
+                    HomeDestination(icon: "bolt.circle", title: "Size an electrical circuit", detail: "Ampacity, voltage drop, assumptions and review")
                 }
                 .buttonStyle(.plain)
 
                 NavigationLink {
                     TroubleshootingOfflineView()
                 } label: {
-                    HomeDestination(
-                        icon: "wrench.and.screwdriver",
-                        title: "Equipment Troubleshooting · Offline",
-                        detail: "21 motor, PLC, VFD, mining and protection guides"
-                    )
+                    HomeDestination(icon: "wrench.and.screwdriver", title: "Troubleshoot equipment", detail: "Offline motor, VFD, PLC and protection guides")
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink {
-                    FabricationView()
-                } label: {
-                    HomeDestination(
-                        icon: "square.stack.3d.up",
-                        title: "Conduit Cut Length & Rack Layout",
-                        detail: "Offline bend gain, cut length, and parallel rack marks"
-                    )
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink {
-                    PracticeQuizView()
-                } label: {
-                    HomeDestination(
-                        icon: "checklist",
-                        title: "Red Seal Daily Quiz · 25 Questions",
-                        detail: "Five categories, worked answers, offline study"
-                    )
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink {
-                    BenderCalibrationView()
-                } label: {
-                    HomeDestination(
-                        icon: "slider.horizontal.3",
-                        title: "Calibrate a Conduit Bender",
-                        detail: "Measure your shoe deduct and gain with scrap"
-                    )
-                }
-                .buttonStyle(.plain)
-
-                Text("SIZING, PROJECTS & STUDY").font(.caption.weight(.bold)).foregroundStyle(WorkbenchStyle.muted)
                 NavigationLink {
                     PullBoxSizingView()
                 } label: {
-                    HomeDestination(
-                        icon: "square.dashed",
-                        title: "Pull Box Dimensions",
-                        detail: "Straight, angle, U, mixed, and back-wall pulls"
-                    )
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink {
-                    FeatureGate(feature: "ELECTRICAL_CALCULATORS", title: "Electrical calculators") {
-                        OfflinePowerCalculatorsView()
-                    }
-                } label: {
-                    HomeDestination(
-                        icon: "function",
-                        title: "Electrical Calculators · Offline",
-                        detail: "Transformer, motor, voltage drop, power factor and more"
-                    )
+                    HomeDestination(icon: "square.dashed", title: "Size a pull box", detail: "Straight, angle, U and back-wall pulls")
                 }
                 .buttonStyle(.plain)
 
                 NavigationLink {
                     NativeWorkspacesView()
                 } label: {
-                    HomeDestination(
-                        icon: "folder",
-                        title: "Jobsite Tools & Saved Projects",
-                        detail: "Learn, field records, projects, career hours and credentials"
-                    )
+                    HomeDestination(icon: "folder", title: "Projects & saved work", detail: "Continue a jobsite record or export your work")
                 }
                 .buttonStyle(.plain)
 
-                NavigationLink {
-                    FeatureGate(feature: "ASK_CHATGPT", title: "Ask ChatGPT") {
-                        NativeChatGPTWorkspaceView()
-                    }
-                } label: {
-                    HomeDestination(
-                        icon: "bubble.left.and.text.bubble.right",
-                        title: "Ask ChatGPT",
-                        detail: "Use the verified ChatGPT portal connection"
-                    )
-                }
-                .buttonStyle(.plain)
-
-                NavigationLink {
-                    PortalScreen(title: "Step-by-Step Calculators", path: "/guided-calculators.html")
-                } label: {
-                    HomeDestination(
-                        icon: "function",
-                        title: "Step-by-Step Calculators",
-                        detail: "Service, transformer, motor, and other electrical calculations"
-                    )
-                }
-                .buttonStyle(.plain)
-
-                Text("Signed-in offline basics use a verified 24-hour cache. Premium calculations, cloud workspaces, enterprise and ChatGPT require live authorization. Field records stay on this device; Code and manufacturer verification still apply.")
+                Text("1 · Find task   →   2 · Enter values   →   3 · Verify   →   4 · Save")
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(WorkbenchStyle.muted)
+                    .padding(.top, 3)
+                Text("Code data and manufacturer requirements must be checked. Offline and cloud tools have different sync requirements.")
                     .font(.footnote)
                     .foregroundStyle(WorkbenchStyle.muted)
-                    .padding(.top, 4)
             }
             .padding(16)
             .frame(maxWidth: 740)
             .frame(maxWidth: .infinity)
         }
         .background(WorkbenchStyle.background)
-        .navigationTitle("Workbench")
+        .navigationTitle("Home")
     }
 }
 
