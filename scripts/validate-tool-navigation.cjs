@@ -105,7 +105,7 @@ for(const text of ['Save input draft','Restore inputs','Export selected JSON','C
   assert.ok(helper.toLowerCase().includes(text.toLowerCase()),'Worksheet workflow missing '+text);
 }
 // Shared task IDs must remain aligned, even if the native destination is offline.
-const sharedTaskIds=['conduit-marks','bend-guide','bender-calibrate','pull-box','conductor-drop','service-demand',
+const sharedTaskIds=['conduit-marks','bend-guide','bender-calibrate','pull-box','conductor-drop','service-demand','motor-drive-select',
   'transformer','motor','advanced-code','relay','power','fault','jobsite','saved','code-updates'];
 for(const id of sharedTaskIds){
   assert.ok(tasks.some(task=>task.id===id),'Web catalog missing '+id);
