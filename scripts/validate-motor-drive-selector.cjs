@@ -49,13 +49,25 @@ assert.equal(method(r,'brushless').status,'eligible');assert.equal(method(r,'dol
 r=check({family:'ac_synchronous_3',supply:'ac3',volts:600,motorVolts:575,fla:20,startsHour:2,startSeconds:6});
 assert.equal(method(r,'wye_delta').status,'not_suitable');
 assert.equal(method(r,'vfd').status,'conditional');cases++;
-for(const x of [{...base,fla:0},{...base,motorVolts:0},{...base,startsHour:0},{...base,startSeconds:-1},{...base,hp:-5},{...base,lraMultiple:-6},{...base,deltaVolts:-600},{...base,family:'unknown'}]){
+r=check({...base,volts:600,motorVolts:230});
+assert.equal(method(r,'dol').status,'not_suitable');
+assert.equal(method(r,'soft').status,'not_suitable');
+assert.equal(method(r,'vfd').status,'conditional');cases++;
+r=check({...base,candidateAmps:30,deratingPct:80});
+assert.equal(r.calculations.afterDeratingCurrentA,24);
+assert.equal(r.calculations.candidatePassesContinuousFLA,true);cases++;
+r=check({...base,candidateAmps:22,deratingPct:80});
+assert.equal(r.calculations.candidatePassesContinuousFLA,false);
+assert.ok(r.warnings.some(x=>x.includes('FAILS continuous-current screening')));cases++;
+r=check({...base,lraMultiple:6,leads:'3'});
+assert.equal(r.calculations.idealWyeDeltaStartingLineA,null);cases++;
+for(const x of [{...base,fla:0},{...base,motorVolts:0},{...base,startsHour:0},{...base,startSeconds:-1},{...base,hp:-5},{...base,lraMultiple:-6},{...base,deltaVolts:-600},{...base,candidateAmps:-2},{...base,deratingPct:120},{...base,family:'unknown'}]){
  assert.equal(selector.compute(x).valid,false,'Invalid input accepted: '+JSON.stringify(x));cases++;
 }
 const html=fs.readFileSync(root+'motor-starter-selector.html','utf8');
 const catalog=fs.readFileSync(root+'tool-catalog.js','utf8');
 assert.ok(html.includes('/workbench-themes.css')&&html.includes('/workbench-theme.js'));
-for(const str of ['motor-drive-selector.js','motorVolts','startsHour','deltaVolts','fla','Export selection JSON','JSON.stringify(payload,null,2)'])
+for(const str of ['motor-drive-selector.js','motorVolts','startsHour','deltaVolts','fla','Export selection JSON','JSON.stringify(payload,null,2)','candidateAmps','deratingPct'])
  assert.ok(html.includes(str),'Missing UI: '+str);
 assert.ok(catalog.includes('"motor-drive-select"')&&catalog.includes('/motor-starter-selector.html'));
 assert.ok(fs.readFileSync('android-client/app/src/main/java/com/gfh/electricalworkbench/MobileToolFinder.kt','utf8').includes('MobileTask("motor-drive-select"'));
