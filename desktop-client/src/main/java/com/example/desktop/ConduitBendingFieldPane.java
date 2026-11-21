@@ -199,7 +199,7 @@ public final class ConduitBendingFieldPane extends BorderPane {
                      .append("Kick projected run: ").append(measure(k/Math.tan(rad))).append("\n")
                      .append("4. Choose the actual kick location on the horizontal leg; mark it according to your shoe's bend reference.\n")
                      .append("5. Orient the kick away from the 90° in the required plane and bend ").append(a).append("°; verify the rise.\n")
-                     .append("SECOND KICK: ? VERIFY HOOK DIRECTION / SHOE REFERENCE. Kick location depends on the chosen leg reference and bender radius; this worksheet does not invent an absolute second mark.\n");
+                      .append("SECOND KICK: HOOK toward the free leg being raised. Choose the actual kick mark from a job reference; no automatic bender flip / 180° conduit roll.\n");
                 }
             } else if(t.equals("Three-point saddle")){
                 double h=positive(rise,"saddle height"), c=positive(center,"obstruction centre"), side=a/2;
@@ -209,9 +209,9 @@ public final class ConduitBendingFieldPane extends BorderPane {
                 double spacing=h*multiplier,shift=h*Math.tan(Math.toRadians(side/2));
                 double B=c+shift,A=B-spacing,C=B+spacing;
                 if(A<0)throw new IllegalArgumentException("Saddle near mark is before the datum. Use a longer lead or shorter/steeper saddle.");
-                visualMarks.add(new BendMarkStripPane.Mark(B,1,"B · centre",traditional?"SADDLE / CENTRE":"BEND CENTRE ONLY","? VERIFY head orientation; use centre notch","Bend "+a+"° centre FIRST"));
-                visualMarks.add(new BendMarkStripPane.Mark(A,2,"A · outer",traditional?"ARROW":"BEND CENTRE ONLY",(traditional&&(a==30||a==45)?"HOOK → toward centre B (Klein method)":"? VERIFY · geometry only"),"Bend "+side+"° outside return"));
-                visualMarks.add(new BendMarkStripPane.Mark(C,3,"C · outer",traditional?"ARROW":"BEND CENTRE ONLY",(traditional&&(a==30||a==45)?"← HOOK toward centre B (Klein method)":"? VERIFY · geometry only"),"Bend "+side+"° outside return"));
+                visualMarks.add(new BendMarkStripPane.Mark(B,1,"B · centre",traditional&&a==45?"45° CENTRE NOTCH":"BEND CENTRE ONLY",traditional&&a==45?"HOOK ← toward tape zero · centre bend FIRST":"GEOMETRY ONLY · use shoe-specific notch","Bend "+a+"° centre FIRST"));
+                visualMarks.add(new BendMarkStripPane.Mark(A,2,"A · outer",traditional&&a==45?"ARROW":"BEND CENTRE ONLY",traditional&&a==45?"A SECOND · FLIP handle DOWN / roll conduit 180° · HOOK → toward B":"GEOMETRY ONLY · shoe-specific arrow needed","Bend "+side+"° outside return"));
+                visualMarks.add(new BendMarkStripPane.Mark(C,3,"C · outer",traditional&&a==45?"ARROW":"BEND CENTRE ONLY",traditional&&a==45?"C THIRD · move shoe across B · HOOK ← toward B":"GEOMETRY ONLY · shoe-specific arrow needed","Bend "+side+"° outside return"));
                 s.append("Centre bend: ").append(a).append("° · side bends: ").append(side).append("°\n")
                  .append("Marking method: ").append(saddleMarks.getValue()).append("\n")
                  .append("Side spacing multiplier: ").append(dec(multiplier)).append(" (pure geometry: ").append(dec(geometricMultiplier)).append(")\n")
@@ -221,20 +221,20 @@ public final class ConduitBendingFieldPane extends BorderPane {
                  .append("\nC (second outside): ").append(measure(C)).append("\n")
                  .append("\nFIELD STEPS\n1. Measure from the reference end to the obstruction centre and add the calculated centre shift. Mark B.\n")
                  .append("2. Measure ").append(measure(spacing)).append(" either side for A and C.\n")
-                 .append("3. Align B with the bender's saddle/centre notch (if equipped) and bend ").append(a).append("°.\n")
-                 .append("4. Turn the conduit 180° on its length and bend A and C ").append(side).append("° in the opposite direction, in the SAME plane.\n")
+                  .append("3. For a 45° Klein-style saddle align the CENTRE NOTCH at B, HOOK LEFT toward tape zero, and bend ").append(a).append("° FIRST. Other shoe/angle layouts are geometry-only until validated.\n")
+                  .append("4. A SECOND: flip handle DOWN and roll conduit 180° in the cradle, HOOK RIGHT toward B, align ARROW and bend ").append(side).append("°. C THIRD: move to the far side of B, HOOK LEFT toward B, bend ").append(side).append("° in the SAME plane.\n")
                  .append("5. The traditional field values of 2.5 for a 45° centre and 3.8 for a 30° centre assume centre-notch and outer-arrow benchmarks; geometric centre-to-centre distances are NOT interchangeable with these shoe markings.\n")
-                 .append("6. Hook directions: B centre ? VERIFY against shoe; A outer HOOK → toward centre B; C outer ← HOOK toward centre B in the documented Klein method. Check clearance on scrap before production.\n");
-                if(!traditional||a!=30&&a!=45)s.append("WARNING: this centre angle / selected method has NO verified physical shoe-mark calibration. Geometry is a planning reference ONLY: do not line up unverified arrow/notch marks using these positions.\n");
+                  .append("6. Hook arrows shown are for the documented 45° Klein-style hand-bender method only. Use your own shoe maker's arrow/notch and handle setup where different.\n");
+                if(!traditional||a!=45)s.append("WARNING: this angle or method has no validated physical arrow/notch setup in this guide. Geometry is for planning only.\n"); //
             } else if(t.equals("Four-point saddle")){
                 double h=positive(rise,"saddle height"), w=positive(width,"obstacle width"),d=positive(distance,"distance to near face");
                 double spacing=h*mult,sh=h*shrinkFactor;
                 double B=d+sh,A=B-spacing,C=B+w,D=C+spacing;
                 if(A<0)throw new IllegalArgumentException("First mark is before reference end; increase clearance to near face.");
-                visualMarks.add(new BendMarkStripPane.Mark(A,1,"A","VERIFY SHOE","? VERIFY hook · four-point geometry only","Bend "+a+"° rise"));
-                visualMarks.add(new BendMarkStripPane.Mark(B,2,"B","VERIFY SHOE","? VERIFY hook after flip · keep plane","Return "+a+"° to level"));
-                visualMarks.add(new BendMarkStripPane.Mark(C,3,"C","VERIFY SHOE","? VERIFY hook · reverse offset","Bend "+a+"° back toward datum plane"));
-                visualMarks.add(new BendMarkStripPane.Mark(D,4,"D","VERIFY SHOE","? VERIFY hook after flip · keep plane","Return "+a+"° to original run"));
+                visualMarks.add(new BendMarkStripPane.Mark(A,1,"A","ARROW · PAIRED OFFSET","A FIRST · HOOK ←, rise with first offset bend","Bend "+a+"° rise"));
+                visualMarks.add(new BendMarkStripPane.Mark(B,2,"B","ARROW · PAIRED OFFSET","B SECOND · FLIP handle DOWN / roll conduit 180° · HOOK ←","Return "+a+"° to level"));
+                visualMarks.add(new BendMarkStripPane.Mark(C,3,"C","ARROW · PAIRED OFFSET","C THIRD · opposite offset in same plane · HOOK ←","Bend "+a+"° back toward datum plane"));
+                visualMarks.add(new BendMarkStripPane.Mark(D,4,"D","ARROW · PAIRED OFFSET","D FOURTH · FLIP handle DOWN / roll conduit 180° · HOOK ←","Return "+a+"° to original run"));
                 s.append("Each offset bend: ").append(a).append("°\nSide spacing: ").append(measure(spacing)).append("\nShrink per offset: ")
                  .append(measure(sh)).append("\nTotal shrink: ").append(measure(2*sh)).append("\n")
                  .append("Marks A/B/C/D: ").append(measure(A)).append(" / ").append(measure(B)).append(" / ")
@@ -242,13 +242,13 @@ public final class ConduitBendingFieldPane extends BorderPane {
                  .append("\nFIELD STEPS\n1. Measure A, B, C and D from the SAME reference end and mark all four points.\n")
                  .append("2. Make equal-angle bends at A and B to rise over the obstacle, reversing the conduit 180° between bends.\n")
                  .append("3. Make equal-angle bends at C and D in the opposite offset direction to return to the starting plane.\n")
-                 .append("4. Four-point layout is geometric until you verify your exact shoe; every mark is labelled ? VERIFY for hook facing and physical arrow placement. Check obstacle and tool clearance.\n");
+                  .append("4. This is two paired offsets: flip the handle down and roll the conduit 180° before each return bend B and D. The hook is shown LEFT for the Klein-style example. Confirm arrow placement, shoe radius and access on your own bender before production.\n");
             } else {
                 double r=positive(rise,"centreline radius");int n=(int)nonNegative(segments,"segments");
                 if(n<3||n>12)throw new IllegalArgumentException("Use 3 to 12 segments.");
                 double each=90d/n, arc=Math.PI*r/2, spacing=arc/n;
                 for(int i=1;i<=n;i++)
-                    visualMarks.add(new BendMarkStripPane.Mark(i*spacing,i,"M"+i,"BEND CENTRE ONLY","? VERIFY actual shoe mark","Form "+dec(each)+"° segment "+i));
+                    visualMarks.add(new BendMarkStripPane.Mark(i*spacing,i,"M"+i,"BEND CENTRE ONLY","GEOMETRY ONLY · use measured shoe station","Form "+dec(each)+"° segment "+i));
                 s.append("Total 90° arc: ").append(measure(arc)).append("\n")
                  .append("Bends: ").append(n).append(" × ").append(dec(each)).append("°\n")
                  .append("Equal arc/mark spacing (approx.): ").append(measure(spacing)).append("\n")
