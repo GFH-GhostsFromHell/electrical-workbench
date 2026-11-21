@@ -68,6 +68,17 @@ for(const task of tasks) {
   if(!knownWebRoutes.includes(base))assert.ok(require('node:fs').existsSync(root+base), 'Missing tool destination '+task.path);
 }
 const start = read(root+'start.html');
+const themeScript=read(root+'workbench-theme.js');
+const themeStyles=read(root+'workbench-themes.css');
+new vm.Script(themeScript,{filename:'workbench-theme.js'});
+for(const name of ['daylight','midnight','workshop','contrast','system'])
+  includes(themeScript,"'"+name+"'",'Theme preference');
+for(const name of ['daylight','midnight','workshop','contrast'])
+  includes(themeStyles,'data-ewb-theme='+name,'Theme colour palette');
+for(const file of ['index.html','portal.html','start.html','calculators.html','guided-calculators.html','advanced-calculations.html','bend-instruction-lab.html','bend-calcs.html','field-suite.html','troubleshooting-kb.html','account-records.html']){
+  includes(read(root+file),'/workbench-theme.js','Shared theme logic on '+file);
+  includes(read(root+file),'/workbench-themes.css','Shared palette on '+file);
+}
 includes(start, 'new URLSearchParams(window.location.search)', 'Dashboard query reaches canonical finder');
 includes(start, 'alternateIds=new Set(', 'Specialist views are grouped instead of duplicated');
 includes(start, 'Show specialist and alternate tools', 'Full catalog remains accessible');

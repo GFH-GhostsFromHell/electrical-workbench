@@ -51,6 +51,30 @@ const server = http.createServer((req, res) => {
   async function take(name){await page.screenshot({path:path.join(screenshots,name),fullPage:true,animations:'disabled'});}
   try{
     await goto('/start.html');
+    await visible('#ewb-theme-button');
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'daylight','Default is readable Daylight');
+    await page.locator('#ewb-theme-button').click();
+    await visible('#ewb-theme-panel');
+    await page.locator('input[name="ewb-appearance"][value="midnight"]').check();
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'midnight','Midnight applied');
+    const darkBackground=await page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
+    await page.locator('#ewb-theme-done').click();
+    await goto('/guided-calculators.html?tool=service');
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'midnight','Theme persists between tools');
+    await goto('/start.html');
+    await page.locator('#ewb-theme-button').click();
+    await page.locator('input[value="workshop"][name="ewb-appearance"]').check();
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'workshop');
+    assert.notEqual(await page.evaluate(()=>getComputedStyle(document.body).backgroundColor),darkBackground,'Warm theme differs from dark');
+    await page.locator('input[value="contrast"][name="ewb-appearance"]').check();
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'contrast');
+    await page.emulateMedia({colorScheme:'dark'});
+    await page.locator('input[value="system"][name="ewb-appearance"]').check();
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'midnight','System dark chosen');
+    await page.emulateMedia({colorScheme:'light'});
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'daylight','System light auto updates');
+    await page.locator('input[value="daylight"][name="ewb-appearance"]').check();
+    await page.locator('#ewb-theme-done').click();
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-a'));
     assert.equal(await page.locator('.task').count(),8,'Only common tasks should show initially');
     await page.locator('#showAllTools').click();
