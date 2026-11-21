@@ -177,8 +177,10 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         favOnly.setStyle("-fx-padding:11 12;-fx-background-radius:9;");
         recentOnly.setStyle("-fx-padding:11 12;-fx-background-radius:9;");
         clearRecent.setStyle("-fx-padding:11 12;-fx-background-radius:9;");
-        HBox finder=new HBox(9,findTool,showSpecialist,favOnly,recentOnly,clearRecent);
-        finder.setAlignment(Pos.CENTER_LEFT);
+        FlowPane filterButtons=new FlowPane();
+        filterButtons.setHgap(8);filterButtons.setVgap(8);
+        filterButtons.getChildren().addAll(showSpecialist,favOnly,recentOnly,clearRecent);
+        VBox finder=new VBox(9,findTool,filterButtons);
         finder.setStyle("-fx-padding:8 0;");
         final List<Node> originalTiles=new ArrayList<>(tiles.getChildren());
         final Set<String> commonJobs=Set.of(

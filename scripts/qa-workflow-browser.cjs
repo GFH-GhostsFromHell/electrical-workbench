@@ -102,6 +102,25 @@ const server = http.createServer((req, res) => {
       assert.ok(controls.every(h=>h>=43),'Category touch targets @'+width);
     }
     await page.setViewportSize({width:390,height:860});
+    // Dashboard no longer duplicates the full tool directory. It forwards search
+    // to the canonical task finder, including a prefilled task query.
+    await goto('/portal.html');
+    await visible('#dashboardTaskSearch');
+    assert.equal(await page.locator('#toolDirectory').count(),0,'Dashboard must not duplicate full tool directory');
+    await page.locator('#toolFinderSearch').fill('motor');
+    await Promise.all([
+      page.waitForURL('**/start.html?q=motor'),
+      page.locator('#dashboardTaskSearch button[type=submit]').click()
+    ]);
+    await visible('.task:has(h3:text-is("Motor Protection & Starter Sizing"))');
+    await page.setViewportSize({width:390,height:860});
+    await goto('/portal.html');
+    await checkNoOverflow('Dashboard @390px');
+    await take('dashboard-390.png');
+    await page.setViewportSize({width:1280,height:900});
+    await checkNoOverflow('Dashboard @1280px');
+    await take('dashboard-1280.png');
+    await page.setViewportSize({width:390,height:860});
     await goto('/guided-calculators.html?tool=conductor');
     await visible('#conductor.module.active');
     await page.waitForFunction(()=>document.getElementById('ewbStatus').textContent.includes('qa-account-a'));
