@@ -19,7 +19,7 @@ for (const id of ['dashboardTaskSearch','toolFinderSearch','dashboardFavorites',
 }
 assert.ok(!dashboard.includes('id="toolDirectory"'), 'Dashboard must not duplicate the task catalog');
 includes(dashboard, 'action="/start.html"', 'Dashboard search delegates to canonical task finder');
-includes(dashboard, 'class="workbench-shortcuts"', 'Personal shortcuts are collapsible');
+includes(dashboard, 'class="card workbench-shortcuts"', 'Personal shortcuts are collapsible');
 for (const link of [
   '/bend-instruction-lab.html', '/guided-calculators.html',
   '/troubleshooting-kb.html', '/account-records.html'
@@ -70,6 +70,15 @@ for(const task of tasks) {
 const start = read(root+'start.html');
 includes(start, 'new URLSearchParams(window.location.search)', 'Dashboard query reaches canonical finder');
 includes(start, 'alternateIds=new Set(', 'Specialist views are grouped instead of duplicated');
+includes(start, 'Show specialist and alternate tools', 'Full catalog remains accessible');
+includes(dashboard, '/workbench-flow.css', 'Readable shared UI styles');
+includes(start, '/workbench-flow.css', 'Readable styles are shared with task finder');
+const androidHome = read('android-client/app/src/main/java/com/gfh/electricalworkbench/MainActivity.kt');
+const iosHome = read('ios-client/ElectricalWorkbench/WorkbenchRoot.swift');
+for (const token of ['Find a tool for this job','COMMON WORKFLOWS','Resume saved work']) includes(androidHome, token, 'Android home workflow');
+includes(iosHome, 'title: "Find a Tool"', 'iOS home uses the canonical task finder');
+assert.ok(!androidHome.includes('Mobile report history, saved calculations and usage statistics will appear here'), 'Remove unimplemented Android dashboard placeholders');
+assert.ok(!iosHome.includes('title: "Conduit Bends + 3D Preview"'), 'Alternate conduit view belongs in full catalog, not home');
 includes(start, '<details class="panel shortlists"', 'Optional shortcuts collapse for readability');
 for(const token of ['id="query"','id="catalog"','id="favourites"','id="recent"','tool-catalog.js','tool-state.js','Save or export'])includes(start,token,'Task launcher');
 const script= start.match(/<script>([\s\S]*?)<\/script>/);
