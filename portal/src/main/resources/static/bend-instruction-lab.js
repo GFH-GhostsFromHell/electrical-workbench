@@ -568,14 +568,14 @@ $('threeDDetails').addEventListener('toggle',()=>{
 $('editorDetails').addEventListener('toggle',()=>{if($('editorDetails').open)renderModel()});
 $('kind').onchange=()=>refresh(true);$('angle').onchange=()=>refresh(true);$('method').onchange=()=>refresh(false);
 $('critical').onchange=()=>refresh(false);
-$('recalc').onclick=()=>{refresh(true);$('quickSummary').scrollIntoView({behavior:'smooth',block:'nearest'});};
+$('recalc').onclick=()=>{refresh(true);$('quickSummary').scrollIntoView({behavior:'auto',block:'nearest'});};
 function openFieldSection(id){
  if(!layout)refresh(true);
- if(!layout){$('quickSummary').scrollIntoView({block:'center',behavior:'smooth'});return;}
+ if(!layout){$('quickSummary').scrollIntoView({block:'center',behavior:'auto'});return;}
  const section=$(id);
  section.open=true;
  requestAnimationFrame(()=>{
-  section.scrollIntoView({block:'start',behavior:'smooth'});
+  section.scrollIntoView({block:'start',behavior:'auto'});
   if(id==='threeDDetails')renderModel();
  });
 }
