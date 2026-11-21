@@ -60,6 +60,10 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         };
     }
     /**
+     * Keep all paired text/surface overrides together: a legacy pastel badge
+     * must not retain navy lettering when its surface becomes Midnight.
+     * Restore from original styles on every switch to avoid cumulative changes.
+     *
      * Preserve each component's original inline style, then re-tint only its colours.
      * This keeps native controls/calculation panes, measurements and event handlers intact.
      */
@@ -81,6 +85,17 @@ public final class ElectricalWorkbenchNativeApp extends Application {
                 .replace("-fx-background-color:#fff;", "-fx-background-color:"+theme.surface()+";")
                 .replace("-fx-background-color:#ffffff", "-fx-background-color:"+theme.surface())
                 .replace("-fx-background-color:#f8fafc", "-fx-background-color:"+theme.surface())
+
+                .replace("-fx-background-color:#edf3fa", "-fx-background-color:"+theme.surface())
+                .replace("-fx-background-color:#cffafe", "-fx-background-color:"+theme.surface())
+                .replace("-fx-background-color:#ecfeff", "-fx-background-color:"+theme.surface())
+                .replace("-fx-background-color:#e0f2fe", "-fx-background-color:"+theme.surface())
+                .replace("-fx-background-color:#16a34a", "-fx-background-color:"+theme.accent())
+                .replace("-fx-text-fill:#0f4c81", "-fx-text-fill:"+theme.text())
+                .replace("-fx-text-fill:#155e75", "-fx-text-fill:"+theme.text())
+                .replace("-fx-text-fill:#075985", "-fx-text-fill:"+theme.text())
+                .replace("-fx-text-fill:#15384f", "-fx-text-fill:"+theme.text())
+                .replace("-fx-text-fill:#0e7490", "-fx-text-fill:"+theme.text())
                 .replace("-fx-text-fill:#0f172a", "-fx-text-fill:"+theme.text())
                 .replace("-fx-text-fill:#14263d", "-fx-text-fill:"+theme.text())
                 .replace("-fx-text-fill:#334155", "-fx-text-fill:"+theme.sub())
