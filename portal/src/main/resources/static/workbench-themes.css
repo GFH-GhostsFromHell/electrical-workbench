@@ -448,3 +448,22 @@ html[data-ewb-theme] body main .warn{
  color:var(--ewb-warning-text)!important;
  border-color:var(--ewb-warn)!important;
 }
+
+/* Final contrast fix: the calculator-section sidebars also contain buttons.
+   Unselected choices must not receive a pale accent fill with white text. */
+html[data-ewb-theme] body .wrap > nav button.navbtn,
+html[data-ewb-theme] body .shell > .nav button {
+ background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;
+ border:1px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body .wrap > nav button.navbtn.active,
+html[data-ewb-theme] body .wrap > nav button.navbtn:hover,
+html[data-ewb-theme] body .shell > .nav button.active,
+html[data-ewb-theme] body .shell > .nav button:hover {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border:2px solid var(--ewb-accent)!important;
+}
+html[data-ewb-theme] body .shell > .nav {
+ background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;
+ border-color:var(--ewb-border)!important;
+}
