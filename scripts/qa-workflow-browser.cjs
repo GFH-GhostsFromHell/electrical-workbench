@@ -230,6 +230,13 @@ const server = http.createServer((req, res) => {
     await page.waitForFunction(()=>Boolean(document.querySelector('#quickSummary .quick-mark')),{timeout:5000});
     assert.ok((await page.locator('#quickSummary').innerText()).includes('A'),'Live tape marks appear');
     await page.locator('#goSteps').click();
+    const bendPanelState=await page.evaluate(()=>{
+      const panel=document.getElementById('bendSteps'),brief=document.getElementById('stepBrief');
+      return {open:panel.open,display:getComputedStyle(panel).display,briefDisplay:getComputedStyle(brief).display,
+        briefRect:brief.getBoundingClientRect().toJSON(),text:brief.textContent,
+        summary:document.getElementById('quickSummary').textContent.slice(0,200)};
+    });
+    console.log('BEND PANEL DEBUG '+JSON.stringify(bendPanelState));
     await visible('#stepBrief');
     assert.equal(await page.locator('#bendSteps').getAttribute('open'),'','Bend steps open in one tap');
     await page.locator('#open3D').click();
