@@ -1,0 +1,133 @@
+/* Electrical Workbench shared themes. Loaded after legacy page styles. */
+:root,[data-ewb-theme=daylight]{
+ --ewb-bg:#f2f6fb;--ewb-surface:#ffffff;--ewb-raised:#e8f1f8;
+ --ewb-text:#14283e;--ewb-muted:#455b70;--ewb-border:#aabfd0;
+ --ewb-accent:#145a7f;--ewb-accent-text:#ffffff;
+ --ewb-nav:#15384f;--ewb-nav-text:#ffffff;
+ --ewb-hero:linear-gradient(125deg,#10364f,#186b86);
+ --ewb-focus:#bd7600;--ewb-ok:#176534;--ewb-warn:#854400;--ewb-bad:#ab271c;
+ color-scheme:light;
+}
+[data-ewb-theme=midnight]{
+ --ewb-bg:#0a1625;--ewb-surface:#182c40;--ewb-raised:#243b50;
+ --ewb-text:#f2f7ff;--ewb-muted:#d0dfec;--ewb-border:#69859b;
+ --ewb-accent:#78dff2;--ewb-accent-text:#08222e;
+ --ewb-nav:#0a1826;--ewb-nav-text:#f4fbff;
+ --ewb-hero:linear-gradient(125deg,#0c2234,#205670);
+ --ewb-focus:#ffd166;--ewb-ok:#93efac;--ewb-warn:#ffcc87;--ewb-bad:#ff9a94;
+ color-scheme:dark;
+}
+[data-ewb-theme=workshop]{
+ --ewb-bg:#f8f0e6;--ewb-surface:#fffaf2;--ewb-raised:#f0e2cf;
+ --ewb-text:#392b20;--ewb-muted:#604e3c;--ewb-border:#bda78e;
+ --ewb-accent:#79411c;--ewb-accent-text:#ffffff;
+ --ewb-nav:#493124;--ewb-nav-text:#fff2df;
+ --ewb-hero:linear-gradient(125deg,#50321d,#81512d);
+ --ewb-focus:#0b6c9b;--ewb-ok:#16653d;--ewb-warn:#874200;--ewb-bad:#a42720;
+ color-scheme:light;
+}
+[data-ewb-theme=contrast]{
+ --ewb-bg:#000000;--ewb-surface:#080808;--ewb-raised:#161616;
+ --ewb-text:#ffffff;--ewb-muted:#ffffff;--ewb-border:#ffffff;
+ --ewb-accent:#ffe15c;--ewb-accent-text:#000000;
+ --ewb-nav:#000000;--ewb-nav-text:#ffffff;
+ --ewb-hero:linear-gradient(125deg,#000000,#252525);
+ --ewb-focus:#00f5ff;--ewb-ok:#a8ffb0;--ewb-warn:#ffe15c;--ewb-bad:#ff9b9b;
+ color-scheme:dark;
+}
+/* Match existing HTML and CSS naming, including legacy readability overrides. */
+html[data-ewb-theme] body {background:var(--ewb-bg)!important;color:var(--ewb-text)!important}
+html[data-ewb-theme] :is(.card,.panel,.task,.tile,.quick,.stat,.step,.ref,.guide,.worksheet,.viewer,.mark,.cue,.out,.info,.info-card,.quick-card,.quick-summary,.markcard,.summary,.placeholder,.tool-finder,.result,.reading,details:not(.warning),.login,.shell:not(.sidebar)) {
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;border-color:var(--ewb-border)!important
+}
+html[data-ewb-theme] :is(.step.active,.hint,.markbar,.mini,.face-direction,.hookvisual,.feature,.field-note){
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;border-color:var(--ewb-border)!important
+}
+html[data-ewb-theme] :is(body > header,.sidebar,.topbar,.top,header:not(.hero)) {
+ background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;border-color:var(--ewb-border)!important
+}
+html[data-ewb-theme] :is(.sidebar,.topbar,header):not(.hero) :is(strong,small,b,.label,.brand,.muted,.side-foot) {
+ color:var(--ewb-nav-text)!important
+}
+html[data-ewb-theme] :is(.nav a,.nav button,header nav a) {
+ background:transparent!important;color:var(--ewb-nav-text)!important;border-color:transparent!important
+}
+html[data-ewb-theme] :is(.nav a,.nav button,header nav a):hover,
+html[data-ewb-theme] .nav button.active {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;border-color:var(--ewb-border)!important
+}
+html[data-ewb-theme] :is(h1,h2,h3,h4,.task h3,.quick strong,.step b,.stat .value,.mark strong,.cue strong,.result strong,.selected strong) {
+ color:var(--ewb-text)!important
+}
+html[data-ewb-theme] :is(p,.lead,.muted,.note,.subtle,.hint,.eyebrow,.task p,.task .tag,.stat .sub,.quick span,.workflow-link span,footer,.photo-help,.mark small,.cue small) {
+ color:var(--ewb-muted)!important
+}
+html[data-ewb-theme] :is(a,.step b,.task .tag):not(.btn):not(.open):not(.workflow-link) {
+ color:var(--ewb-accent)!important
+}
+html[data-ewb-theme] :is(input,textarea,select,.field input,.field select,.field textarea) {
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;
+ border:1px solid var(--ewb-border)!important;color-scheme:inherit!important
+}
+html[data-ewb-theme] :is(input,textarea)::placeholder{color:var(--ewb-muted)!important;opacity:1}
+html[data-ewb-theme] select option{background:var(--ewb-surface)!important;color:var(--ewb-text)!important}
+html[data-ewb-theme] :is(button,.btn,.task .open,.selected .open,.button,button.primary,button[type=submit]):not(#ewb-theme-button):not(#ewb-theme-done) {
+ background:var(--ewb-accent)!important;color:var(--ewb-accent-text)!important;
+ border:1px solid var(--ewb-accent)!important;text-shadow:none!important
+}
+html[data-ewb-theme] :is(button.secondary,.btn.secondary,.btn.ghost,button.filter:not([aria-pressed=true]),button.star,.finder-chip:not([aria-pressed=true])) {
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;border-color:var(--ewb-border)!important
+}
+html[data-ewb-theme] :is(button:disabled,.btn:disabled){background:var(--ewb-raised)!important;color:var(--ewb-muted)!important;border-color:var(--ewb-border)!important}
+html[data-ewb-theme] :is(.hero,#view-dashboard .hero) {
+ background:var(--ewb-hero)!important;color:#ffffff!important;border-color:var(--ewb-border)!important
+}
+html[data-ewb-theme] .hero :is(h1,h2,h3,.eyebrow,.brandline strong){color:#ffffff!important}
+html[data-ewb-theme] .hero :is(p,.lead,.muted,small){color:#f0f5ff!important}
+html[data-ewb-theme] .workflow-link {
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;border:1px solid var(--ewb-border)!important
+}
+html[data-ewb-theme] .workflow-link strong{color:var(--ewb-text)!important}
+html[data-ewb-theme] :is(.good,.success,.result.green strong){color:var(--ewb-ok)!important}
+html[data-ewb-theme] :is(.warn,.result.amber strong){color:var(--ewb-warn)!important}
+html[data-ewb-theme] :is(.bad,.error){color:var(--ewb-bad)!important}
+html[data-ewb-theme] :is(a,button,input,select,textarea,summary,[role=button]):focus-visible {
+ outline:3px solid var(--ewb-focus)!important;outline-offset:3px!important
+}
+/* Accessible appearance chooser (not part of any electrical calculation). */
+#ewb-theme-host{position:relative;display:inline-flex;align-items:center;flex:0 0 auto}
+#ewb-theme-host.ewb-theme-floating{position:fixed;z-index:8990;right:12px;bottom:12px}
+html[data-ewb-theme] #ewb-theme-button {
+ min-height:44px;min-width:90px;padding:8px 12px;border-radius:10px;
+ border:2px solid var(--ewb-border)!important;background:var(--ewb-surface)!important;
+ color:var(--ewb-text)!important;font:700 14px/1.3 system-ui,sans-serif;cursor:pointer
+}
+html[data-ewb-theme] #ewb-theme-panel {
+ position:fixed;right:12px;top:72px;z-index:9000;
+ width:min(360px,calc(100vw - 24px));max-height:calc(100dvh - 86px);overflow-y:auto;
+ padding:18px;border:2px solid var(--ewb-border)!important;border-radius:16px;
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;
+ box-shadow:0 12px 38px #0005;font:14px/1.5 system-ui,sans-serif;text-align:left
+}
+html[data-ewb-theme] #ewb-theme-panel[hidden]{display:none!important}
+#ewb-theme-panel h2{font-size:20px;margin:0 0 6px;color:var(--ewb-text)!important}
+#ewb-theme-panel p{margin:0 0 10px;color:var(--ewb-muted)!important}
+#ewb-theme-panel fieldset{min-width:0;padding:0;margin:6px 0 14px;border:0}
+#ewb-theme-panel legend{color:var(--ewb-text);font-weight:700;margin-bottom:8px}
+#ewb-theme-panel .ewb-theme-option{
+ display:flex;gap:10px;align-items:center;min-height:54px;margin:5px 0;
+ padding:7px 9px;border:1px solid var(--ewb-border);border-radius:10px;cursor:pointer;
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important
+}
+#ewb-theme-panel .ewb-theme-option:has(input:checked){outline:2px solid var(--ewb-accent)}
+#ewb-theme-panel input[type=radio]{width:18px;height:18px;min-height:18px;flex:0 0 18px;accent-color:var(--ewb-accent)}
+#ewb-theme-panel .ewb-theme-swatches{display:flex;border:1px solid var(--ewb-border);border-radius:8px;overflow:hidden;flex:0 0 40px;height:28px}
+#ewb-theme-panel .ewb-theme-swatches i{width:50%;height:100%;display:block}
+#ewb-theme-panel .ewb-theme-option strong{display:block;font-size:14px;color:var(--ewb-text)!important}
+#ewb-theme-panel .ewb-theme-option small{display:block;font-size:12px;color:var(--ewb-muted)!important}
+html[data-ewb-theme] #ewb-theme-done {
+ width:100%;min-height:44px;border:2px solid var(--ewb-accent)!important;border-radius:10px;
+ background:var(--ewb-accent)!important;color:var(--ewb-accent-text)!important;font-weight:800;cursor:pointer
+}
+@media(max-width:640px){#ewb-theme-host:not(.ewb-theme-floating){margin-left:auto}html[data-ewb-theme] #ewb-theme-panel{top:62px;max-height:calc(100dvh - 76px)}}
+@media print{#ewb-theme-host{display:none!important}}
