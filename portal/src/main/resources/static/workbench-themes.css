@@ -62,7 +62,8 @@ html[data-ewb-theme] :is(h1,h2,h3,h4,.task h3,.quick strong,.step b,.stat .value
 html[data-ewb-theme] :is(p,.lead,.muted,.note,.subtle,.hint,.eyebrow,.task p,.task .tag,.stat .sub,.quick span,.workflow-link span,footer,.photo-help,.mark small,.cue small) {
  color:var(--ewb-muted)!important
 }
-html[data-ewb-theme] :is(a,.step b,.task .tag):not(.btn):not(.open):not(.workflow-link) {
+html[data-ewb-theme] main a:not(.btn):not(.open):not(.workflow-link),
+html[data-ewb-theme] .step b,html[data-ewb-theme] .task .tag {
  color:var(--ewb-accent)!important
 }
 html[data-ewb-theme] :is(input,textarea,select,.field input,.field select,.field textarea) {
