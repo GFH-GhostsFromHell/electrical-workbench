@@ -121,6 +121,10 @@ html[data-ewb-theme] .actions button.secondary{background:var(--ewb-surface)!imp
 <div class="field"><label for="installation">Installation conditions</label><select name="installation" id="installation"><option value="standard">Normal indoor enclosure</option><option value="harsh">Mine / dust / outdoor / high heat / harsh environment</option></select></div>
 <div class="field"><label for="motorDuty">Service pattern</label><select name="motorDuty" id="motorDuty"><option value="continuous">Continuous running duty</option><option value="intermittent">Intermittent/cyclic duty</option></select></div>
 </div>
+<div class="fields" style="margin-top:15px">
+<div class="field"><label for="candidateAmps">Candidate starter/drive catalog continuous rating (A, optional)</label><input name="candidateAmps" id="candidateAmps" type="number" min="0.01" step="any" placeholder="e.g. 25"><small>Enter the applicable AC-3 / output current, not just a motor horsepower label.</small></div>
+<div class="field"><label for="deratingPct">Applied manufacturer continuous-current derating (%)</label><input name="deratingPct" id="deratingPct" type="number" min="0.1" max="100" step="any" value="100" required><small>100% unless the exact OEM catalog specifies an applicable reduction.</small></div>
+</div>
 <div class="choices"><label><input type="checkbox" name="reversing" id="reversing"> Need forward and reverse</label><label><input type="checkbox" name="braking" id="braking"> Need controlled braking/stopping</label></div>
 </fieldset>
 <div class="actions"><button type="submit" id="calculate">Compare starting options</button><button type="button" class="secondary" id="reset">Reset</button></div>
@@ -191,12 +195,17 @@ function show(){
  metrics.append(metric('Nameplate full-load current',c.nameplateFLA+' A'),
   metric('Minimum continuous controller output (before derating)',c.continuousOutputMinimumA+' A'),
   metric('Motor rated voltage',values.motorVolts+' V'));
- if(c.apparentInputKva!==null)metrics.append(metric('Motor apparent VA screening',c.apparentInputKva+' kVA'));
+ if(c.apparentInputKva!==null)metrics.append(metric('Motor apparent-power screening',c.apparentInputKva+' kVA'));
  if(c.nominalDcKw!==null)metrics.append(metric('DC voltage × armature current',c.nominalDcKw+' kW'));
  if(c.motorOutputKw!==null)metrics.append(metric('Nameplate horsepower conversion',c.motorOutputKw+' kW (shaft)'));
  if(c.suppliedLraA!==null)metrics.append(metric('Estimated locked-rotor current',c.suppliedLraA+' A'));
  if(c.idealWyeDeltaStartingLineA!==null)metrics.append(metric('Idealized wye-start line current',c.idealWyeDeltaStartingLineA+' A'));
  if(c.insideDeltaWindingA!==null)metrics.append(metric('Ideal delta winding current',c.insideDeltaWindingA+' A'));
+ if(c.enteredCandidateCurrentA!==null){
+  metrics.append(metric('Catalog continuous rating entered',c.enteredCandidateCurrentA+' A'),
+   metric('Available after entered derating',c.afterDeratingCurrentA+' A'),
+   metric('Continuous-current screening',c.candidatePassesContinuousFLA?'MEETS motor FLA (not approved)':'BELOW motor FLA — reject'));
+ }
  $('mathNote').textContent='Current calculations are screening figures, not a motor overload setting or certified starter/VFD catalog rating. Load/inertia and drive duty are manufacturer-specific.';
  const body=$('methods');body.replaceChildren();
  res.methods.forEach(m=>{
