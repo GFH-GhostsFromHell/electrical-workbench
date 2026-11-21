@@ -31,6 +31,9 @@ jobs:
           "$CHROME" --version
       - name: Test real browser workflows at mobile and desktop widths
         run: node scripts/qa-workflow-browser.cjs
+      - name: Audit theme contrast across real pages
+        if: always()
+        run: node scripts/qa-theme-contrast.cjs
       - name: Upload responsive screenshots for review
         if: always()
         uses: actions/upload-artifact@v4
