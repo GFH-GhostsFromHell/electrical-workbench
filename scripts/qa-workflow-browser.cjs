@@ -67,26 +67,31 @@ const server = http.createServer((req, res) => {
     await page.locator('button[data-category="all"]').click();
     const conduit=page.locator('.task:has(h3:text-is("Conduit Bend Marks + 3D"))');
     await conduit.getByRole('button',{name:/Add to favourites/}).click();
+    await page.locator('.shortlists summary').click();
     await visible('#favourites a:text-is("Conduit Bend Marks + 3D")');
     await page.reload({waitUntil:'load'});
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-a'));
+    await page.locator('.shortlists summary').click();
     await visible('#favourites a:text-is("Conduit Bend Marks + 3D")');
-    await conduit.getByRole('button',{name:'How to use'}).click();
+    await conduit.getByRole('button',{name:'Preview steps'}).click();
     await visible('#selectedTask');
     assert.ok((await page.locator('#selectedTask').innerText()).includes('Your workflow'),'Guidance explains next steps');
     await conduit.locator('a.open').click();
     await page.waitForURL('**/bend-instruction-lab.html');
     await goto('/start.html');
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-a'));
+    await page.locator('.shortlists summary').click();
     await visible('#recent a:text-is("Conduit Bend Marks + 3D")');
 
     activeUser='qa-account-b';
     await page.reload({waitUntil:'load'});
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-b'));
+    await page.locator('.shortlists summary').click();
     assert.ok(!(await page.locator('#favourites').innerText()).includes('Conduit Bend Marks + 3D'),'Account B should not see A favourites');
     activeUser='qa-account-a';
     await page.reload({waitUntil:'load'});
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-a'));
+    await page.locator('.shortlists summary').click();
     await visible('#favourites a:text-is("Conduit Bend Marks + 3D")');
 
     for(const width of [320,360,390,768,1280]){
