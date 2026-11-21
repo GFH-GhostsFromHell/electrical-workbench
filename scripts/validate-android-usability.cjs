@@ -22,17 +22,28 @@ function luminance(hex){
   return linear[0]*.2126+linear[1]*.7152+linear[2]*.0722;
 }
 function contrast(a,b){const x=luminance(a),y=luminance(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
-const colors={};
-for(const match of palette.matchAll(/val (\w+)=Color\(0xFF([0-9A-Fa-f]{6})\)/g)) colors[match[1]]=match[2];
-for(const [front,back,min] of [
-  ['text','background',7],['text','raised',7],['text','card',7],
-  ['muted','card',4.5],['muted','raised',4.5],['primary','raised',4.5],
-  ['onPrimary','primary',4.5],['warning','card',4.5],['danger','card',4.5]
-]){
-  assert.ok(colors[front]&&colors[back],'Missing color pair '+front+'/'+back);
-  assert.ok(contrast(colors[front],colors[back])>=min,
-    front+' on '+back+' fails contrast: '+contrast(colors[front],colors[back]).toFixed(2));
+// Validate every selectable native theme, not just the former static Daylight values.
+const fields=['background','raised','card','outline','primary','onPrimary','secondary','warning','text','muted','good','danger'];
+for(const name of ['daylight','midnight','workshop','contrast']){
+  const marker='private val '+name+' = EWPalette(';
+  const position=palette.indexOf(marker);
+  assert.ok(position>=0,'Missing selectable palette '+name);
+  const body=palette.slice(position+marker.length,palette.indexOf('\n    )',position));
+  const hex=[...body.matchAll(/Color\(0xFF([0-9A-Fa-f]{6})\)|Color\.(White|Black)/g)]
+    .map(m=>m[1]||(m[2]==='White'?'FFFFFF':'000000'));
+  assert.equal(hex.length,fields.length,'Palette '+name+' must have '+fields.length+' named colours');
+  const colors=Object.fromEntries(fields.map((key,index)=>[key,hex[index]]));
+  for(const [front,back,min] of [
+    ['text','background',7],['text','raised',7],['text','card',7],
+    ['muted','card',4.5],['muted','raised',4.5],['primary','raised',4.5],
+    ['onPrimary','primary',4.5],['warning','card',4.5],['danger','card',4.5]
+  ]){
+    assert.ok(contrast(colors[front],colors[back])>=min,
+      name+': '+front+' on '+back+' fails contrast: '+contrast(colors[front],colors[back]).toFixed(2));
+  }
 }
+must(palette,'var selectedTheme by mutableStateOf','Theme changes trigger Compose recomposition');
+must(palette,'getSharedPreferences("ewb.appearance.v1"','Selected theme persists on device');
 must(shell,'ElectricalUiTheme(content)','One shared Android theme');
 must(common,'Card(onClick=onClick','Compact one-tap cards, no redundant Open button');
 must(common,'MWSectionPicker(','One bounded section picker');
