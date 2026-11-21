@@ -239,17 +239,21 @@ function checkStockAndSpacing(){
 
 function showQuickSummary(error){
  const box=$('quickSummary');
- if(error){const msg=error.message||String(error);box.innerHTML='<strong>'+(/^Enter /.test(msg)?'Enter your job measurements':'Check these measurements')+'</strong><span>'+html(msg)+'</span>';return}
+ if(error){
+  const msg=error.message||String(error);
+  box.innerHTML='<strong>'+(/^Enter /.test(msg)?'Enter measurements':'Check measurements')+'</strong><span>'+html(msg)+'</span>';
+  return;
+ }
  if(!layout)return;
  const marks=layout.marks.filter(m=>m.tool!=='GEOMETRY ONLY');
  const first=layout.steps[0];
- const markRows=marks.length?marks.map(m=>'<div class="quick-mark">'+html(m.tag)+' · '+html(length(m.pos))+' · '+html(m.tool)+'</div>').join(''):
-  '<div class="quick-alert">No verified physical mark is available here. Confirm the shoe and required dimensions before marking conduit.</div>';
- box.innerHTML='<strong>'+html(layout.name)+'</strong>'+markRows+
- '<span><b>Next:</b> '+html(first.where)+' · '+html(first.reference)+'</span>'+
- '<span><b>Hook:</b> '+html(hookCaption(first.hookSide))+'</span>'+
- '<span><b>Action:</b> '+html(first.label)+' · '+html(first.flip)+'</span>'+
- '<span class="quick-alert">Verify shoe marks, springback and physical dimensions before bending.</span>';
+ const chips=marks.length
+   ?'<div class="quick-mark-row">'+marks.map(m=>'<span class="quick-mark">'+html(m.tag)+' · '+html(length(m.pos))+'</span>').join('')+'</div>'
+   :'<span class="quick-alert">No verified physical marks. Use the manufacturer layout before marking.</span>';
+ box.innerHTML='<strong>'+html(layout.name)+'</strong>'+chips+
+  '<span class="next-move">NEXT: '+html(first.label)+' · '+html(first.where)+' · '+html(first.reference)+'</span>'+
+  '<span>Hook: '+html(hookCaption(first.hookSide))+'</span>'+
+  '<span class="quick-alert">Verify actual bender shoe, clearances and springback.</span>';
 }
 function renderMarks(){
  const $svg=$('markDrawing'),max=Math.max(v('stock')||1,...layout.marks.map(m=>m.pos+(unit()==='mm'?100:4)));
@@ -270,6 +274,7 @@ function renderStep(){
  $('cueMark').textContent=item.where;$('cueReference').textContent=item.reference;$('cueHook').textContent=hookCaption(item.hookSide)+' · '+item.hook;$('cueFlip').textContent=item.flip;
  $('hookVisual').textContent=hookCaption(item.hookSide);
  $('hookVisual').className='hookvisual '+(item.hookSide==='unknown'?'unverified':'');
+ $('stepBrief').textContent=item.label+' · '+item.where+' · '+item.reference;
  $('instruction').textContent=item.body;$('stepWarning').textContent=item.caution;
  $('prev').disabled=step===0;$('next').disabled=step===layout.steps.length-1;
  if(mode==='partial')renderModel();
@@ -545,6 +550,7 @@ function refresh(reset){
   $('markDrawing').innerHTML='';$('markCards').innerHTML='';
   $('markAlert').textContent=e.message;
   $('instruction').textContent='Correct the measurements. No physical bend plan is approved.';
+  $('stepBrief').textContent='Enter valid measurements before bending.';
   $('geometryNote').textContent='Preview withheld while field stock or mark check fails.';
  }
 }
@@ -562,7 +568,19 @@ $('threeDDetails').addEventListener('toggle',()=>{
 $('editorDetails').addEventListener('toggle',()=>{if($('editorDetails').open)renderModel()});
 $('kind').onchange=()=>refresh(true);$('angle').onchange=()=>refresh(true);$('method').onchange=()=>refresh(false);
 $('critical').onchange=()=>refresh(false);
-$('recalc').onclick=()=>{refresh(true);$('quickSummary').scrollIntoView({behavior:'smooth',block:'center'});};
+$('recalc').onclick=()=>{refresh(true);$('quickSummary').scrollIntoView({behavior:'smooth',block:'nearest'});};
+function openFieldSection(id){
+ if(!layout)refresh(true);
+ if(!layout){$('quickSummary').scrollIntoView({block:'center',behavior:'smooth'});return;}
+ const section=$(id);
+ section.open=true;
+ requestAnimationFrame(()=>{
+  section.scrollIntoView({block:'start',behavior:'smooth'});
+  if(id==='threeDDetails')renderModel();
+ });
+}
+$('goSteps').onclick=()=>openFieldSection('bendSteps');
+$('open3D').onclick=()=>openFieldSection('threeDDetails');
 ['stock','minMarkGap','minStraight'].forEach(id=>$(id).addEventListener('input',()=>refresh(false)));
 $('unit').addEventListener('change',function(){
  const old=this.dataset.previous||'mm',now=this.value,change=old===now?1:now==='mm'?25.4:1/25.4;
