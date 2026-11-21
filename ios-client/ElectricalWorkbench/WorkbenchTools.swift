@@ -21,7 +21,7 @@ struct WorkbenchTools: View {
 
     // Stable identifiers match the web tool catalog and Android where tools overlap.
     private let tools: [ElectricalTool] = [
-        .init(id: "conduit-marks", name: "Conduit Bend Marks + 3D", description: "Bend marks, shoe facing and 3D preview", category: "Installation", terms: "conduit offset saddle 90 kick pipe hook", icon: "cube.transparent", path: "/bend-instruction-lab.html"),
+        .init(id: "conduit-marks", name: "Conduit Bender · Field Marks", description: "Bend marks, shoe facing and simple guided steps", category: "Installation", terms: "conduit offset saddle 90 kick pipe hook", icon: "ruler", path: "/bend-calcs.html"),
         .init(id: "bend-guide", name: "Conduit Bend Diagrams", description: "Offsets, saddles and parallel conduit", category: "Installation", terms: "emt pipe bending", icon: "ruler", path: "/bend-calcs.html"),
         .init(id: "bender-calibrate", name: "Calibrate a Conduit Bender", description: "Save your shoe deduct and gain", category: "Installation", terms: "shoe gain calibration", icon: "slider.horizontal.3", path: nil),
         .init(id: "quick-bender", name: "Quick Bend Marks - Offline", description: "Fast conduit marks without internet", category: "Installation", terms: "offset saddle 90", icon: "ruler", path: nil),
