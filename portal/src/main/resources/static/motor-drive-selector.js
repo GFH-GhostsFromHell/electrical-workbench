@@ -37,7 +37,7 @@
       fla:15,hp:'',nameplateRpm:'',deltaVolts:'',leads:'3',goal:'simple',
       load:'normal',startsHour:2,startSeconds:8,lraMultiple:'',braking:false,
       reversing:false,controlSupply:'',ambient:40,installation:'standard',
-      currentRating:'',sccr:'',motorDuty:'continuous'},raw||{});
+      candidateAmps:'',deratingPct:100,motorDuty:'continuous'},raw||{});
     const problems=[],warnings=[],checks=[];
     if(!FAMILIES[x.family])problems.push('Choose a supported motor family.');
     if(!['ac3','ac1','dc'].includes(x.supply))problems.push('Choose the correct supply type.');
@@ -49,11 +49,14 @@
     const starts=positive(x.startsHour),seconds=positive(x.startSeconds);
     if(!starts||starts>10000)problems.push('Starts per hour must be between 1 and 10,000.');
     if(!seconds||seconds>3600)problems.push('Start duration must be between 0 and 3,600 seconds.');
-    const lra=optional(x.lraMultiple),delta=optional(x.deltaVolts),hp=optional(x.hp),rpm=optional(x.nameplateRpm);
+    const lra=optional(x.lraMultiple),delta=optional(x.deltaVolts),hp=optional(x.hp),rpm=optional(x.nameplateRpm),
+      candidateAmps=optional(x.candidateAmps),deratingPct=positive(x.deratingPct);
     if(String(x.lraMultiple||'').trim()&&!lra)problems.push('Locked-rotor multiple must be a positive number.');
     if(String(x.deltaVolts||'').trim()&&!delta)problems.push('Delta winding voltage must be a positive number.');
     if(String(x.hp||'').trim()&&!hp)problems.push('Motor horsepower must be a positive number.');
     if(String(x.nameplateRpm||'').trim()&&!rpm)problems.push('Rated RPM must be a positive number.');
+    if(String(x.candidateAmps||'').trim()&&!candidateAmps)problems.push('Candidate catalog continuous current must be positive.');
+    if(!deratingPct||deratingPct>100)problems.push('Manufacturer derating percentage must be greater than 0 and no more than 100.');
     if(problems.length)return {valid:false,errors:problems,warnings:[],checks:[],methods:[],calculations:{},recommendations:[]};
     const is3=x.family==='ac_induction_3',sync=x.family==='ac_synchronous_3',
       single=x.family.startsWith('ac_')&&!is3&&!sync,
@@ -63,7 +66,14 @@
     const high=(x.load==='heavy'||x.goal==='torque'),freq=Number(x.startsHour);
     const supplyCompatible=(acMotor&&acSupply)||(dcBrush&&x.supply==='dc')||(brushless);
     const mismatch=Math.abs(volts-motorVolts)/motorVolts;
+    const severeVoltageMismatch=mismatch>.10;
     if(mismatch>.035)warnings.push('Supply and motor nameplate voltages differ by '+rounded(mismatch*100,1)+'%. Verify the motor connection and the allowed voltage range of the complete starter/drive system; the selector does not approve this difference.');
+    if(severeVoltageMismatch)warnings.push('MATERIAL VOLTAGE MISMATCH: Never connect a motor directly across this source without a manufacturer-approved winding/voltage configuration. Drive output-voltage capability must also be confirmed. The 10% threshold is a screening flag, NOT an allowed operating tolerance.');
+    if(candidateAmps){
+      const effective=candidateAmps*deratingPct/100;
+      if(effective<motorAmps)warnings.push('Candidate catalog current after entered derating ('+rounded(effective)+' A) is BELOW motor FLA ('+rounded(motorAmps)+' A); this device FAILS continuous-current screening.');
+      else warnings.push('Candidate current passes continuous-FLA screening ONLY; verify the actual output current duty, time-limited overload, start duty, voltage and OEM derating tables.');
+    }
     if(acMotor&&x.supply==='dc')warnings.push('AC motor on a DC source requires a correctly rated inverter/controller; no direct AC starter may be connected to DC.');
     if(dcBrush&&acSupply)warnings.push('A brushed DC motor needs a correctly rated DC output supply/drive; direct connection to AC is not suitable.');
     if(x.supply==='ac1'&&(is3||sync))warnings.push('Single-phase input for a three-phase motor requires a manufacturer-approved drive with single-phase input ratings and derating; contactor/soft-starter approaches do not create three-phase power.');
@@ -79,32 +89,32 @@
     }
     const phaseOK=x.supply==='ac3';
     if(is3&&phaseOK){
-      add('dol',x.goal==='variable'?'conditional':'eligible',
+      add('dol',severeVoltageMismatch?'not_suitable':x.goal==='variable'?'conditional':'eligible',
         'Simple full-voltage starting; high inrush and mechanical shock are possible.',
         ['AC-3 contactor/combination starter rated for motor nameplate current, voltage and duty',
          'Motor overload, upstream short-circuit/ground-fault protection, disconnect and coordination',
          'Utility/site inrush limits, voltage dip and mechanical starting duty'], x.goal==='simple'?100:20);
-      add('reversing',(x.reversing||x.goal==='reverse')?'eligible':'conditional',
+      add('reversing',severeVoltageMismatch?'not_suitable':(x.reversing||x.goal==='reverse')?'eligible':'conditional',
         'Interlocked forward/reverse contactors for a motor permitted to reverse.',
         ['Mechanical and electrical contactor interlocks and permitted reversing duty',
          'Deceleration and stop before reversing where required by equipment'],x.goal==='reverse'?105:8);
-      const ydPossible=Number(x.leads)>=6&&delta&&Math.abs(volts-delta)/delta<=.055;
+      const ydPossible=!severeVoltageMismatch&&Number(x.leads)>=6&&delta&&Math.abs(volts-delta)/delta<=.055;
       add('wye_delta',ydPossible?(high?'conditional':'eligible'):'not_suitable',
         ydPossible?'Reduced-voltage start with approximately one-third DOL starting torque (idealized).':'Requires six accessible leads AND a nameplate delta RUN winding voltage matching the line supply; dual-voltage alone is not proof.',
         ['Confirm six-lead winding schematic and line-voltage delta run rating',
          'Three appropriately coordinated contactors, transition control, interlocks and overload',
          'Low-load/low-inertia start; verify transition surge and acceleration torque'],x.goal==='inrush'&&!high&&ydPossible?75:5);
-      add('soft',high?'conditional':'eligible',
+      add('soft',severeVoltageMismatch?'not_suitable':high?'conditional':'eligible',
         'Smooth fixed-speed starting and/or stopping; not continuous variable-speed control.',
         ['Soft starter continuous line current at least motor FLA after ambient/altitude derating',
          'OEM starting-duty envelope: start current/time, starts/hour and heavy-duty thermal class',
          'External or integrated bypass as required; overload and short-circuit coordination'],x.goal==='inrush'&&!high?105:x.goal==='simple'?38:75);
-      add('vfd','eligible',
+      add('vfd',severeVoltageMismatch?'conditional':'eligible',
         'Adjustable-frequency speed/torque control with controlled acceleration; check motor/drive compatibility.',
         ['Drive output current at least nameplate FLA after derating, plus correct normal/heavy overload duty',
          'Input supply phase/voltage, motor insulation, cable length and dv/dt/filter requirements',
          'Motor cooling at low speed, EMC/harmonics, motor protection and safety functions'],x.goal==='variable'?120:x.goal==='torque'?115:60);
-      add('auto','conditional',
+      add('auto',severeVoltageMismatch?'conditional':'conditional',
         'Reduced-voltage taps; starting torque decreases with voltage squared.',
         ['Autotransformer starter rated for motor duty, tap setting, transition and starts/hour',
          'Torque/current study and approved protection/coordination'],x.goal==='inrush'?55:8);
@@ -127,7 +137,7 @@
       add('soft','not_suitable','Conventional three-phase induction soft starter not established as suitable.',[],0);
     }
     if(single){
-      add('dol','eligible',
+      add('dol',severeVoltageMismatch?'not_suitable':'eligible',
         'Line-rated magnetic starter may switch a single-phase motor; its start winding/capacitor circuit remains motor-specific.',
         ['Single-phase rated switching/overload and branch protection',
          'Motor internal start relay/centrifugal switch or manufacturer-approved start module'],x.goal==='simple'?105:70);
@@ -151,7 +161,7 @@
         ['Continuous armature output current at least motor nameplate armature amps after derating',
          'Armature voltage range and field excitation/field-loss protection, where applicable',
          'Reversing/regeneration/braking and DC motor overload coordination'],x.goal==='variable'?125:100);
-      add('dc_control','conditional',
+      add('dc_control',severeVoltageMismatch?'not_suitable':'conditional',
         'DC-rated contactor and properly engineered current-limiting start arrangement; DC arc interruption differs from AC.',
         ['DC utilization category and breaking capacity at actual DC voltage/current',
          'Armature inrush resistance/current limit and motor excitation sequence'],x.goal==='simple'?100:40);
@@ -188,11 +198,14 @@
       motorOutputKw:hp?rounded(hp*0.745699872):null,
       motorRatedRpm:rpm?rpm:null,
       suppliedLraA:lra?rounded(motorAmps*lra):null,
-      idealWyeDeltaStartingLineA:lra&&is3?rounded(motorAmps*lra/3):null,
-      insideDeltaWindingA:is3&&phaseOK&&delta?rounded(motorAmps/Math.sqrt(3)):null
+      idealWyeDeltaStartingLineA:lra&&is3&&phaseOK&&Number(x.leads)>=6&&delta&&!severeVoltageMismatch?rounded(motorAmps*lra/3):null,
+      insideDeltaWindingA:is3&&phaseOK&&delta&&!severeVoltageMismatch?rounded(motorAmps/Math.sqrt(3)):null,
+      enteredCandidateCurrentA:candidateAmps?rounded(candidateAmps):null,
+      afterDeratingCurrentA:candidateAmps?rounded(candidateAmps*deratingPct/100):null,
+      candidatePassesContinuousFLA:candidateAmps?candidateAmps*deratingPct/100>=motorAmps:null
     };
     if(lra&&is3)warnings.push('Calculated locked-rotor and wye–delta current figures are rough comparisons based on your entered locked-rotor multiple; do not use them as equipment ratings.');
-    if(is3&&delta&&phaseOK)warnings.push('Inside-delta winding-current example is line current ÷ √3 only. Do not use it to select a soft starter without an OEM-approved inside-delta connection and rating table.');
+    if(is3&&delta&&phaseOK&&!severeVoltageMismatch)warnings.push('Inside-delta winding-current example is line current ÷ √3 only. Do not use it to select a soft starter without an OEM-approved inside-delta connection and rating table.');
     const recommended=selection.filter(x=>x.priority>0).slice(0,3);
     return {valid:true,errors:[],warnings,checks,methods:entries,calculations,
       recommendations:recommended,selectionBasis:'Method-level shortlist only — no manufacturer part number or branch protective device is selected.',
