@@ -620,7 +620,7 @@ $('copyPlan').onclick=()=>{
  navigator.clipboard.writeText(data).then(()=>alert('Instruction plan copied.'),()=>alert('Clipboard unavailable here.'));
 };
 $('print').onclick=()=>window.print();
-$('quickCopy').onclick=()=>$('copyPlan').click();
+// Copy the detailed plan from the verification panel when needed.
 const items=['Tape zero and reference end are confirmed.','I know which ARROW/STAR/NOTCH belongs on EACH physical mark.','Hook direction matches this exact bender and floor/air method.','I checked whether to FLIP the bender assembly for the next bend.','I checked pipe ROTATION and preserved the intended bend plane.','The finished shape, shoe clearance, radius, springback and bend sum are verified.'];
 $('checks').innerHTML=items.map((t,i)=>'<label class="check"><input type="checkbox" aria-label="Field check '+(i+1)+'"><span>'+html(t)+'</span></label>').join('');
 $('unit').dataset.previous='mm';defaults();refresh(false);
