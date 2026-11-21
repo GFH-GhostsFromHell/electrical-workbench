@@ -230,6 +230,15 @@ const server = http.createServer((req, res) => {
     await page.locator('#dist').fill('30');
     await page.locator('#marks .markitem').first().waitFor({state:'visible'});
     const regularMarks=await page.locator('#marks').innerText();
+    assert.ok(regularMarks.includes('HOOK TOWARD TAPE ZERO'),'Offset shows physical hook direction');
+    assert.ok(regularMarks.includes('FLIP bender handle DOWN'),'Offset return identifies when to flip the bender');
+    assert.ok(regularMarks.includes('roll conduit 180°'),'Offset return identifies required cradle roll');
+    assert.ok(!regularMarks.includes('? VERIFY HOOK'),'No generic verify hook warning');
+    await page.locator('#shoeMethod').selectOption('other');
+    const otherMarks=await page.locator('#marks').innerText();
+    assert.ok(otherMarks.includes('USE MANUFACTURER SHOE PROCEDURE'),'Other brands do not inherit the Klein arrow directions');
+    assert.ok(!otherMarks.includes('FLIP bender handle DOWN'),'Other shoe method suppresses unsupported Klein flip instruction');
+    await page.locator('#shoeMethod').selectOption('klein');
     const stepTotal=await page.locator('#stepList li').count();
     assert.ok(stepTotal>=4,'Working calculator still has the complete field steps');
     await page.locator('#fieldFocusToggle').click();
@@ -241,6 +250,20 @@ const server = http.createServer((req, res) => {
     await page.locator('#fieldFocusToggle').click();
     await visible('#stepList');
     assert.equal(await page.locator('#marks').innerText(),regularMarks,'Guided mode never changes the physical mark calculation');
+    await page.locator('#toolScreen .back').click();
+    await page.locator('button.bendbtn').filter({hasText:'Three-bend saddle'}).first().click();
+    await visible('#toolScreen.screen.active');
+    const saddleMarks=await page.locator('#marks').innerText();
+    for(const note of ['B FIRST','A SECOND','C THIRD','HOOK TOWARD FAR END','FLIP bender handle DOWN']){
+      assert.ok(saddleMarks.includes(note),'Saddle must identify correct three-bend sequence: '+note);
+    }
+    await page.locator('#toolScreen .back').click();
+    await page.locator('button.bendbtn').filter({hasText:'Four-bend saddle'}).first().click();
+    await visible('#toolScreen.screen.active');
+    const fourMarks=await page.locator('#marks').innerText();
+    for(const note of ['A FIRST','B SECOND','C THIRD','D FOURTH','HOOK TOWARD FAR END','TURN bender AROUND']){
+      assert.ok(fourMarks.includes(note),'Four-point saddle sequence: '+note);
+    }
     await page.locator('#toolScreen .back').click();
 
     // Multi-bend mark math stays intact; only the step presentation changes.
