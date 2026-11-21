@@ -9,6 +9,7 @@ import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -42,6 +43,68 @@ public final class ElectricalWorkbenchNativeApp extends Application {
     private JsonNode currentBootstrap;
     private StackPane workspace;
     private final Preferences toolPrefs = Preferences.userNodeForPackage(ElectricalWorkbenchNativeApp.class);
+    private static final String APPEARANCE_KEY = "appearance.v1";
+    private static final List<String> APPEARANCES = List.of("Daylight","Midnight","Warm Workshop","High Contrast");
+
+    private String appearance() {
+        String saved = toolPrefs.get(APPEARANCE_KEY,"Daylight");
+        return APPEARANCES.contains(saved) ? saved : "Daylight";
+    }
+    private record ThemeColours(String bg,String surface,String text,String sub,String edge,String accent,String nav) {}
+    private ThemeColours colours() {
+        return switch (appearance()) {
+            case "Midnight" -> new ThemeColours("#0b1727","#182c40","#f4f8ff","#d0deeb","#648299","#145c7b","#091625");
+            case "Warm Workshop" -> new ThemeColours("#f8f0e6","#fffaf2","#392b20","#64503e","#bda88e","#79411c","#493124");
+            case "High Contrast" -> new ThemeColours("#000000","#080808","#ffffff","#ffffff","#ffe15c","#003d91","#000000");
+            default -> new ThemeColours("#eef3f8","#ffffff","#0f172a","#475569","#dfe7ef","#0e7490","#07111f");
+        };
+    }
+    /**
+     * Preserve each component's original inline style, then re-tint only its colours.
+     * This keeps native controls/calculation panes, measurements and event handlers intact.
+     */
+    private void applyAppearance(Node node) {
+        if (node == null) return;
+        final String key = "ewb.original.style";
+        String original = (String) node.getProperties().get(key);
+        if (original == null) {
+            original = node.getStyle() == null ? "" : node.getStyle();
+            node.getProperties().put(key, original);
+        }
+        ThemeColours theme = colours();
+        String styled = original;
+        if (!"Daylight".equals(appearance())) {
+            styled = styled
+                .replace("-fx-background-color:#eef3f8", "-fx-background-color:"+theme.bg())
+                .replace("-fx-background-color:#f3f6fb", "-fx-background-color:"+theme.bg())
+                .replace("-fx-background-color:white", "-fx-background-color:"+theme.surface())
+                .replace("-fx-background-color:#fff;", "-fx-background-color:"+theme.surface()+";")
+                .replace("-fx-background-color:#ffffff", "-fx-background-color:"+theme.surface())
+                .replace("-fx-background-color:#f8fafc", "-fx-background-color:"+theme.surface())
+                .replace("-fx-text-fill:#0f172a", "-fx-text-fill:"+theme.text())
+                .replace("-fx-text-fill:#14263d", "-fx-text-fill:"+theme.text())
+                .replace("-fx-text-fill:#334155", "-fx-text-fill:"+theme.sub())
+                .replace("-fx-text-fill:#475569", "-fx-text-fill:"+theme.sub())
+                .replace("-fx-text-fill:#64748b", "-fx-text-fill:"+theme.sub())
+                .replace("-fx-border-color:#dfe7ef", "-fx-border-color:"+theme.edge())
+                .replace("-fx-border-color:#cbd5e1", "-fx-border-color:"+theme.edge())
+                .replace("-fx-background-color:#07111f", "-fx-background-color:"+theme.nav())
+                .replace("-fx-background-color:#0e7490", "-fx-background-color:"+theme.accent())
+                .replace("-fx-background-color:linear-gradient(to right,#050b14,#0b2743,#0e7490)",
+                    "-fx-background-color:"+theme.nav())
+                .replace("-fx-background-color:linear-gradient(to bottom right,#07111f,#0b2743 58%,#0e7490)",
+                    "-fx-background-color:"+theme.nav());
+            if (node instanceof Parent) {
+                styled += ";-fx-text-base-color:"+theme.text()
+                    +";-fx-control-inner-background:"+theme.surface()
+                    +";-fx-base:"+theme.surface()+";";
+            }
+        }
+        if (!styled.equals(node.getStyle())) node.setStyle(styled);
+        if (node instanceof Parent parent)
+            for (Node child : parent.getChildrenUnmodifiable()) applyAppearance(child);
+    }
+
 
     private static final String BG = "-fx-background-color:linear-gradient(to bottom right,#07111f,#0b2743 58%,#0e7490);";
     private static final String CARD = "-fx-background-color:white;-fx-background-radius:16;-fx-border-color:#dfe7ef;-fx-border-radius:16;";
@@ -104,6 +167,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
 
         GridPane layout=new GridPane();ColumnConstraints left=new ColumnConstraints();left.setPercentWidth(55);ColumnConstraints right=new ColumnConstraints();right.setPercentWidth(45);layout.getColumnConstraints().addAll(left,right);layout.add(hero,0,0);StackPane wrap=new StackPane(loginCard);wrap.setPadding(new Insets(40));layout.add(wrap,1,0);root.setCenter(layout);
         stage.setScene(new Scene(root,1040,680));
+        applyAppearance(root);
     }
 
     private void showWorkspace() {
@@ -114,8 +178,23 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         Button update=new Button("Check for Updates");update.setVisible(true);update.setManaged(true);update.setStyle("-fx-background-color:#16a34a;-fx-text-fill:white;-fx-font-weight:bold;-fx-background-radius:8;-fx-padding:7 10;");
         update.setOnAction(e->checkForUpdates(update,true));
         HBox cloud=new HBox(cloudStatus);cloud.setStyle("-fx-background-color:rgba(255,255,255,.10);-fx-background-radius:9;-fx-padding:4 7;");
+
+        MenuButton appearanceMenu = new MenuButton("◐ Theme");
+        appearanceMenu.setStyle("-fx-background-color:#edf3fa;-fx-text-fill:#15384f;-fx-background-radius:9;-fx-padding:6 10;");
+        appearanceMenu.setTooltip(new Tooltip("Change the colour theme for the desktop application"));
+        ToggleGroup appearanceOptions = new ToggleGroup();
+        for (String name : APPEARANCES) {
+            RadioMenuItem item = new RadioMenuItem(name);
+            item.setToggleGroup(appearanceOptions);
+            item.setSelected(name.equals(appearance()));
+            item.setOnAction(event -> {
+                toolPrefs.put(APPEARANCE_KEY,name);
+                if (stage.getScene() != null) applyAppearance(stage.getScene().getRoot());
+            });
+            appearanceMenu.getItems().add(item);
+        }
         Button logout=new Button("Sign out");logout.setStyle("-fx-background-color:rgba(255,255,255,.10);-fx-text-fill:white;-fx-border-color:rgba(255,255,255,.20);-fx-border-radius:8;-fx-background-radius:8;-fx-padding:7 10;");logout.setOnAction(e->{DesktopAccountSync.disconnect();currentUsername=null;currentPassword=null;currentBootstrap=null;showLogin();checkCloud();});
-        top.getChildren().addAll(brand,version,push,update,cloud,logout);root.setTop(top);checkForUpdates(update,false);
+        top.getChildren().addAll(brand,version,push,appearanceMenu,update,cloud,logout);root.setTop(top);checkForUpdates(update,false);
 
         VBox nav=new VBox(6);nav.setPadding(new Insets(18,12,18,12));nav.setPrefWidth(225);nav.setStyle("-fx-background-color:#07111f;");
         Label navTitle=new Label("WORKSPACE");navTitle.setStyle("-fx-text-fill:#67e8f9;-fx-font-size:10px;-fx-font-weight:bold;-fx-padding:0 8 7 8;");
@@ -134,6 +213,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         workspace=new StackPane();workspace.setPadding(new Insets(22));root.setCenter(workspace);
         home.setOnAction(e->setWorkspace(buildHome()));calculators.setOnAction(e->setWorkspace(buildCalculators()));engineering.setOnAction(e->setWorkspace(buildEngineering()));learn.setOnAction(e->setWorkspace(buildPlatform("Learn")));field.setOnAction(e->setWorkspace(buildPlatform("Field")));safety.setOnAction(e->setWorkspace(buildSafety()));projects.setOnAction(e->setWorkspace(buildPlatform("Projects")));career.setOnAction(e->setWorkspace(buildPlatform("Career")));business.setOnAction(e->setWorkspace(new EnterpriseTeamPane(portal,currentUsername,currentPassword)));news.setOnAction(e->setWorkspace(buildNews()));chatgpt.setOnAction(e->setWorkspace(AskChatGptView.create(currentUsername)));profile.setOnAction(e->setWorkspace(buildProfile()));setWorkspace(buildHome());
         stage.setScene(new Scene(root,1320,830));
+        applyAppearance(root);
     }
 
     private Node buildHome() {
@@ -321,7 +401,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         recent.remove(title);recent.add(0,title);
         storeToolShortcuts("recent",recent);
     }
-    private void setWorkspace(Node node){workspace.getChildren().setAll(node);}
+    private void setWorkspace(Node node){workspace.getChildren().setAll(node);applyAppearance(node);}
 
     private void checkForUpdates(Button button){checkForUpdates(button,false);}
     private void checkForUpdates(Button button,boolean manual){
