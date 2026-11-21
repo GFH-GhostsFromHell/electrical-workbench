@@ -38,7 +38,7 @@ async function inspect(page){
    const c=[x.r,x.g,x.b].map(v=>{v/=255;return v<=.04045?v/12.92:((v+.055)/1.055)**2.4;});
    return c[0]*.2126+c[1]*.7152+c[2]*.0722;
   }
-  function ratio(a,b){const l=lum(a),r=lum(b);return (Math.max(l,r)+.05)/(Math.min(l,r))+.05;}
+  function ratio(a,b){const l=lum(a),r=lum(b);return (Math.max(l,r)+.05)/(Math.min(l,r)+.05);}
   const results=[];
   let checked=0;
   for(const el of document.querySelectorAll('h1,h2,h3,h4,h5,p,small,label,a,button,summary,legend,span,strong,b,em,li,th,td,output,pre')){
