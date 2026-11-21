@@ -105,7 +105,6 @@
     ]
   },
   {
-    {
     "id": "motor-drive-select",
     "name": "Motor Starter & Drive Selector",
     "description": "Compare DOL, wye–delta, soft starters, VFDs, capacitor-start and DC controllers by motor nameplate and duty.",
@@ -118,7 +117,8 @@
       "Export the provisional shortlist and verify manufacturer data and CEC/OESC requirements."
     ]
   },
-  "id": "refrigeration",
+  {
+    "id": "refrigeration",
     "name": "Refrigeration Motor Sizing",
     "description": "Size compressor circuits using MCA/MOCP and motor data.",
     "category": "calculations",
