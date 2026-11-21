@@ -1,6 +1,6 @@
 # Bend Instruction Mode — experimental developer/UI package
 
-Status: implemented as an **opt-in** web experiment at `/bend-instruction-lab.html`. The existing `/bend-calcs.html`, native bender tools and stored measurements are intentionally retained. This is a trial for field usability, not a replacement for checked, tool-specific manufacturing instructions.
+Status: **retired**. The experiment is no longer in app menus and its old URL redirects to the stable `/bend-calcs.html`. Optional one-step-at-a-time guides are integrated into the stable web calculator without replacing its calculation code.
 
 ## User experience contract
 
