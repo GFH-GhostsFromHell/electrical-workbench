@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @RestController
 @RequestMapping("/api/public/releases")
 public class ReleaseResource {
-    private static final String RELEASES_API = "https://api.github.com/repos/GFH-GhostsFromHell/jhipster-javafx-remote-platform/releases?per_page=40";
+    private static final String RELEASES_API = "https://api.github.com/repos/GFH-GhostsFromHell/electrical-workbench/releases?per_page=40";
     private static final Duration RELEASE_LIST_TTL = Duration.ofMinutes(3);
     private static final Duration RESOLVED_RELEASE_TTL = Duration.ofSeconds(45);
 

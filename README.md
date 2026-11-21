@@ -4,7 +4,7 @@
 
 Electrical Workbench combines a **Spring Boot web portal** with native **Android (Kotlin/Compose), Windows (JavaFX)** and developing **iPhone/iPad (SwiftUI)** clients. It is designed around a simple field workflow: **find a task → enter measurements → review the result → save or export**.
 
-[**Open web portal**](https://remote-javafx-portal.onrender.com) · [**GitHub releases**](https://github.com/GFH-GhostsFromHell/jhipster-javafx-remote-platform/releases) · [**Builds & downloads**](https://github.com/GFH-GhostsFromHell/jhipster-javafx-remote-platform/actions) · [**Development roadmap**](docs/PRODUCTION_HARDENING_ROADMAP.md)
+[**Open web portal**](https://remote-javafx-portal.onrender.com) · [**GitHub releases**](https://github.com/GFH-GhostsFromHell/electrical-workbench/releases) · [**Builds & downloads**](https://github.com/GFH-GhostsFromHell/electrical-workbench/actions) · [**Development roadmap**](docs/PRODUCTION_HARDENING_ROADMAP.md)
 
 > [!IMPORTANT]
 > **Active development / not Code-certified.** The project includes CEC 2024 / Ontario-oriented workflows, but numerical Code tables, installation assumptions, field measurements and safety-critical outputs have **not been independently verified for compliance**. Check the current official CEC, applicable Ontario amendments, equipment specifications, and authority having jurisdiction. Do not use generated results as a substitute for qualified design, inspection or protection studies.
@@ -53,8 +53,8 @@ These are **real browser screenshots of the HTML/JavaScript shipped in this repo
 | Platform | Availability / getting started | Notes |
 | --- | --- | --- |
 | **Web portal** | [Open hosted portal](https://remote-javafx-portal.onrender.com) or [web source](portal/) | Spring Boot app with browser worksheets and account services. Hosted deployment may be behind `main`; check the [production release runbook](docs/PRODUCTION_RELEASE_RUNBOOK.md). |
-| **Android** | [Android build workflow](.github/workflows/build-android-client.yml) / [workflow runs](https://github.com/GFH-GhostsFromHell/jhipster-javafx-remote-platform/actions/workflows/build-android-client.yml) | Native Kotlin/Compose client. Download the `ElectricalWorkbench-Android` APK artifact from a **successful** run. A debug CI APK is not equivalent to a persistently signed update. Android 8.0+ (API 26). |
-| **Windows** | [Desktop build workflow](.github/workflows/build-desktop-client.yml) / [releases](https://github.com/GFH-GhostsFromHell/jhipster-javafx-remote-platform/releases) | JavaFX app; successful workflow runs produce `RemoteJavaFXClient-Windows` with an MSI. Review the build and release before installing. |
+| **Android** | [Android build workflow](.github/workflows/build-android-client.yml) / [workflow runs](https://github.com/GFH-GhostsFromHell/electrical-workbench/actions/workflows/build-android-client.yml) | Native Kotlin/Compose client. Download the `ElectricalWorkbench-Android` APK artifact from a **successful** run. A debug CI APK is not equivalent to a persistently signed update. Android 8.0+ (API 26). |
+| **Windows** | [Desktop build workflow](.github/workflows/build-desktop-client.yml) / [releases](https://github.com/GFH-GhostsFromHell/electrical-workbench/releases) | JavaFX app; successful workflow runs produce `RemoteJavaFXClient-Windows` with an MSI. Review the build and release before installing. |
 | **iPhone/iPad** | [iOS source and build guidance](ios-client/README.md) / [simulator workflow](.github/workflows/build-ios-client.yml) | SwiftUI client for iOS 17+. Simulator builds exist, but **no public App Store installation is claimed**; physical device use requires Apple code signing. |
 
 **Downloading a GitHub Actions artifact:** open the workflow run, confirm it succeeded, scroll to **Artifacts**, download the named ZIP, and extract the installer/APK. GitHub sign-in may be required and artifacts have retention limits. Check installer signatures and release notes before installing.
@@ -111,8 +111,8 @@ The separate [**Device Security Center**](https://github.com/GFH-GhostsFromHell/
 **Prerequisites:** JDK 21 and Maven for the Java projects; Android SDK/API 36 and Gradle for Android; macOS/Xcode and XcodeGen for iOS. Cloud features require appropriately configured server/database environment variables and test accounts.
 
 ```bash
-git clone https://github.com/GFH-GhostsFromHell/jhipster-javafx-remote-platform.git
-cd jhipster-javafx-remote-platform
+git clone https://github.com/GFH-GhostsFromHell/electrical-workbench.git
+cd electrical-workbench
 
 # Spring Boot portal tests and local launch
 mvn -B -f portal/pom.xml test
@@ -143,4 +143,4 @@ See [CEC data audit](docs/CEC2024_CONDUCTOR_DATA_AUDIT.md), [industrial calculat
 
 ## Project status and feedback
 
-This is an evolving multi-platform electrical field toolkit, not an officially endorsed or certified Code product. Source changes and bug reports can be opened in [GitHub Issues](https://github.com/GFH-GhostsFromHell/jhipster-javafx-remote-platform/issues). For calculation defects, include the task, input values, expected formula/source, actual result, affected platform and app/build version. **Avoid attaching private jobsite information or credentials.**
+This is an evolving multi-platform electrical field toolkit, not an officially endorsed or certified Code product. Source changes and bug reports can be opened in [GitHub Issues](https://github.com/GFH-GhostsFromHell/electrical-workbench/issues). For calculation defects, include the task, input values, expected formula/source, actual result, affected platform and app/build version. **Avoid attaching private jobsite information or credentials.**
