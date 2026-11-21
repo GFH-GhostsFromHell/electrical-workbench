@@ -526,7 +526,7 @@ private fun DashboardScreen(session: Session, onOpenWeb: (String) -> Unit) {
         ElectricalCard {
             Text("COMMON WORKFLOWS", color = ElectricCyan, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
             Spacer(Modifier.height(9.dp))
-            OutlinedButton(onClick = { onOpenWeb("/bend-instruction-lab.html") }, modifier = Modifier.fillMaxWidth()) { Text("Conduit bends & tape marks") }
+            OutlinedButton(onClick = { onOpenWeb("/bend-calcs.html") }, modifier = Modifier.fillMaxWidth()) { Text("Conduit bends & tape marks") }
             OutlinedButton(onClick = { onOpenWeb("/guided-calculators.html") }, modifier = Modifier.fillMaxWidth()) { Text("Circuit, motor & service calculations") }
             OutlinedButton(onClick = { onOpenWeb("/troubleshooting-kb.html") }, modifier = Modifier.fillMaxWidth()) { Text("Troubleshoot equipment") }
             OutlinedButton(onClick = { onOpenWeb("/account-records.html") }, modifier = Modifier.fillMaxWidth()) { Text("Resume saved work") }
