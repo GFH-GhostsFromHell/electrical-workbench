@@ -271,7 +271,8 @@ function calcGainCut(){
 
 function hookFaceCaption(side){
  if(bendShoeMethod==='other'&&['left','right'].includes(side))return 'USE MANUFACTURER SHOE PROCEDURE';
- return side==='left'?'← HOOK TOWARD TAPE ZERO (LEFT)':
+ return side==='other'?'USE MANUFACTURER SHOE PROCEDURE':
+        side==='left'?'← HOOK TOWARD TAPE ZERO (LEFT)':
         side==='right'?'HOOK TOWARD FAR END (RIGHT) →':
         side==='kick'?'HOOK TOWARD FREE LEG BEING RAISED':
         side==='plane'?'KEEP SAME BEND PLANE · NO FLIP':
