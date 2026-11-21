@@ -139,7 +139,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
     private Node buildHome() {
         JsonNode account=currentBootstrap.path("user");String name=account.path("displayName").asText(account.path("username").asText("user"));String rawTier=account.path("subscriptionTier").asText("TIER_1");String tier="TIER_4".equals(rawTier)?"BUSINESS / ENTERPRISE":rawTier.replace('_',' ');
         VBox page=new VBox(18);Label hello=new Label("Welcome, "+name);hello.setStyle("-fx-font-size:26px;-fx-font-weight:bold;-fx-text-fill:#0f172a;");Label tierLabel=new Label(tier);tierLabel.setStyle("-fx-background-color:#cffafe;-fx-text-fill:#155e75;-fx-background-radius:999;-fx-padding:5 9;-fx-font-weight:bold;");HBox head=new HBox(12,hello,tierLabel);head.setAlignment(Pos.CENTER_LEFT);
-        Label note=new Label("Choose a task: Electrical Calculators for code and sizing, Engineering for power studies, Jobsite Tools for installation work, or Saved Projects for records. Native tools are available offline where indicated.");note.setWrapText(true);note.setStyle("-fx-text-fill:#64748b;-fx-font-size:14px;");
+        Label note=new Label("Start with one job. Choose from common tasks, or search for a specialist tool. Enter values → verify the result → save or export. Native tools work offline where indicated.");note.setWrapText(true);note.setStyle("-fx-text-fill:#64748b;-fx-font-size:14px;");
         Label managedNotice=new Label();managedNotice.setWrapText(true);managedNotice.setVisible(false);managedNotice.setManaged(false);managedNotice.setStyle("-fx-background-color:#ecfeff;-fx-border-color:#a5f3fc;-fx-border-radius:10;-fx-background-radius:10;-fx-padding:10 12;-fx-text-fill:#155e75;-fx-font-weight:bold;");
         CompletableFuture.supplyAsync(()->{try{return portal.enterpriseMembership(currentUsername,currentPassword);}catch(Exception ex){return null;}}).thenAccept(body->Platform.runLater(()->{
             if(body==null)return;
@@ -164,6 +164,8 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         );
         if(isEnterpriseOwner()) tiles.getChildren().add(tile("🏢 Business / Enterprise","Manage electricians, apprentices, field roles and Tier 1–3 business seats",()->setWorkspace(new EnterpriseTeamPane(portal,currentUsername,currentPassword))));
         VBox info=new VBox(8);info.setPadding(new Insets(18));info.setStyle(CARD);Label infoTitle=new Label("Native desktop architecture");infoTitle.setStyle("-fx-font-size:18px;-fx-font-weight:bold;-fx-text-fill:#0f172a;");Label infoText=new Label("The UI remains JavaFX. Calculations can use cloud APIs, while quiz history, projects, field sheets, apprenticeship hours and credentials are stored locally for offline use. Engineering Power is embedded inside the desktop app and uses the same account tier permissions as the cloud portal.");infoText.setWrapText(true);infoText.setStyle("-fx-text-fill:#475569;-fx-line-spacing:3px;");info.getChildren().addAll(infoTitle,infoText);
+        ToggleButton showSpecialist=new ToggleButton("Specialist & web tools");
+        showSpecialist.setStyle("-fx-padding:11 12;-fx-background-radius:9;");
         TextField findTool=new TextField();
         findTool.setPromptText("Search by job: conduit, motor, fuse, voltage drop, relay, quote…");
         findTool.setStyle(INPUT);
@@ -175,10 +177,17 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         favOnly.setStyle("-fx-padding:11 12;-fx-background-radius:9;");
         recentOnly.setStyle("-fx-padding:11 12;-fx-background-radius:9;");
         clearRecent.setStyle("-fx-padding:11 12;-fx-background-radius:9;");
-        HBox finder=new HBox(9,findTool,favOnly,recentOnly,clearRecent);
-        finder.setAlignment(Pos.CENTER_LEFT);
+        FlowPane filterButtons=new FlowPane();
+        filterButtons.setHgap(8);filterButtons.setVgap(8);
+        filterButtons.getChildren().addAll(showSpecialist,favOnly,recentOnly,clearRecent);
+        VBox finder=new VBox(9,findTool,filterButtons);
         finder.setStyle("-fx-padding:8 0;");
         final List<Node> originalTiles=new ArrayList<>(tiles.getChildren());
+        final Set<String> commonJobs=Set.of(
+            "🧮 Electrical Calculators","⚙ Power System Analysis",
+            "🎓 Red Seal Study & Daily Quiz","🛠 Jobsite Tools",
+            "↪ Conduit Bend Marks & Calibration","🛠 Equipment Troubleshooting · Offline",
+            "🦺 Electrical Safety","📁 Saved Projects");
         Runnable filterTiles=()->{
             String search=findTool.getText().trim().toLowerCase(Locale.ROOT);
             Set<String> favourites=new LinkedHashSet<>(loadToolShortcuts("favourites"));
@@ -187,7 +196,8 @@ public final class ElectricalWorkbenchNativeApp extends Application {
                 String taskName=String.valueOf(n.getProperties().getOrDefault("toolTitle",""));
                 String terms=String.valueOf(n.getUserData()).toLowerCase(Locale.ROOT);
                 boolean matches=Arrays.stream(search.split("\\s+")).allMatch(terms::contains);
-                boolean show=matches&&(!favOnly.isSelected()||favourites.contains(taskName))
+                boolean show=matches&&(showSpecialist.isSelected()||!search.isBlank()||commonJobs.contains(taskName)||favourites.contains(taskName))
+                    &&(!favOnly.isSelected()||favourites.contains(taskName))
                     &&(!recentOnly.isSelected()||recently.contains(taskName));
                 n.setVisible(show);n.setManaged(show);
             }
@@ -202,14 +212,15 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         findTool.textProperty().addListener((observable,oldText,newText)->filterTiles.run());
         favOnly.setOnAction(e->{if(favOnly.isSelected())recentOnly.setSelected(false);filterTiles.run();});
         recentOnly.setOnAction(e->{if(recentOnly.isSelected())favOnly.setSelected(false);filterTiles.run();});
+        showSpecialist.setOnAction(e->filterTiles.run());
         clearRecent.setOnAction(e->{storeToolShortcuts("recent",List.of());filterTiles.run();});
         filterTiles.run();
         Label taskSteps=new Label("1  Find a task     2  Enter values     3  Verify result     4  Save / export");
         taskSteps.setWrapText(true);
         taskSteps.setStyle("-fx-font-size:13px;-fx-text-fill:#075985;-fx-font-weight:bold;");
-        Label toolNote=new Label("Favourites and recently opened tools are kept on this Windows device for your signed-in account, separately from cloud project records.");
+        Label toolNote=new Label("Common jobs are shown first. Search or choose Specialist & web tools to see alternatives. Your favourites and recent tasks stay on this Windows device.");
         toolNote.setStyle("-fx-font-size:12px;-fx-text-fill:#64748b;");toolNote.setWrapText(true);
-        page.getChildren().addAll(head,note,managedNotice,taskSteps,finder,tiles,toolNote,info);ScrollPane scroll=new ScrollPane(page);scroll.setFitToWidth(true);scroll.setStyle("-fx-background:transparent;-fx-background-color:transparent;");return scroll;
+        page.getChildren().addAll(head,note,managedNotice,taskSteps,finder,tiles,toolNote,new TitledPane("About local and cloud records",info));ScrollPane scroll=new ScrollPane(page);scroll.setFitToWidth(true);scroll.setStyle("-fx-background:transparent;-fx-background-color:transparent;");return scroll;
     }
 
     private void openFieldPage(String path) {

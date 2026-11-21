@@ -35,20 +35,19 @@
 }
 @media(max-width:420px){.tool-finder{padding:13px}.workflow-link{min-height:84px}}
 </style>
+<link rel="stylesheet" href="/workbench-flow.css">
 </head>
 <body>
 <div class="shell">
   <aside class="sidebar">
     <div class="brand"><div class="brand-mark"><div class="bolt">⚡</div><div><strong>Electrical Workbench</strong><small>CEC 2024 · CLOUD WORKSPACE</small></div></div></div>
-    <nav class="nav">
-      <button class="active" data-view="dashboard" onclick="showView('dashboard',this)"><span class="icon">⌂</span><span class="label">Dashboard</span></button>
-      <a href="/calculators.html"><span class="icon">∑</span><span class="label">Electrical Calculators</span></a>
-      <a href="/guided-calculators.html"><span class="icon">✓</span><span class="label">Step-by-Step Calculators</span></a>
+    <nav class="nav" aria-label="Main navigation">
+      <button class="active" data-view="dashboard" onclick="showView('dashboard',this)"><span class="icon">⌂</span><span class="label">Home</span></button>
+      <a href="/start.html"><span class="icon">⌕</span><span class="label">Find a Tool</span></a>
       <a href="/field-suite.html"><span class="icon">🛠</span><span class="label">Jobsite Tools</span></a>
-       <a href="/account-records.html"><span class="icon">☁</span><span class="label">Saved Work</span></a>
+      <a href="/account-records.html"><span class="icon">▣</span><span class="label">Saved Work</span></a>
       <a href="/troubleshooting-kb.html"><span class="icon">☑</span><span class="label">Equipment Troubleshooting</span></a>
-      <a href="/advanced-calculations.html"><span class="icon">⚡</span><span class="label">Advanced CEC Calculators</span></a>
-      <a href="/news.html"><span class="icon">⚠</span><span class="label">Code Updates</span></a>
+      <a href="/news.html"><span class="icon">⚡</span><span class="label">Code Updates</span></a>
       <button data-view="profile" onclick="showView('profile',this)"><span class="icon">◉</span><span class="label">Profile & Settings</span></button>
       <button id="adminNav" class="admin" data-view="admin" onclick="showView('admin',this)"><span class="icon">⚙</span><span class="label">Administration</span></button>
     </nav>
@@ -56,35 +55,45 @@
   </aside>
 
   <div class="main">
-    <header class="topbar"><div><h1 id="pageTitle">Dashboard</h1><div id="who" class="muted" style="font-size:13px">Loading account…</div></div><div class="top-actions"><a href="/guided-calculators.html">Start calculation</a></div></header>
+    <header class="topbar"><div><h1 id="pageTitle">Dashboard</h1><div id="who" class="muted" style="font-size:13px">Loading account…</div></div><div class="top-actions"><a href="/start.html">Find a tool</a></div></header>
     <main class="wrap">
       <section id="view-dashboard" class="view active">
-        <div class="hero"><div><div class="eyebrow">CEC 2024 ELECTRICAL WORKSPACE</div><h2 id="welcomeTitle">Welcome back</h2><p>Choose the job you need to do. Use a quick shortcut below, or search by task (such as voltage drop, conduit bending or motor troubleshooting).</p></div><a class="btn" href="/guided-calculators.html">Start guided calculation</a></div>
-        <div class="stats"><div class="stat"><div class="label">Subscription</div><div id="dashTier" class="value">—</div><div class="sub">Current account tier</div></div><div class="stat"><div class="label">Enabled features</div><div id="dashFeatures" class="value">—</div><div class="sub">From live account bootstrap</div></div></div>
-        <div class="section-title"><h2>Start with a task</h2></div>
-<div class="section-title"><h2>Find your workflow</h2><a class="btn" href="/start.html">Search all tools</a></div>
-<div class="workflow-links" aria-label="Common jobs">
- <a class="workflow-link" href="/bend-instruction-lab.html"><strong>↪ Bend conduit</strong><span>Get marks and shoe direction</span></a>
- <a class="workflow-link" href="/guided-calculators.html"><strong>∑ Size an electrical circuit</strong><span>Follow a guided calculation</span></a>
- <a class="workflow-link" href="/troubleshooting-kb.html"><strong>🛠 Diagnose equipment</strong><span>Step-by-step fault checks</span></a>
- <a class="workflow-link" href="/account-records.html"><strong>📁 Open saved work</strong><span>Projects and synced records</span></a>
-</div>
-<div class="card" style="margin:14px 0" aria-label="Favourites and recent tools"><h2 style="margin:0 0 10px">Your shortcuts</h2><div class="grid"><div><h3>★ Favourite tools</h3><div id="dashboardFavorites" class="quick-grid"></div></div><div><h3>Recently opened</h3><div id="dashboardRecent" class="quick-grid"></div></div></div><p class="muted">Saved only on this device for your signed-in account. <a href="/start.html">Manage favourites and find more tools</a>.</p></div>
-<div class="tool-finder" role="search" aria-label="Find Electrical Workbench tools">
- <label for="toolFinderSearch">Find a tool by name or task</label>
- <input id="toolFinderSearch" type="search" autocomplete="off" placeholder="Try motor, voltage drop, 3D bend, pull box or quote">
- <div class="finder-chips" aria-label="Filter tools by type">
-  <button class="finder-chip" type="button" data-tool-category="all" aria-pressed="true">All tools</button>
-  <button class="finder-chip" type="button" data-tool-category="install" aria-pressed="false">Installation</button>
-  <button class="finder-chip" type="button" data-tool-category="calculate" aria-pressed="false">Calculations</button>
-  <button class="finder-chip" type="button" data-tool-category="troubleshoot" aria-pressed="false">Troubleshooting</button>
-  <button class="finder-chip" type="button" data-tool-category="projects" aria-pressed="false">Projects</button>
-  <button class="finder-chip" type="button" data-tool-category="reference" aria-pressed="false">Code & reference</button>
- </div>
- <div class="finder-meta" id="toolFinderCount" role="status" aria-live="polite"></div>
- <div id="toolFinderEmpty" class="finder-meta" hidden>No tools match. Try another word or select All tools.</div>
-</div>
-<div class="section-title"><h2>All available tools</h2></div><div class="quick-grid" id="toolDirectory"><a class="quick" href="/pull-box-calcs.html"><strong>Pull-box dimensions</strong><span>Straight, angle, U, mixed and back-cover layouts.</span></a><a class="quick" href="/bend-calcs.html"><strong>Conduit Bend Marks</strong><span>Marking diagrams and step-by-step bend instructions.</span></a><a class="quick" href="/bender-calibration.html"><strong>Bender calibration</strong><span>Measure shoe deduct and gain; save reusable bender profiles.</span></a><a class="quick" href="/bend-instruction-lab.html"><strong>Conduit Bends + 3D Preview</strong><span>Rotatable multi-bend conduit, larger marks and visual bender facing/flip instructions. Original calculator preserved.</span></a><a class="quick" href="/account-records.html"><strong>Saved Work & Exports</strong><span>Access saved field records, bender profiles, safety reports, quiz history and exports across your devices.</span></a><a class="quick" href="/field-suite.html"><strong>Jobsite Tools</strong><span>Jobsite mode, blueprint takeoff, one-line sketches, controls, quotes, commissioning, projects and nameplates.</span></a><a class="quick" href="/troubleshooting-kb.html"><strong>Equipment Troubleshooting</strong><span>23 step-by-step diagnostic methods for motors, VFDs, PLCs, mining, relays and equipment failures.</span></a><a class="quick" href="/calculators.html"><strong>Electrical Calculators</strong><span>Open section-based calculators and worksheets.</span></a><a class="quick" href="/advanced-calculations.html"><strong>Advanced CEC Calculators</strong><span>Grounding, fire pumps, neutral, advanced services, motors, transformer fault, HVAC, fire alarm and conductor derating.</span></a><a class="quick" href="#" onclick="showView('profile',document.querySelector('[data-view=profile]'));return false"><strong>Edit profile & account</strong><span>Photo, email, password, subscription and features.</span></a><a class="quick" href="/news.html"><strong>Code Updates & Bulletins</strong><span>Newest ESA OESC bulletins and code notices, severity colour-coded.</span></a><a class="quick" href="/device-security.html"><strong>Device Security Center</strong><span>Read-only Windows encryption status and voluntary owner-controlled cloud reports. No recovery keys or remote lockout.</span></a></div>
+        <div class="hero">
+          <div><div class="eyebrow">ELECTRICAL WORKBENCH</div><h2 id="welcomeTitle">Welcome back</h2>
+          <p>One job at a time. Choose a task, enter measurements, review the result, then save your work.</p></div>
+          <a class="btn" href="/start.html">Find your tool</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><div class="label">Account plan</div><div id="dashTier" class="value">—</div><div class="sub">Your subscription</div></div>
+          <div class="stat"><div class="label">Enabled tools</div><div id="dashFeatures" class="value">—</div><div class="sub">Your available features</div></div>
+        </div>
+        <section class="tool-finder" aria-label="Search by task">
+          <h2>What are you working on?</h2>
+          <p class="muted">Search once to find the right tool. Specialist and alternate versions are kept in the full tool catalog instead of duplicated here.</p>
+          <form id="dashboardTaskSearch" action="/start.html" method="get" role="search">
+            <label for="toolFinderSearch">Search by job or calculation</label>
+            <div class="workbench-search-row">
+              <input name="q" id="toolFinderSearch" type="search" autocomplete="off" placeholder="e.g. 3-bend saddle, transformer current, voltage drop">
+              <button class="btn" type="submit">Find tool</button>
+            </div>
+          </form>
+        </section>
+        <div class="section-title"><h2>Start a common job</h2><a href="/start.html">Browse all jobs</a></div>
+        <div class="workflow-links" aria-label="Common jobs">
+          <a class="workflow-link" href="/bend-instruction-lab.html"><strong>↪ Bend conduit</strong><span>Measurements → marks → verify shoe orientation</span></a>
+          <a class="workflow-link" href="/guided-calculators.html"><strong>∑ Size an electrical circuit</strong><span>Load → conductor → verify → save</span></a>
+          <a class="workflow-link" href="/troubleshooting-kb.html"><strong>🛠 Diagnose equipment</strong><span>Symptoms → safe checks → findings</span></a>
+          <a class="workflow-link" href="/account-records.html"><strong>▣ Open saved work</strong><span>Review → continue → export</span></a>
+        </div>
+        <p class="muted workflow-steps">1. Choose task <span>→</span> 2. Enter values <span>→</span> 3. Verify result <span>→</span> 4. Save or export</p>
+        <details class="card workbench-shortcuts" aria-label="Your personal shortcuts">
+          <summary>★ Favourites & recently used tools <span class="muted">Expand when needed</span></summary>
+          <div class="grid">
+            <div><h3>Favourites</h3><div id="dashboardFavorites" class="quick-grid"></div></div>
+            <div><h3>Recently opened</h3><div id="dashboardRecent" class="quick-grid"></div></div>
+          </div>
+          <p class="muted">Stored only on this device. <a href="/start.html">Manage tool shortcuts</a>.</p>
+        </details>
       </section>
 
       <section id="view-profile" class="view"><div class="section-title" style="margin-top:0"><div><h2>Profile & Settings</h2><div class="muted">Account, security and subscription details.</div></div></div><div class="grid"><section class="card"><div class="profile-head"><div class="avatar-wrap"><div id="avatar" class="avatar"><span>?</span></div><label class="avatar-edit" title="Change profile picture">✎<input id="avatarFile" type="file" accept="image/png,image/jpeg,image/webp" hidden></label></div><div class="profile-meta"><h2 id="profileTitle">My profile</h2><div id="profileSubtitle" class="muted">Manage how your account appears.</div><div id="tierBadge" class="badge">Loading…</div></div></div><div class="field"><label>Username</label><input id="profileUsername" disabled></div><div class="field"><label>Display name</label><input id="displayName"></div><div class="field"><label>Email</label><input id="email" type="email"></div><button class="btn" onclick="saveProfile()">Save profile</button><button class="btn ghost" style="margin-left:6px" onclick="removePhoto()">Remove photo</button><div class="photo-help">Profile pictures are resized in your browser before upload.</div><div id="profileStatus" class="status"></div></section><section class="card"><h2>Security</h2><p class="muted">Change the password used by both the web portal and desktop client.</p><div class="field"><label>Current password</label><input id="currentPassword" type="password"></div><div class="field"><label>New password</label><input id="newPassword" type="password" minlength="8"></div><button class="btn" onclick="changePassword()">Change password</button><div id="passwordStatus" class="status"></div></section></div><section class="card" style="margin-top:18px"><h2>Subscription & feature access</h2><p class="muted">Your account tier and currently enabled application features.</p><div id="tiers" class="tier-row"><div class="tier" data-tier="TIER_1"><h3>Tier 1</h3><div>Core tools</div></div><div class="tier" data-tier="TIER_2"><h3>Tier 2</h3><div>Expanded tools</div></div><div class="tier" data-tier="TIER_3"><h3>Tier 3</h3><div>Advanced tools</div></div></div><h3 style="margin-top:20px">Effective features</h3><div id="features" class="features"></div></section></section>
@@ -98,50 +107,7 @@ let profile=null,avatarData=null,bootstrap=null;
 async function api(url,opt={}){const r=await fetch(url,opt);if(r.status===401){location.href='/';throw new Error('Not signed in')}if(!r.ok){let t=await r.text();throw new Error(t||('HTTP '+r.status))}const ct=r.headers.get('content-type')||'';return ct.includes('json')?r.json():r.text()}
 function jsonOpt(method,body){return{method,headers:{'Content-Type':'application/json'},body:JSON.stringify(body)}}function setStatus(id,msg,ok=true){const e=document.getElementById(id);if(!e)return;e.textContent=msg;e.className='status '+(ok?'good':'bad')}function initials(name){return(name||'?').split(/\s+/).filter(Boolean).slice(0,2).map(x=>x[0].toUpperCase()).join('')||'?'}function tierText(t){return t==='ADMIN'?'Administrator':(t||'TIER_1').replace('_',' ')}function renderAvatar(){const a=document.getElementById('avatar');if(!a)return;if(avatarData)a.innerHTML=`<img alt="Profile picture" src="${avatarData}">`;else a.innerHTML=`<span>${initials(document.getElementById('displayName')?.value||profile?.username)}</span>`}function showView(name,button){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));document.getElementById('view-'+name)?.classList.add('active');document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('active'));if(button)button.classList.add('active');pageTitle.textContent=name==='dashboard'?'Dashboard':name==='profile'?'Profile & Settings':'Administration';window.scrollTo({top:0,behavior:'smooth'})}
 async function load(){profile=await api('/api/profile');avatarData=profile.avatarData||null;profileUsername.value=profile.username||'';displayName.value=profile.displayName||'';email.value=profile.email||'';profileTitle.textContent=profile.displayName||profile.username;profileSubtitle.textContent='@'+profile.username+(profile.email?' · '+profile.email:'');tierBadge.textContent=tierText(profile.subscriptionTier);renderAvatar();const whoText=(profile.displayName||profile.username)+' · '+tierText(profile.subscriptionTier);who.textContent=whoText;sideWho.textContent=whoText;welcomeTitle.textContent='Welcome back, '+(profile.displayName||profile.username);dashTier.textContent=tierText(profile.subscriptionTier);document.querySelectorAll('.tier').forEach(e=>e.classList.toggle('active',e.dataset.tier===profile.subscriptionTier));try{bootstrap=await api('/api/client/bootstrap');features.innerHTML='';let enabled=0;Object.entries(bootstrap.features||{}).forEach(([k,v])=>{if(v)enabled++;const d=document.createElement('div');d.className='feature';d.textContent=(v?'✓ ':'✕ ')+k.replaceAll('_',' ');features.appendChild(d)});dashFeatures.textContent=String(enabled)}catch(e){dashFeatures.textContent='—'}try{await api('/api/admin/users');adminSection.style.display='block';adminNav.style.display='flex';loadUsers()}catch(e){adminSection.style.display='none';adminNav.style.display='none'}if(profile.subscriptionTier==='ADMIN'){tiers.innerHTML='<div class="tier active"><h3>Administrator</h3><div>Portal administration account</div></div>'}}
-async function saveProfile(){try{if(profile.subscriptionTier==='ADMIN')throw new Error('Admin profile values are controlled by deployment settings.');profile=await api('/api/profile',jsonOpt('PUT',{displayName:displayName.value,email:email.value,avatarData}));profileTitle.textContent=profile.displayName||profile.username;profileSubtitle.textContent='@'+profile.username+(profile.email?' · '+profile.email:'');const txt=(profile.displayName||profile.username)+' · '+tierText(profile.subscriptionTier);who.textContent=txt;sideWho.textContent=txt;welcomeTitle.textContent='Welcome back, '+(profile.displayName||profile.username);renderAvatar();setStatus('profileStatus','Profile saved.')}catch(e){setStatus('profileStatus',e.message,false)}}async function changePassword(){try{if(profile.subscriptionTier==='ADMIN')throw new Error('Admin password is managed in Render environment settings.');await api('/api/profile/password',jsonOpt('PUT',{currentPassword:currentPassword.value,newPassword:newPassword.value}));currentPassword.value='';newPassword.value='';setStatus('passwordStatus','Password changed successfully.')}catch(e){setStatus('passwordStatus',e.message,false)}}function removePhoto(){avatarData=null;renderAvatar();setStatus('profileStatus','Photo removed locally. Click Save profile to apply.')}avatarFile.addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;if(f.size>8*1024*1024){setStatus('profileStatus','Please choose an image smaller than 8 MB.',false);return}try{const img=await createImageBitmap(f);const max=420,scale=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);avatarData=c.toDataURL('image/jpeg',.84);renderAvatar();setStatus('profileStatus','New picture ready. Click Save profile to apply.')}catch(err){setStatus('profileStatus','Could not read that image.',false)}finally{e.target.value=''}});displayName.addEventListener('input',()=>{if(!avatarData)renderAvatar()});async function loadUsers(){const users=await api('/api/admin/users');userList.innerHTML='<h3>Users</h3>';users.forEach(u=>{const d=document.createElement('div');d.className='admin-user';d.innerHTML=`<b>${u.displayName||u.username}</b> · ${u.username}<br><span class="muted">${u.email||'No email'} · ${(u.subscriptionTier||'TIER_1').replace('_',' ')} · ${u.enabled?'Enabled':'Disabled'}</span><br><button class="btn secondary" style="margin-top:10px" onclick='editUser(${JSON.stringify(JSON.stringify(u))})'>Edit</button>`;userList.appendChild(d)})}function editUser(raw){const u=JSON.parse(raw);aUsername.value=u.username||'';aDisplayName.value=u.displayName||'';aEmail.value=u.email||'';aTier.value=u.subscriptionTier||'TIER_1';aEnabled.value=String(!!u.enabled);aPassword.value='';showView('admin',adminNav)}async function saveAdminUser(){try{const u=aUsername.value.trim();if(!u)throw new Error('Username is required');await api('/api/admin/users/'+encodeURIComponent(u),jsonOpt('PUT',{displayName:aDisplayName.value,email:aEmail.value,password:aPassword.value,enabled:aEnabled.value==='true',subscriptionTier:aTier.value}));setStatus('adminStatus','User saved.');aPassword.value='';loadUsers()}catch(e){setStatus('adminStatus',e.message,false)}}async function logout(){await fetch('/logout',{method:'POST'});location.href='/'}/* Task search operates on existing destinations without changing calculation logic. */
-(function initToolFinder(){
- const input=document.getElementById('toolFinderSearch');
- const cards=Array.from(document.querySelectorAll('#toolDirectory a.quick'));
- const buttons=Array.from(document.querySelectorAll('[data-tool-category]'));
- const categoryFor=(href)=>{
-  if(/bend-calcs|bender-calibration|bend-instruction-lab|pull-box-calcs/.test(href))return 'install';
-  if(/calculators|advanced-calculations/.test(href))return 'calculate';
-  if(/troubleshooting/.test(href))return 'troubleshoot';
-  if(/field-suite|account-records/.test(href)||href==='#')return 'projects';
-  return 'reference';
- };
- const related={
-  install:'conduit pipe offset saddle 90 stub marking raceway pull box hook shoe',
-  calculate:'electrical code cec voltage drop conductor transformer motor service demand sizing power factor',
-  troubleshoot:'fault equipment vfd plc motor relay diagnosis',
-  projects:'jobsite quoting project records estimates takeoff commissioning',
-  reference:'esa oesc code electrical updates rules'
- };
- cards.forEach(card=>{
-  card.dataset.category=categoryFor(card.getAttribute('href')||'');
-  card.dataset.keywords=(card.textContent+' '+related[card.dataset.category]).toLowerCase();
- });
- let category='all';
- function update(){
-  const term=input.value.trim().toLowerCase();
-  let count=0;
-  cards.forEach(card=>{
-   const show=(category==='all'||card.dataset.category===category)&&(!term||term.split(/\s+/).every(word=>card.dataset.keywords.includes(word)));
-   card.hidden=!show;
-   if(show)count++;
-  });
-  document.getElementById('toolFinderCount').textContent=count+' tool'+(count===1?'':'s')+' shown';
-  document.getElementById('toolFinderEmpty').hidden=count!==0;
- }
- buttons.forEach(btn=>btn.addEventListener('click',()=>{
-  category=btn.dataset.toolCategory;
-  buttons.forEach(b=>b.setAttribute('aria-pressed',String(b===btn)));
-  update();
- }));
- input.addEventListener('input',update);
- update();
-})();
-load().catch(e=>{console.error(e);location.href='/'})
+async function saveProfile(){try{if(profile.subscriptionTier==='ADMIN')throw new Error('Admin profile values are controlled by deployment settings.');profile=await api('/api/profile',jsonOpt('PUT',{displayName:displayName.value,email:email.value,avatarData}));profileTitle.textContent=profile.displayName||profile.username;profileSubtitle.textContent='@'+profile.username+(profile.email?' · '+profile.email:'');const txt=(profile.displayName||profile.username)+' · '+tierText(profile.subscriptionTier);who.textContent=txt;sideWho.textContent=txt;welcomeTitle.textContent='Welcome back, '+(profile.displayName||profile.username);renderAvatar();setStatus('profileStatus','Profile saved.')}catch(e){setStatus('profileStatus',e.message,false)}}async function changePassword(){try{if(profile.subscriptionTier==='ADMIN')throw new Error('Admin password is managed in Render environment settings.');await api('/api/profile/password',jsonOpt('PUT',{currentPassword:currentPassword.value,newPassword:newPassword.value}));currentPassword.value='';newPassword.value='';setStatus('passwordStatus','Password changed successfully.')}catch(e){setStatus('passwordStatus',e.message,false)}}function removePhoto(){avatarData=null;renderAvatar();setStatus('profileStatus','Photo removed locally. Click Save profile to apply.')}avatarFile.addEventListener('change',async e=>{const f=e.target.files?.[0];if(!f)return;if(f.size>8*1024*1024){setStatus('profileStatus','Please choose an image smaller than 8 MB.',false);return}try{const img=await createImageBitmap(f);const max=420,scale=Math.min(1,max/Math.max(img.width,img.height));const c=document.createElement('canvas');c.width=Math.max(1,Math.round(img.width*scale));c.height=Math.max(1,Math.round(img.height*scale));c.getContext('2d').drawImage(img,0,0,c.width,c.height);avatarData=c.toDataURL('image/jpeg',.84);renderAvatar();setStatus('profileStatus','New picture ready. Click Save profile to apply.')}catch(err){setStatus('profileStatus','Could not read that image.',false)}finally{e.target.value=''}});displayName.addEventListener('input',()=>{if(!avatarData)renderAvatar()});async function loadUsers(){const users=await api('/api/admin/users');userList.innerHTML='<h3>Users</h3>';users.forEach(u=>{const d=document.createElement('div');d.className='admin-user';d.innerHTML=`<b>${u.displayName||u.username}</b> · ${u.username}<br><span class="muted">${u.email||'No email'} · ${(u.subscriptionTier||'TIER_1').replace('_',' ')} · ${u.enabled?'Enabled':'Disabled'}</span><br><button class="btn secondary" style="margin-top:10px" onclick='editUser(${JSON.stringify(JSON.stringify(u))})'>Edit</button>`;userList.appendChild(d)})}function editUser(raw){const u=JSON.parse(raw);aUsername.value=u.username||'';aDisplayName.value=u.displayName||'';aEmail.value=u.email||'';aTier.value=u.subscriptionTier||'TIER_1';aEnabled.value=String(!!u.enabled);aPassword.value='';showView('admin',adminNav)}async function saveAdminUser(){try{const u=aUsername.value.trim();if(!u)throw new Error('Username is required');await api('/api/admin/users/'+encodeURIComponent(u),jsonOpt('PUT',{displayName:aDisplayName.value,email:aEmail.value,password:aPassword.value,enabled:aEnabled.value==='true',subscriptionTier:aTier.value}));setStatus('adminStatus','User saved.');aPassword.value='';loadUsers()}catch(e){setStatus('adminStatus',e.message,false)}}async function logout(){await fetch('/logout',{method:'POST'});location.href='/'}load().catch(e=>{console.error(e);location.href='/'})
 </script>
 <script src="/tool-catalog.js" defer></script><script src="/tool-state.js" defer></script><script src="/dashboard-tools.js" defer></script>
 </body></html>

@@ -6,6 +6,9 @@ on:
     paths:
       - '.github/workflows/capture-readme-screenshots.yml'
       - 'scripts/capture-readme-screenshots.cjs'
+      - 'portal/src/main/resources/static/start.html'
+      - 'portal/src/main/resources/static/portal.html'
+      - 'portal/src/main/resources/static/workbench-flow.css'
   workflow_dispatch:
 
 permissions:

@@ -84,3 +84,42 @@ testing at narrow and large text sizes; functional testing of search, clear, res
 network failure and sign-out/sign-in account switching; and verification that
 existing project sync remains intact. Keep the pull request in draft until
 these checks are satisfactory.
+
+
+## Task-first UX refresh (November 2026)
+
+The Home screen is now a **launch point, not a second inventory of every available
+calculator**. The web dashboard search forwards to the one searchable `/start.html`
+source of task definitions. This avoids maintaining multiple slightly different lists.
+
+- **Primary actions:** bend conduit, size a circuit, troubleshoot equipment, and
+  resume saved work. All other functions remain available in the full catalog.
+- **Specialist and alternate views:** some older or overlapping calculator
+  entry points are hidden from the default list to reduce clutter. Use
+  **Show specialist and alternate tools** or search by name to reach them.
+  Existing URLs and user favourites remain valid; no calculators were deleted.
+- **Reduced scrolling:** favourites/recent on web are inside an expandable panel;
+  Windows defaults to common job tiles; iOS Home lists common tasks and links to
+  its full finder; Android Home has short workflows rather than an empty reports box.
+- **Consistent 4-step sequence:** choose task → enter values → verify
+  assumptions/code → save or export. The task guides on the web finder remain
+  three concrete task-specific instructions after selection.
+- **Readability:** shared high-contrast card, label, focus and mobile-layout
+  overrides for the web dashboard and catalog. Calculators keep their own
+  domain-specific validation and results.
+
+**Intentional scope:** navigation and presentation changes only. They do not
+change CEC source data, calculations, authentication, synchronized records,
+plan entitlements, Android package identity, Windows installer name, or iOS
+bundle identity. Existing deep links and account-scoped favorites continue.
+
+### Acceptance checklist
+
+1. At 375 px width, portal and tool finder have readable text, no clipped
+   controls, and one-column task cards.
+2. Search on the web dashboard opens the task finder with a prefilled term.
+3. Common jobs are directly accessible; specialist view toggle reveals legacy
+   routes and query search can still find them.
+4. Favourites and recent tools still open exact task IDs and URLs.
+5. Native platforms build and display the same four-stage journey.
+6. No changes to the existing calculation engine or saved data schemas.

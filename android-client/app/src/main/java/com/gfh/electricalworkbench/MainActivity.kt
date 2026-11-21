@@ -504,146 +504,77 @@ private fun navColors() = NavigationBarItemDefaults.colors(
 @Composable
 private fun DashboardScreen(session: Session, onOpenWeb: (String) -> Unit) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(18.dp),
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text("Welcome, ${session.displayName}", fontSize = 26.sp, fontWeight = FontWeight.Black)
-        Text("Your electrical workspace is connected and ready.", color = TextSecondary)
-
+        Text("Welcome, ${session.displayName}", fontSize = 25.sp, fontWeight = FontWeight.Black)
+        Text("Start with a task instead of guessing which calculator to open.", color = TextSecondary, fontSize = 15.sp, lineHeight = 21.sp)
+        ElectricalCard {
+            Text("1 · CHOOSE YOUR JOB", color = ElectricCyan, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+            Spacer(Modifier.height(6.dp))
+            Text("Find a tool", fontSize = 21.sp, fontWeight = FontWeight.Bold)
+            Text("Search by job: conduit offset, voltage drop, motor starter, transformer or troubleshooting.", color = TextSecondary, fontSize = 14.sp, lineHeight = 20.sp)
+            Spacer(Modifier.height(12.dp))
+            Button(onClick = { onOpenWeb("/start.html") }, modifier = Modifier.fillMaxWidth()) {
+                Text("Find a tool for this job", fontWeight = FontWeight.Bold)
+            }
+        }
+        ElectricalCard {
+            Text("COMMON WORKFLOWS", color = ElectricCyan, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
+            Spacer(Modifier.height(9.dp))
+            OutlinedButton(onClick = { onOpenWeb("/bend-instruction-lab.html") }, modifier = Modifier.fillMaxWidth()) { Text("Conduit bends & tape marks") }
+            OutlinedButton(onClick = { onOpenWeb("/guided-calculators.html") }, modifier = Modifier.fillMaxWidth()) { Text("Circuit, motor & service calculations") }
+            OutlinedButton(onClick = { onOpenWeb("/troubleshooting-kb.html") }, modifier = Modifier.fillMaxWidth()) { Text("Troubleshoot equipment") }
+            OutlinedButton(onClick = { onOpenWeb("/account-records.html") }, modifier = Modifier.fillMaxWidth()) { Text("Resume saved work") }
+        }
+        Text("2 · Enter values    →    3 · Verify results    →    4 · Save or export",
+            color = TextSecondary, fontSize = 13.sp, lineHeight = 20.sp)
         Row(horizontalArrangement = Arrangement.spacedBy(12.dp), modifier = Modifier.fillMaxWidth()) {
-            StatCard("Plan", if (session.tier == "TIER_4") "BUSINESS / ENTERPRISE" else session.tier.replace('_', ' '), Modifier.weight(1f))
+            StatCard("Plan", if (session.tier == "TIER_4") "Business" else session.tier.replace('_',' '), Modifier.weight(1f))
             StatCard("Features", session.featureCount.toString(), Modifier.weight(1f))
         }
-
         if (session.tier == "TIER_4") {
-            ElectricalCard {
-                Text("Business / Enterprise", color = ElectricCyan, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
-                Spacer(Modifier.height(6.dp))
-                Text("Manage your electricians, apprentices and field staff from the Business tab.", color = TextSecondary)
-                Spacer(Modifier.height(12.dp))
-                Button(onClick = { onOpenWeb("/portal.html#enterprise") }, modifier = Modifier.fillMaxWidth()) {
-                    Icon(Icons.Default.Business, null)
-                    Spacer(Modifier.width(8.dp))
-                    Text("Open Business Team Manager", fontWeight = FontWeight.Bold)
-                }
+            OutlinedButton(onClick = { onOpenWeb("/portal.html#enterprise") }, modifier = Modifier.fillMaxWidth()) {
+                Text("Manage Business Team")
             }
         }
-
-        ElectricalCard {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.CloudDone, null, tint = Good)
-                Spacer(Modifier.width(10.dp))
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Cloud connected", fontWeight = FontWeight.Bold)
-                    Text(
-                        PORTAL_BASE_URL.removePrefix("https://"),
-                        color = TextSecondary,
-                        fontSize = 12.sp,
-                        maxLines = 2,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                }
-            }
-        }
-
-        ElectricalCard {
-            Text("CEC Calculator Workspace", color = ElectricCyan, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
-            Spacer(Modifier.height(6.dp))
-            Text("Open every calculator currently available on the web portal inside the Android app.", color = TextSecondary)
-            Spacer(Modifier.height(14.dp))
-            Button(onClick = { onOpenWeb("/calculators.html") }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Calculate, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Open calculator workspace", fontWeight = FontWeight.Bold)
-            }
-        }
-
-        ElectricalCard {
-            Text("Reports & Statistics", fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(5.dp))
-            Text("Mobile report history, saved calculations and usage statistics will appear here as those backend features are added.", color = TextSecondary, fontSize = 13.sp)
-        }
-
-        ElectricalCard {
-            Text("CEC 2024 & Ontario Code News", color = ElectricCyan, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
-            Spacer(Modifier.height(6.dp))
-            Text("Newest ESA OESC public bulletins and CEC/OESC notices, sorted newest to oldest with app-generated severity colours.", color = TextSecondary, fontSize = 13.sp, lineHeight = 18.sp)
-            Spacer(Modifier.height(12.dp))
-            Button(onClick = { onOpenWeb("/news.html") }, modifier = Modifier.fillMaxWidth()) {
-                Icon(Icons.Default.Launch, null)
-                Spacer(Modifier.width(8.dp))
-                Text("Open code news & bulletins", fontWeight = FontWeight.Bold)
-            }
-        }
-
-        OutlinedButton(onClick = { onOpenWeb("/portal.html") }, modifier = Modifier.fillMaxWidth()) {
-            Icon(Icons.Default.Launch, null)
-            Spacer(Modifier.width(8.dp))
-            Text("Open full web dashboard")
-        }
+        Text("CEC/OESC tables, equipment ratings and local site requirements must be verified before using results in the field.",
+            color = TextSecondary, fontSize = 12.sp, lineHeight = 19.sp)
     }
 }
 
 @Composable
 private fun CalculatorsScreen(onOpenWeb: (String) -> Unit) {
-    val sections = listOf(
-        "General Rules", "Section 4 · Conductors / Busbars", "Section 8 · Services & Demand", "Section 12 · Wiring Methods",
-        "Section 16 · Class 1 & Class 2", "Section 24 · Patient Care", "Section 26 · Electrical Equipment",
-        "Section 28 · AC & DC Motors", "Section 32 · Fire Alarm", "Section 42 · Welders",
-        "Advanced · Grounding, Fire Pump, Neutral, Services, HVAC, Fire Alarm & Derating",
-        "Conduit Bending", "Supports & Straps"
-    )
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(18.dp),
+        modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("CEC Calculators", fontSize = 26.sp, fontWeight = FontWeight.Black)
-        Text("The Android app uses the same live calculation backend and workspace as desktop/web.", color = TextSecondary)
-
+        Text("Electrical calculations", fontSize = 25.sp, fontWeight = FontWeight.Black)
+        Text("Choose the result you need. The same specialist tools are listed once in Find a Tool.",
+            color = TextSecondary, fontSize = 15.sp, lineHeight = 21.sp)
         ElectricalCard {
-            Text("Available workspace areas", color = ElectricCyan, fontWeight = FontWeight.Bold)
-            Spacer(Modifier.height(10.dp))
-            sections.forEachIndexed { index, name ->
-                Text(name, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                if (index != sections.lastIndex) HorizontalDivider(color = Color(0x223B82F6), modifier = Modifier.padding(vertical = 8.dp))
+            Text("RECOMMENDED START", color = ElectricCyan, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+            Spacer(Modifier.height(8.dp))
+            Button(onClick = { onOpenWeb("/guided-calculators.html") }, modifier = Modifier.fillMaxWidth()) {
+                Text("Step-by-step electrical calculation")
             }
+            Text("Enter your system and load, review the formula and assumptions, then save or export.",
+                color = TextSecondary, fontSize = 13.sp, lineHeight = 19.sp)
         }
-
-        Button(onClick = { onOpenWeb("/circuit-sizing.html") }, modifier = Modifier.fillMaxWidth()) {
-            Icon(Icons.Default.Calculate, null)
-            Spacer(Modifier.width(8.dp))
-            Text("Circuit + conductor review", fontWeight = FontWeight.Bold)
+        OutlinedButton(onClick = { onOpenWeb("/circuit-sizing.html") }, modifier = Modifier.fillMaxWidth()) {
+            Text("Circuit & conductor review")
+        }
+        OutlinedButton(onClick = { onOpenWeb("/start.html?q=motor") }, modifier = Modifier.fillMaxWidth()) {
+            Text("Find motor, transformer or service tools")
         }
         OutlinedButton(onClick = { onOpenWeb("/calculators.html") }, modifier = Modifier.fillMaxWidth()) {
-            Icon(Icons.Default.Calculate, null)
-            Spacer(Modifier.width(8.dp))
-            Text("Launch calculator workspace", fontWeight = FontWeight.Bold)
+            Text("Browse by CEC section")
         }
-
         OutlinedButton(onClick = { onOpenWeb("/advanced-calculations.html") }, modifier = Modifier.fillMaxWidth()) {
-            Icon(Icons.Default.Calculate, null)
-            Spacer(Modifier.width(8.dp))
-            Text("Open advanced calculation pack", fontWeight = FontWeight.SemiBold)
+            Text("Specialist calculations")
         }
-
-        OutlinedButton(onClick = { onOpenWeb("/bend-calcs.html") }, modifier = Modifier.fillMaxWidth()) {
-            Icon(Icons.Default.Launch, null)
-            Spacer(Modifier.width(8.dp))
-            Text("Open visual conduit bender", fontWeight = FontWeight.SemiBold)
-        }
-
-        Text(
-            "Future Android releases can move the most-used calculators to fully native screens one section at a time while keeping the same server calculation logic.",
-            color = TextMuted,
-            fontSize = 12.sp,
-            lineHeight = 17.sp
-        )
+        Text("Verify the current CEC/OESC references and equipment details before installation.",
+            color = TextSecondary, fontSize = 12.sp, lineHeight = 18.sp)
     }
 }
 

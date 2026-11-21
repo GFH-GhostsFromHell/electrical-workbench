@@ -105,8 +105,10 @@ internal fun MobileToolFinder(username:String,onOpenWeb:(String)->Unit,
         }
     }
     val categories=listOf("All","Installation","Calculations","Power & Protection","Troubleshooting","Projects & Learning")
+    val alternateIds=setOf("bend-guide","advanced-code")
     val filtered=allTasks.filter{ task->
         (group=="All"||group==task.group)&&(!offlineOnly||task.offline)&&
+        (showAll||query.isNotBlank()||task.id !in alternateIds||task.id in favourites)&&
             query.trim().lowercase().split(Regex("\\s+")).all{word->
                 word.isBlank()||(task.title+" "+task.detail+" "+task.search).lowercase().contains(word)
             }
@@ -118,7 +120,9 @@ internal fun MobileToolFinder(username:String,onOpenWeb:(String)->Unit,
     val pinned=if(compact)favourites.mapNotNull{id->allTasks.find{it.id==id}}.take(3) else emptyList()
     val recentlyUsed=if(compact)recent.firstNotNullOfOrNull{id->allTasks.find{it.id==id}} else null
 
-    MWPage("Find a tool","Search by task, then tap the result.") {
+    MWPage("Find a tool","Choose the result you need, then open one tool.") {
+        Text("1 · Choose job   →   2 · Enter values   →   3 · Verify   →   4 · Save",
+            color=MWMuted,fontSize=12.sp,lineHeight=18.sp)
         OutlinedTextField(value=query,onValueChange={query=it},singleLine=true,
             label={Text("Search tools by job or calculation")},
             placeholder={Text("Offset, motor fuse, voltage drop")},
@@ -170,7 +174,7 @@ internal fun MobileToolFinder(username:String,onOpenWeb:(String)->Unit,
             }
         }
         if(compact) OutlinedButton(onClick={showAll=true},modifier=Modifier.fillMaxWidth()){
-            Text("Show all "+allTasks.size+" tools")
+            Text("Show all tools, including specialist views")
         } else if(query.isBlank()&&group=="All"&&!offlineOnly)
             OutlinedButton(onClick={showAll=false},modifier=Modifier.fillMaxWidth()){
                 Text("Show common tasks only")
