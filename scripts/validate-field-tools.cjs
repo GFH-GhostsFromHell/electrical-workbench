@@ -26,7 +26,7 @@ if(!retiredRoute.includes('location.replace("/bend-calcs.html")')){
 if(stableBender.includes('href="/bend-instruction-lab.html"')){
  console.error('Experimental bender still linked from the stable calculator');failed=true;
 }
-const stableIds=new Set([...stableBender.matchAll(/\\bid="([^"]+)"/g)].map(m=>m[1]));
+const stableIds=new Set([...stableBender.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
 for(const id of ['menuScreen','toolScreen','multiScreen','marks','stepList','stepWarning',
  'fieldFocusToggle','fieldFocusCount','fieldFocusText','fieldFocusPrevious','fieldFocusNext',
  'mbMarkCanvas','mbSteps','mbWarnings','mbFocusToggle','mbFocusPanel','mbFocusContent',
