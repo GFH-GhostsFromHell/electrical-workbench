@@ -127,7 +127,7 @@ struct PracticeQuizView: View {
                                             .foregroundStyle(.orange)
                                     }
                                 }
-                                .foregroundStyle(.white)
+                                .foregroundStyle(WorkbenchStyle.text)
                                 .padding(12)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .background(selected ? WorkbenchStyle.surface : WorkbenchStyle.background,

@@ -118,7 +118,7 @@ struct QuickBenderView: View {
                         .accessibilityLabel(sketchDescription)
                     Text(datum)
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(WorkbenchStyle.text)
                     ForEach(Array(measureSteps.enumerated()), id: \.offset) { number, line in
                         Text("\(number + 1). \(line)")
                             .font(.caption)
@@ -160,7 +160,7 @@ struct QuickBenderView: View {
                                     .foregroundStyle(WorkbenchStyle.cyan)
                                 Text(mark.distance.measurement(units))
                                     .font(.title2.bold().monospacedDigit())
-                                    .foregroundStyle(.white)
+                                    .foregroundStyle(WorkbenchStyle.text)
                                 Text(mark.shoeReference.contains("GEOMETRY") ? "Planning coordinate only — DO NOT align a shoe here." : "Measure from the stated datum; verify shoe ARROW/STAR/NOTCH alignment.")
                                     .font(.caption)
                                     .foregroundStyle(WorkbenchStyle.muted)
@@ -343,7 +343,7 @@ struct QuickBenderView: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(label)
                 .font(.subheadline.weight(.semibold))
-                .foregroundStyle(.white)
+                .foregroundStyle(WorkbenchStyle.text)
             TextField("Enter measurement", text: value)
                 .keyboardType(.decimalPad)
                 .textContentType(.none)
@@ -364,7 +364,7 @@ struct QuickBenderView: View {
         HStack {
             Text(title).foregroundStyle(WorkbenchStyle.muted)
             Spacer(minLength: 8)
-            Text(value).foregroundStyle(.white).bold().monospacedDigit()
+            Text(value).foregroundStyle(WorkbenchStyle.text).bold().monospacedDigit()
         }
         .font(.subheadline)
     }
@@ -605,7 +605,7 @@ private struct BendSketch: View {
                 Text([BendMode.stub, .back, .kicked90].contains(mode) ? "First 90°" : (mode == .rolling ? "Rise ↑ + roll ↔" : "Rise ↑"))
             }
             .font(.caption2.bold())
-            .foregroundStyle(.white)
+            .foregroundStyle(WorkbenchStyle.text)
             .padding(10)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottom)
         }

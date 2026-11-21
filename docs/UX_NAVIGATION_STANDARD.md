@@ -123,3 +123,18 @@ bundle identity. Existing deep links and account-scoped favorites continue.
 4. Favourites and recent tools still open exact task IDs and URLs.
 5. Native platforms build and display the same four-stage journey.
 6. No changes to the existing calculation engine or saved data schemas.
+
+
+## Switchable appearance (November 2026)
+
+Use the **◐ Theme** button in the web header (or bottom corner on pages
+without a header). Choose **Daylight**, **Midnight**, **Warm Workshop**,
+**High Contrast**, or **Follow device**. The selection takes effect immediately,
+persists in local browser storage, works across web calculators, and can be
+changed without reloading or signing in again. Browser storage is local to
+that browser/WebView; it is not a project record and never contains credentials.
+
+The palette override is intentionally added *after* older page styles including
+`readable-daylight.css`; the underlying calculation fields, warnings and
+form validation remain unchanged. The theme chooser is removed in print.
+Browser QA verifies persistence, system preference changes and mobile layout.

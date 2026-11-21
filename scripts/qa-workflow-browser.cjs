@@ -49,8 +49,55 @@ const server = http.createServer((req, res) => {
   }
   async function visible(selector){assert.ok(await page.locator(selector).isVisible(),'Expected visible: '+selector);}
   async function take(name){await page.screenshot({path:path.join(screenshots,name),fullPage:true,animations:'disabled'});}
+  async function checkThemeNavContrast(theme){
+    const values=await page.evaluate(()=>{
+      const el=document.querySelector('header nav a');
+      const bar=document.querySelector('body > header');
+      return {fg:getComputedStyle(el).color,bg:getComputedStyle(bar).backgroundColor};
+    });
+    const rgb=s=>(s.match(/[0-9.]+/g)||[]).slice(0,3).map(Number);
+    const lum=s=>{
+      const value=rgb(s).map(v=>{
+        const c=v/255;return c<=0.04045?c/12.92:((c+0.055)/1.055)**2.4;
+      });
+      return value[0]*0.2126+value[1]*0.7152+value[2]*0.0722;
+    };
+    const a=lum(values.fg),b=lum(values.bg);
+    const ratio=(Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+    assert.ok(ratio>=4.5,theme+' header navigation contrast too low: '+ratio.toFixed(2)+' '+JSON.stringify(values));
+  }
+
   try{
     await goto('/start.html');
+    await visible('#ewb-theme-button');
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'daylight','Default is readable Daylight');
+    await checkThemeNavContrast('Daylight');
+    await page.locator('#ewb-theme-button').click();
+    await visible('#ewb-theme-panel');
+    await page.locator('input[name="ewb-appearance"][value="midnight"]').check();
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'midnight','Midnight applied');
+    await checkThemeNavContrast('Midnight');
+    const darkBackground=await page.evaluate(()=>getComputedStyle(document.body).backgroundColor);
+    await page.locator('#ewb-theme-done').click();
+    await goto('/guided-calculators.html?tool=service');
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'midnight','Theme persists between tools');
+    await goto('/start.html');
+    await page.locator('#ewb-theme-button').click();
+    await page.locator('input[value="workshop"][name="ewb-appearance"]').check();
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'workshop');
+    await checkThemeNavContrast('Warm Workshop');
+    assert.notEqual(await page.evaluate(()=>getComputedStyle(document.body).backgroundColor),darkBackground,'Warm theme differs from dark');
+    await page.locator('input[value="contrast"][name="ewb-appearance"]').check();
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'contrast');
+    await checkThemeNavContrast('High Contrast');
+    await page.emulateMedia({colorScheme:'dark'});
+    await page.locator('input[value="system"][name="ewb-appearance"]').check();
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'midnight','System dark chosen');
+    await page.emulateMedia({colorScheme:'light'});
+    await page.waitForFunction(()=>document.documentElement.getAttribute('data-ewb-theme')==='daylight');
+    assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'daylight','System light auto updates');
+    await page.locator('input[value="daylight"][name="ewb-appearance"]').check();
+    await page.locator('#ewb-theme-done').click();
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-a'));
     assert.equal(await page.locator('.task').count(),8,'Only common tasks should show initially');
     await page.locator('#showAllTools').click();
