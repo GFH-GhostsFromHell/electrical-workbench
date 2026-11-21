@@ -79,6 +79,8 @@ for(const file of ['index.html','portal.html','start.html','calculators.html','g
   includes(read(root+file),'/workbench-theme.js','Shared theme logic on '+file);
   includes(read(root+file),'/workbench-themes.css','Shared palette on '+file);
 }
+includes(read(root+'motor-starter-selector.html'),'/motor-drive-selector.js','Motor selector engine is loaded');
+includes(read(root+'motor-starter-selector.html'),'/workbench-themes.css','Motor selector follows the shared themes');
 includes(start, 'new URLSearchParams(window.location.search)', 'Dashboard query reaches canonical finder');
 includes(start, 'alternateIds=new Set(', 'Specialist views are grouped instead of duplicated');
 includes(start, 'Show specialist and alternate tools', 'Full catalog remains accessible');
