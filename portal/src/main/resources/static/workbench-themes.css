@@ -467,3 +467,62 @@ html[data-ewb-theme] body .shell > .nav {
  background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;
  border-color:var(--ewb-border)!important;
 }
+
+/* Full-catalog contrast audit: legacy bend buttons are cards, not filled
+   calls to action. Keep their descriptions readable with the selected theme. */
+html[data-ewb-theme] body main button.bendbtn {
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;
+ border:2px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body main button.bendbtn :is(strong,b) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body main button.bendbtn span {
+ color:var(--ewb-muted)!important;
+}
+html[data-ewb-theme] body main button.bendbtn:is(.active,.selected,[aria-pressed=true]){
+ background:var(--ewb-accent)!important;color:var(--ewb-accent-text)!important;
+ border-color:var(--ewb-accent)!important;
+}
+html[data-ewb-theme] body main button.bendbtn:is(.active,.selected,[aria-pressed=true]) :is(strong,b,span){
+ color:var(--ewb-accent-text)!important;
+}
+/* Recolour the old dark announcement instead of leaving a low-contrast link
+   on its original navy rectangle in otherwise bright themes. */
+html[data-ewb-theme] body main p:has(> a[href="/bend-instruction-lab.html"]) {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+html[data-ewb-theme] body main p:has(> a[href="/bend-instruction-lab.html"]) > a {
+ color:var(--ewb-accent)!important;
+}
+/* Signup tier cards retain their own #fff / #f0fbff styling, so move the
+   surface and the lettering together, including High Contrast. */
+html[data-ewb-theme] body .tier {
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;
+ border:1px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body .tier.selected {
+ background:var(--ewb-raised)!important;border:2px solid var(--ewb-accent)!important;
+}
+html[data-ewb-theme] body .tier :is(h3,strong,small,span){
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body .tier .badge{
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border:1px solid var(--ewb-border)!important;
+}
+/* CEC source verification status must be clearly visible even on white paper. */
+html[data-ewb-theme] body main :is(.flag,td.flag,p.flag) {
+ color:var(--ewb-warn)!important;
+}
+html[data-ewb-theme] body main table th {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+/* The news feed's status pills were white-on-almost-white regardless of
+   the selected theme. */
+html[data-ewb-theme] body main .meta .pill {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border:1px solid var(--ewb-border)!important;
+}
