@@ -242,7 +242,7 @@ html[data-ewb-theme] body main :is(pre,.result,.out,.reading,.answer,.output) {
  background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
  border-color:var(--ewb-border)!important;
 }
-html[data-ewb-theme] body main :is(b,strong):not(.ewb-steps b) {
+html[data-ewb-theme] body main :is(b,strong) {
  color:var(--ewb-text)!important;
 }
 html[data-ewb-theme] body main :is(summary,.advanced-disclosure summary,.preview-disclosure summary) {
@@ -337,4 +337,75 @@ html[data-ewb-theme="contrast"] body :is(button:disabled,.btn:disabled,input:dis
 }
 html[data-ewb-theme] :is(input,select,textarea,button,a,summary):focus-visible {
  outline:3px solid var(--ewb-focus)!important;outline-offset:3px!important;
+}
+
+/* Older screens put a pale background on nav itself, below a dark header.
+   Treat navigation as one atomic foreground/background pair. */
+html[data-ewb-theme] body header nav {
+ background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+html[data-ewb-theme] body header nav :is(a,button,span,b,strong,small) {
+ color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body .top :is(h1,h2,p,label,span,b,strong,small) {
+ color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body .top :is(a,button:not(#ewb-theme-button)) {
+ background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+/* Main navigation buttons are not content buttons; keep text and icon contrast
+   stable when their state changes (rather than using the generic accent fill). */
+html[data-ewb-theme] body .shell aside.sidebar nav.nav button.active[data-view] {
+ background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;
+ border:2px solid var(--ewb-border)!important;
+ box-shadow:inset 4px 0 var(--ewb-accent)!important;
+}
+html[data-ewb-theme] body .shell aside.sidebar nav.nav button.active[data-view] :is(.label,.icon) {
+ color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body .shell aside.sidebar nav.nav button[data-view]:hover {
+ background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;
+ border:2px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body .shell aside.sidebar nav.nav button[data-view]:hover :is(.label,.icon){
+ color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body #dashboardFavorites span,
+html[data-ewb-theme] body #dashboardRecent span {
+ color:var(--ewb-muted)!important;
+}
+/* Troubleshooting categories are actual buttons with nested bold/small text.
+   A themed yellow or cyan selection requires dark ink, not inherited white. */
+html[data-ewb-theme] body main #topics button.topic {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border:1px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body main #topics button.topic :is(b,strong,span,small) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body main #topics button.topic.active {
+ background:var(--ewb-accent)!important;color:var(--ewb-accent-text)!important;
+ border:2px solid var(--ewb-accent)!important;
+}
+html[data-ewb-theme] body main #topics button.topic.active :is(b,strong,span,small){
+ color:var(--ewb-accent-text)!important;
+}
+html[data-ewb-theme] body main .banner {
+ background:var(--ewb-warning-bg)!important;color:var(--ewb-warning-text)!important;
+ border-color:var(--ewb-warn)!important;
+}
+html[data-ewb-theme] body main .banner :is(b,strong,span,small){
+ color:var(--ewb-warning-text)!important;
+}
+/* Pull-box conduit entry rows previously stayed navy while their text changed
+   to dark ink in Daylight and Workshop. */
+html[data-ewb-theme] body main .entry {
+ background:var(--ewb-raised)!important;
+ color:var(--ewb-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+html[data-ewb-theme] body main .entry :is(strong,b,small,span) {
+ color:var(--ewb-text)!important;
 }
