@@ -254,7 +254,9 @@ const server = http.createServer((req, res) => {
       }
       return {width:bounds.width,height:bounds.height,backing:canvas.width,backingHeight:canvas.height,dpr,light,hash};
     });
+    await page.waitForTimeout(250); // expand/render/resize observer settles
     let frame=await snapshot();
+    console.log('BENDER 3D FIRST FRAME '+JSON.stringify(frame));
     assert.ok(frame.width>180&&frame.height>=230,'3D viewer visible on a phone');
     assert.ok(Math.abs(frame.backing-frame.width*frame.dpr)<3,'Canvas is resolution-matched to the display width');
     assert.ok(Math.abs(frame.backingHeight-frame.height*frame.dpr)<3,'Canvas is resolution-matched to the display height');
