@@ -58,6 +58,11 @@
  .toplinks{display:flex;flex-wrap:wrap;justify-content:flex-start;flex:1 1 100%;width:100%;max-width:100%;gap:6px}
  .toplinks a{flex:0 1 auto;min-width:0;max-width:100%;font-size:11px;padding:7px 8px;white-space:normal}
 }
+
+.method-chooser{display:flex;gap:12px;flex-wrap:wrap;align-items:center;padding:10px 14px;margin:0 0 12px}
+.method-chooser .field{flex:1 1 265px;max-width:460px}.method-chooser p{flex:1 1 230px;margin:0;color:#d5e8f4;font-size:12px;line-height:1.5}
+.bend-action{margin-top:6px;padding:8px 10px;border-radius:8px;border-left:3px solid #5eead4;background:#0d3040;color:#e9faff;font-size:12px;font-weight:750;line-height:1.5}
+@media(max-width:500px){.method-chooser{padding:9px 11px}.method-chooser .field,.method-chooser p{flex-basis:100%}}
 </style>
 <link rel="stylesheet" href="/readable-daylight.css?v=1">
 <link rel="stylesheet" href="/workbench-themes.css">
@@ -65,6 +70,7 @@
 <body>
 <header class="top"><div class="brand"><div class="bolt">ϟ</div><div><b>Conduit Bend Diagrams</b><span>ELECTRICAL WORKBENCH · FIELD MATH</span></div></div><div class="toplinks"><a href="/portal.html">Dashboard</a><a href="/start.html">Find a Tool</a><a href="/calculators.html">CEC Calculators</a><a href="/pull-box-calcs.html">Pull Box Sizing</a><a href="/bender-calibration.html">Bender Calibration</a><a href="/field-suite.html#bend">3D Bend Preview</a></div></header>
 <div class="wrap">
+<div class="card method-chooser"><div class="field"><label for="shoeMethod">Hook and flip method</label><select id="shoeMethod" onchange="setShoeMethod(this.value)"><option value="klein">Klein-style hand bender · floor / air</option><option value="other">Different shoe or method · use its manual</option></select></div><p id="shoeMethodNote">Shown hook arrows use a Klein-style hand bender with tape zero LEFT. Check that your actual tool follows this procedure.</p></div>
 <section id="menuScreen" class="screen active">
   <div class="hero"><h1>Conduit bending, explained visually.</h1><p>Choose the bend you are making. Each calculator shows the geometry, field inputs, shrink or spacing, and the actual A/B/C/D marks on a straight conduit before you bend it.</p></div>
   <div class="toolbar"><div class="field"><label>Working units</label><select id="unit" onchange="unit=this.value;renderMenu()"><option value="in">Inches · nearest 1/16</option><option value="mm">Millimetres</option></select></div><div class="warn">Bender take-up/deduct, star marks and shoe radius can vary by tool. Confirm the values stamped on your bender before making final field bends.</div></div>
@@ -122,7 +128,16 @@ Exact geometric multiplier = 1 / sin(angle). Exact geometric shrink approximatio
 <div class="footer">Geometry is calculated from conduit centerline dimensions. Results are rounded for field layout; rounding can accumulate on multi-bend work. This workspace is a trade-math aid, not a substitute for the bender manufacturer's marks or job-specific layout checks.</div>
 </div>
 <script>
-let unit='in',current='offsetFar',angle=30;
+let unit='in',current='offsetFar',angle=30,bendShoeMethod='klein';
+function setShoeMethod(next){
+ bendShoeMethod=next==='other'?'other':'klein';
+ document.getElementById('shoeMethodNote').textContent=bendShoeMethod==='klein'
+ ? 'Klein-style illustrated procedure: tape zero LEFT; the hook and handle-down flip directions below apply only to a matching shoe.'
+ : 'For a different shoe, use its manufacturer’s hook, arrow/notch and flip procedure. The bend geometry stays available.';
+ if(document.getElementById('toolScreen').classList.contains('active'))recalc();
+ if(document.getElementById('multiScreen').classList.contains('active'))mbCompute();
+}
+
 const tools=[['offsetFar','Offset · far bend critical','Two-bend offset with the far bend tied to an obstacle/reference.','offset'],['offsetNear','Offset · near bend critical','Two-bend offset with the near bend tied to an obstacle/reference.','offset'],['rollFar','Rolling offset · far bend','Rise + roll combined into a true offset.','roll'],['rollNear','Rolling offset · near bend','Rolling offset anchored from the near bend.','roll'],['saddle3','Three-bend saddle','Symmetrical saddle with a center bend twice the side-bend angle.','saddle3'],['saddle4','Four-bend saddle','Two equal offsets around a rectangular obstruction.','saddle4'],['parallel','Parallel bend','Stagger adjacent conduits so the bends remain parallel.','parallel'],['stub','90° stub-up','Desired stub minus the bender take-up/deduct.','stub'],['kick90','Kicked 90°','90° stub plus a controlled kick rise.','kick'],['segment90','Segmented 90°','Break a 90 into equal small bends around a target radius.','segment'],['back2back','Back-to-back 90s','Layout helper using your bender’s star/back-of-90 reference.','back'],['rect','Rectangle obstruction','Four-bend saddle preset for a rectangular obstruction.','rect'],['square','Square obstruction','Four-bend saddle preset with equal height/width.','rect'],['round','Round obstruction','Three-bend saddle preset using obstruction diameter + clearance.','round'],['gainCut','90° bend gain & cut length','Calibrate gain using scrap and calculate straight cut stock before bending.','stub']];
 const defaults={in:{offset:[1.625,27.5],roll:[11,0,24],s3:[5,25],s4:[3,9,14],stub:[10,5],kick:[10,5,3],segment:[12],parallel:[2],back:[10,5,18],round:[5,0,25],gain:[18,24,30,36,15,24]},mm:{offset:[40,700],roll:[280,0,610],s3:[125,635],s4:[75,225,355],stub:[250,125],kick:[250,125,75],segment:[300],parallel:[50],back:[250,125,450],round:[125,0,635],gain:[450,600,750,900,375,600]}};
 function mini(kind){const stroke='#687783',hi='#23a86b';if(kind==='stub')return `<svg viewBox="0 0 80 50"><path d="M58 42H29Q19 42 19 31V7" fill="none" stroke="${stroke}" stroke-width="7"/><path d="M19 7v20" stroke="${hi}" stroke-width="2"/></svg>`;if(kind==='saddle3'||kind==='round')return `<svg viewBox="0 0 80 50"><path d="M3 38H22L40 13L58 38H77" fill="none" stroke="${stroke}" stroke-width="6" stroke-linejoin="round"/><circle cx="40" cy="34" r="8" fill="none" stroke="#9e8d58" stroke-width="2"/></svg>`;if(kind==='saddle4'||kind==='rect')return `<svg viewBox="0 0 80 50"><path d="M3 39H18L29 19H51L62 39H77" fill="none" stroke="${stroke}" stroke-width="6" stroke-linejoin="round"/><rect x="31" y="27" width="18" height="12" fill="#c7d7e4"/></svg>`;if(kind==='roll')return `<svg viewBox="0 0 80 50"><path d="M6 41L26 34L52 10L73 16" fill="none" stroke="${stroke}" stroke-width="6"/><path d="M26 34L52 10" stroke="${hi}" stroke-width="2"/></svg>`;if(kind==='parallel')return `<svg viewBox="0 0 80 50"><path d="M4 39H19L39 14H76" fill="none" stroke="${stroke}" stroke-width="5"/><path d="M4 31H18L38 6H76" fill="none" stroke="#9ba8b3" stroke-width="5"/></svg>`;if(kind==='segment')return `<svg viewBox="0 0 80 50"><path d="M10 43C10 18 27 7 55 7H73" fill="none" stroke="${stroke}" stroke-width="5" stroke-dasharray="4 2"/></svg>`;if(kind==='kick')return `<svg viewBox="0 0 80 50"><path d="M13 7v23q0 9 10 9h17l19-12h16" fill="none" stroke="${stroke}" stroke-width="6"/></svg>`;if(kind==='back')return `<svg viewBox="0 0 80 50"><path d="M15 8v28h50V8" fill="none" stroke="${stroke}" stroke-width="6"/></svg>`;return `<svg viewBox="0 0 80 50"><path d="M3 39H20L43 12H77" fill="none" stroke="${stroke}" stroke-width="6"/><path d="M20 39L43 12" stroke="${hi}" stroke-width="2"/></svg>`}
@@ -255,55 +270,73 @@ function calcGainCut(){
 }
 
 function hookFaceCaption(side){
- return side==='left'?'← HOOK FACES LEFT · toward tape zero':
-        side==='right'?'HOOK FACES RIGHT → · toward far end':
-        '? VERIFY HOOK DIRECTION · shoe method needed';
+ if(bendShoeMethod==='other'&&['left','right'].includes(side))return 'USE MANUFACTURER SHOE PROCEDURE';
+ return side==='left'?'← HOOK TOWARD TAPE ZERO (LEFT)':
+        side==='right'?'HOOK TOWARD FAR END (RIGHT) →':
+        side==='kick'?'HOOK TOWARD FREE LEG BEING RAISED':
+        side==='plane'?'KEEP SAME BEND PLANE · NO FLIP':
+        'GEOMETRY ONLY · NO PHYSICAL SHOE MARK';
 }
 function hookFaceBadge(side){
- return '<div class="hook-facing-badge '+(side==='unknown'?'unknown':'')+'">'+hookFaceCaption(side)+'</div>';
+ return '<div class="hook-facing-badge '+(['left','right'].includes(side)&&bendShoeMethod==='klein'?'':'unknown')+'">'+hookFaceCaption(side)+'</div>';
 }
 function bendReference(currentBend,mark,index){
  const saddle=['saddle3','round'].includes(currentBend);
- const unverifiedSaddle=saddle&&(document.getElementById('saddleMethod')?.value.startsWith('Geometric')||![30,45].includes(Number(document.getElementById('centerAngle')?.value)));
- if(unverifiedSaddle)return [index+1,'BEND CENTRE ONLY','Geometry, NOT a physical shoe mark; validate the bender','? VERIFY','unknown'];
- if(saddle)return mark==='B'
-   ?[1,'CENTRE / SADDLE NOTCH','Centre bend FIRST · verify shoe orientation','? VERIFY','unknown']
-   :[mark==='A'?2:3,'ARROW','Outer return · hook points toward centre B (Klein-style method)',mark==='A'?'HOOK →':'← HOOK',mark==='A'?'right':'left'];
- if(['offsetFar','offsetNear','rollFar','rollNear'].includes(currentBend))
-   return [index+1,'ARROW',index===0?'First bend · hook away from B':'Return bend · flip head and roll conduit in cradle; do NOT change bend plane','← HOOK','left'];
- if(['saddle4','rect','square'].includes(currentBend))
-   return [({A:1,B:2,C:3,D:4}[mark]||index+1),'VERIFY SHOE MARK','Four-point layout: confirm tool placement and return direction','? VERIFY','unknown'];
- if(currentBend==='stub'||currentBend==='kick90')
-   return [1,'ARROW','90° stub first · hook toward short datum end','← HOOK','left'];
- if(currentBend==='back2back')
-   return [1,'ARROW','First 90° · hook toward original stub end','← HOOK','left'];
- if(currentBend==='parallel')
-   return [index+1,'Conduit '+(index+1),'Separate pipes · not a physical shoe alignment mark','? VERIFY','unknown'];
- return [index+1,'SHOE / ANGLE','Geometry only · verify physical bender reference and facing','? VERIFY','unknown'];
+ const ca=Number(document.getElementById('centerAngle')?.value);
+ const verified=saddle&&document.getElementById('saddleMethod')?.value.startsWith('Traditional')&&ca===45;
+ let ref;
+ if(saddle&&!verified)ref=[index+1,'BEND CENTRE ONLY','Geometric layout only for this angle or shoe convention. No Klein notch/arrow sequence is established.','GEOMETRY','none'];
+ else if(saddle){
+  if(mark==='B')ref=[1,'45° CENTRE NOTCH','B FIRST · hook LEFT toward tape zero. Align the 45° centre-notch and floor-bend 45°.','← HOOK','left'];
+  else if(mark==='A')ref=[2,'ARROW','A SECOND · FLIP bender handle DOWN; roll conduit 180° in its cradle. Align ARROW at A, hook RIGHT toward centre B; air-bend 22.5°.','HOOK →','right'];
+  else ref=[3,'ARROW','C THIRD · move bender to the far side of centre B; hook LEFT toward B. Align ARROW at C; air-bend 22.5° in same plane.','← HOOK','left'];
+ }else if(['offsetFar','offsetNear','rollFar','rollNear'].includes(currentBend)){
+  ref=index===0
+   ?[1,'ARROW','A FIRST · hook LEFT, away from B. Floor-bend while keeping the selected bend plane.','← HOOK','left']
+   :[2,'ARROW','B SECOND · FLIP bender handle DOWN, roll conduit 180° in cradle, slide to B and align ARROW. Hook remains LEFT in the tape-zero drawing; air-bend back to parallel.','← HOOK','left'];
+ }else if(['saddle4','rect','square'].includes(currentBend)){
+  const seq={
+   A:[1,'ARROW · PAIRED OFFSET','A FIRST · hook LEFT; make the first offset bend to rise.','← HOOK','left'],
+   B:[2,'ARROW · PAIRED OFFSET','B SECOND · FLIP handle DOWN and roll conduit 180°; hook LEFT. Return to the upper flat.','← HOOK','left'],
+   C:[3,'ARROW · PAIRED OFFSET','C THIRD · begin the opposite offset in the same plane; reverse the rise direction. For this paired-offset setup, hook LEFT.','← HOOK','left'],
+   D:[4,'ARROW · PAIRED OFFSET','D FOURTH · FLIP handle DOWN and roll conduit 180°; hook LEFT. Return to the original run.','← HOOK','left']
+  };
+  ref=seq[mark]||[index+1,'GEOMETRY ONLY','No physical shoe alignment mark was produced.','GEOMETRY','none'];
+ }else if(currentBend==='stub'||currentBend==='kick90')
+  ref=[1,'ARROW','FIRST 90° · hook LEFT toward short tape-zero end; align ARROW and bend 90°.','← HOOK','left'];
+ else if(currentBend==='back2back')
+  ref=[1,'ARROW','FIRST 90° · hook LEFT toward original short stub end; align ARROW.','← HOOK','left'];
+ else if(currentBend==='parallel')
+  ref=[index+1,'SEPARATE CONDUIT','Apply the same offset method to this separate pipe; it is not an additional mark on the first pipe.','SAME PLANE','plane'];
+ else if(currentBend==='segment90')
+  ref=[index+1,'SHOE STATION','Small bends in the same plane: do not flip between segments. The actual shoe centre/station must be measured.','NO FLIP','plane'];
+ else ref=[index+1,'PLANNING ONLY','No physical shoe alignment mark is available from this calculation.','GEOMETRY','none'];
+ if(bendShoeMethod==='other'&&['left','right'].includes(ref[4]))ref=[ref[0],ref[1],'Follow your bender manufacturer’s ARROW/STAR/NOTCH, hook and flip method for this bend; do not copy the Klein-style setup.','OWN SHOE','other'];
+ return ref;
 }
 function decorateBendMarks(){
  const names=Array.from(document.querySelectorAll('#marks .markitem b')).map(x=>x.textContent.trim());
- const ticks=document.querySelectorAll('#marks .tick');
- const cards=document.querySelectorAll('#marks .markitem');
+ const ticks=document.querySelectorAll('#marks .tick'),cards=document.querySelectorAll('#marks .markitem');
  names.forEach((mark,i)=>{
   const ref=bendReference(current,mark,i),tick=ticks[i],card=cards[i];
   if(tick){
    const label=tick.querySelector('i');if(label)label.textContent=ref[0];
-   tick.setAttribute('data-orient',ref[3]);
-   tick.title='Bend '+ref[0]+' · mark '+mark+' · '+ref[1]+' · '+ref[2];
+   tick.setAttribute('data-orient',ref[3]);tick.title='Bend '+ref[0]+' · mark '+mark+' · '+ref[1]+' · '+ref[2];
   }
   if(card){
    const badge=card.querySelector('b');if(badge)badge.textContent=ref[0];
-   const details=document.createElement('div');details.className='bendmarkdetail';
-   details.textContent='Mark '+mark+' · '+ref[1]+' | '+ref[2];
-   const div=card.querySelector('div');if(div){div.appendChild(details);div.insertAdjacentHTML('beforeend',hookFaceBadge(ref[4]));}
+   const div=card.querySelector('div');
+   if(div){
+    const detail=document.createElement('div');detail.className='bendmarkdetail';detail.textContent='Mark '+mark+' · align '+ref[1];div.appendChild(detail);
+    const action=document.createElement('div');action.className='bend-action';action.textContent=ref[2];div.appendChild(action);
+    div.insertAdjacentHTML('beforeend',hookFaceBadge(ref[4]));
+   }
   }
  });
  const list=document.querySelector('#marks .marklegend');
- if(list && current==='back2back')list.insertAdjacentHTML('beforeend','<div class="markitem"><b>2</b><div><strong>STAR · SECOND 90° (relative mark)</strong><div class="hook-facing-info">Measure the mark from the BACK of the completed first 90°, not the unbent zero. Align the shoe STAR.</div>'+hookFaceBadge('right')+'<div class="hook-facing-info">Hook toward the remaining free end on the documented Klein-style method; tight U uses a different procedure.</div></div></div>');
- if(list && current==='kick90')list.insertAdjacentHTML('beforeend','<div class="markitem"><b>2</b><div><strong>KICK · MANUAL MARK REQUIRED</strong><div class="hook-facing-info">The geometry does not establish a physical kick reference.</div>'+hookFaceBadge('unknown')+'</div></div>');
- const help=document.getElementById('benderHelp');
- if(help)help.textContent=benderHelpText(current);
+ if(list&&current==='back2back')list.insertAdjacentHTML('beforeend','<div class="markitem"><b>2</b><div><strong>STAR · SECOND 90° (relative mark)</strong><div class="bend-action">SECOND 90° · reposition the shoe with hook toward remaining FREE END (right of tape zero); align STAR with the distance measured from the BACK of the finished first 90. Do not align a second ARROW.</div>'+hookFaceBadge('right')+'<div class="hook-facing-info">Tight U bends require separate bender-specific clearance checks.</div></div></div>');
+ if(list&&current==='kick90')list.insertAdjacentHTML('beforeend','<div class="markitem"><b>2</b><div><strong>KICK · MARK FROM JOB REFERENCE</strong><div class="bend-action">KICK SECOND · measure the kick position independently. Set the hook toward the FREE LEG being raised; bend in the selected plane. Do not flip or roll automatically.</div>'+hookFaceBadge('kick')+'</div></div>');
+ const help=document.getElementById('benderHelp');if(help)help.textContent=benderHelpText(current);
 }
 function benderHelpText(which){
  const common='\n\nSAFETY: Align only to marks on your exact shoe, maintain the intended bend plane, check take-up/deduct and springback, and test-fit before installation.';
