@@ -76,6 +76,7 @@ struct AccountCentreView: View {
     @EnvironmentObject private var account: CloudAccountSession
     @ObservedObject private var sync = AccountRecordSync.shared
     @ObservedObject var updates: IOSUpdateMonitor
+    @AppStorage("ewb.ios.theme.v1") private var appearance = "midnight"
 
     private var conflictBackup: String {
         let key = "ewb.ios.sync.\(account.username).conflicts"
@@ -140,6 +141,18 @@ struct AccountCentreView: View {
                     .foregroundStyle(WorkbenchStyle.muted)
             } header: {
                 Text("Account & subscription")
+            }
+
+            Section("Appearance") {
+                Picker("Colour theme", selection: $appearance) {
+                    Text("Daylight — bright").tag("daylight")
+                    Text("Midnight — dark").tag("midnight")
+                    Text("Warm Workshop — cream").tag("workshop")
+                    Text("High Contrast").tag("contrast")
+                }
+                Text("The theme changes immediately and is saved on this iPhone or iPad. The cloud web tools have their own browser appearance preference.")
+                    .font(.footnote)
+                    .foregroundStyle(WorkbenchStyle.muted)
             }
 
             Section("Cross-device account synchronization") {

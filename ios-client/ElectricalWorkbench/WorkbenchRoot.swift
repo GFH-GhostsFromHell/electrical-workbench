@@ -99,7 +99,7 @@ struct WorkbenchHome: View {
                         .foregroundStyle(WorkbenchStyle.cyan)
                     Text("What are you working on?")
                         .font(.title2.bold())
-                        .foregroundStyle(.white)
+                        .foregroundStyle(WorkbenchStyle.text)
                     Text("Choose one task. Enter measurements, check the result, then save or export. Specialist tools are in Find a Tool.")
                         .font(.subheadline)
                         .foregroundStyle(WorkbenchStyle.muted)
@@ -192,7 +192,7 @@ private struct HomeDestination: View {
                 .frame(width: 36)
                 .accessibilityHidden(true)
             VStack(alignment: .leading, spacing: 5) {
-                Text(title).font(.headline).foregroundStyle(.white)
+                Text(title).font(.headline).foregroundStyle(WorkbenchStyle.text)
                 Text(detail)
                     .font(.subheadline)
                     .foregroundStyle(WorkbenchStyle.muted)
