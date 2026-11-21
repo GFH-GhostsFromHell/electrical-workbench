@@ -228,7 +228,7 @@ const server = http.createServer((req, res) => {
     await visible('#toolScreen.screen.active');
     await page.locator('#off').fill('2');
     await page.locator('#dist').fill('30');
-    await visible('#marks .markitem');
+    await page.locator('#marks .markitem').first().waitFor({state:'visible'});
     const regularMarks=await page.locator('#marks').innerText();
     const stepTotal=await page.locator('#stepList li').count();
     assert.ok(stepTotal>=4,'Working calculator still has the complete field steps');
@@ -246,7 +246,7 @@ const server = http.createServer((req, res) => {
     // Multi-bend mark math stays intact; only the step presentation changes.
     await page.locator('button.bendbtn').filter({hasText:'Advanced · multiple bends on one pipe'}).click();
     await visible('#multiScreen.screen.active');
-    await visible('#mbMarkCanvas .tick');
+    await page.locator('#mbMarkCanvas .tick').first().waitFor({state:'visible'});
     const multiCount=await page.locator('#mbSteps .advanced-mark').count();
     assert.ok(multiCount>=2,'Working multi-bend example produces numbered marks');
     const multiMarks=await page.locator('#mbMarkCanvas').innerText();
@@ -262,7 +262,7 @@ const server = http.createServer((req, res) => {
     await page.locator('#mbStock').fill('120');
     await visible('#mbFocusPanel');
     await page.locator('#mbFocusToggle').click();
-    await visible('#mbSteps .advanced-mark');
+    await page.locator('#mbSteps .advanced-mark').first().waitFor({state:'visible'});
     for(const width of [320,390,768,1280]){
       await page.setViewportSize({width,height:820});
       await checkNoOverflow('Stable conduit bender at '+width);
