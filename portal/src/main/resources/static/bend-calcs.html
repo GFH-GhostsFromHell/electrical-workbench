@@ -369,27 +369,27 @@ function renderSteps(){
   steps=make('Measure the required rise and the reference distance from your chosen datum end; verify whether the near or far bend is the critical reference.',
   'Measure mark A and mark B from that SAME end using the calculated marks above. Recheck the mark spacing against the bend multiplier.',
   'Align your bender ARROW to mark A; make the first '+angle+'° bend, applying firm foot pressure and keeping the shoe square.',
-  'Flip the bender/conduit for the return bend, rotating the conduit in the cradle as the shoe requires while preserving the bend plane. Hook faces LEFT on the straight-stock datum view for this Klein-style setup. Align ARROW with B; bend to '+angle+'°.',
+   'B SECOND: flip bender handle DOWN with the conduit in place; roll the conduit 180° in the shoe cradle. Slide to B and align ARROW, with hook LEFT toward tape zero in the drawing; air-bend '+angle+'° back to parallel.',
   'Check the two straight sections are parallel and level; test the obstacle clearance before cutting or securing.');
  }else if(current==='rollFar'||current==='rollNear'){
   const rise=v('rise'),roll=v('roll');const rot=Math.atan2(roll,rise)*180/Math.PI;
   steps=make('Measure the vertical rise and lateral roll separately. Combine them into the true offset shown above.',
   'Orient the conduit bending plane about '+num(rot)+'° from vertical to produce the required roll direction; mark your orientation on the pipe.',
   'Measure A and B from the same reference end. Use the calculated mark spacing, not the vertical rise alone.',
-  'Align ARROW at A with the hook facing LEFT. For B use the documented flip-and-cradle-rotation setup: hook faces LEFT in the straight-stock datum view. Maintain the original inclined bend plane; bend '+angle+'° back to parallel.',
+   'A FIRST: floor-bend '+angle+'° with hook LEFT away from B. B SECOND: flip handle DOWN, roll the conduit 180° in its cradle and align ARROW at B; hook LEFT toward tape zero. Air-bend back to parallel in the SAME rolled plane.',
   'Test both vertical rise and horizontal roll before installing.');
  }else if(current==='saddle3'||current==='round'){
   const ca=parseFloat(document.getElementById('centerAngle')?.value)||45;
-  const verified=document.getElementById('saddleMethod')?.value.startsWith('Traditional')&&[30,45].includes(ca);
+   const verified=document.getElementById('saddleMethod')?.value.startsWith('Traditional')&&ca===45;
   steps=make('Measure the centre of the obstruction from your marked datum. Add the calculated centre shift and make the centre mark B.',
   'Measure the outside marks A and C equally to either side of B using the computed side spacing.',
-  'Align the centre mark B with the bender SADDLE/CENTRE NOTCH if your shoe has one; bend '+ca+'°.',
-  'Rotate the conduit 180° along its length. Use the ARROW or manufacturer-designated outer mark to bend A and C '+(ca/2)+'° in the opposite direction.',
+   'For the documented 45° saddle: B FIRST, align the 45° centre-notch with hook LEFT toward tape zero; bend the centre '+ca+'°. For other angles these are layout points, not an issued shoe procedure.',
+   'A SECOND: flip bender handle DOWN and roll conduit 180° in cradle; hook RIGHT toward B, align ARROW at A and air-bend '+(ca/2)+'°. C THIRD: move bender across B, hook LEFT toward B, align ARROW at C and air-bend '+(ca/2)+'°.',
   'Test-fit the saddle. '+(verified?'Use centre-notch and outer-arrow positions only with your calibrated bender.':'BEND-CENTRE PLANNING positions only; they must NOT be treated as physical arrow/notch marks.'));
  }else if(['saddle4','rect','square'].includes(current)){
   steps=make('Measure the actual obstacle height and width, including chosen clearances. Use all four calculated marks A, B, C and D.',
-  'At A and B, make two equal '+angle+'° bends opposite each other, returning to a straight section above the obstruction.',
-  'At C and D, repeat an equal offset in the opposite direction so the pipe returns to its original line.',
+   'A: hook LEFT and bend the first rise. B: flip handle DOWN and roll conduit 180° in the cradle, hook LEFT, and return to the upper flat using the paired-offset method.',
+   'C: start the opposite offset while keeping the original bend plane. D: flip handle DOWN and roll conduit 180° in the cradle again, hook LEFT, returning to the original run.',
   'Keep all bends in one plane, inspect the horizontal section across the obstruction, and verify total shrink and shoe-radius clearance.');
  }else if(current==='stub'){
   steps=make('Check the stamped take-up/deduct on the EXACT bender and conduit type; the preset is only a starting value.',
@@ -399,12 +399,12 @@ function renderSteps(){
  }else if(current==='kick90'){
   steps=make('Make the 90° stub with the correct ARROW mark and measured take-up first.',
   'Choose and mark where the kick should START on the straight leg. The calculated kick travel is geometry, not an automatic absolute second mark.',
-  'Orient the kick in the intended plane and bend '+angle+'° to the required rise; keep the original 90° square.',
+   'Set the hook toward the free straight leg you need to raise. Bend '+angle+'° in the intended plane; do not perform an automatic 180° roll or flip for this single kick.',
   'Confirm overall rise and installed orientation against the obstruction.');
  }else if(current==='back2back'){
   steps=make('Make the first 90° at arrow mark A using the confirmed stub deduct.',
   'Measure desired back-to-back leg spacing from the BACK of the first completed bend, not from the conduit end.',
-  'Line up the STAR / BACK-OF-90 reference on your bender at the second reference location (and use correction only if calibrated for that shoe).',
+   'For the second 90°, position the hook toward the remaining free end and align the STAR at the back-of-first-90 dimension (not another ARROW). Do not flip the conduit unless your method specifies it.',
   'Bend the second 90° in the proper plane and verify finished clear distance between legs.');
  }else if(current==='gainCut'){
   steps=make('Bend matching scrap through 90°; measure its original unbent length and its two finished straight legs.',
@@ -422,6 +422,9 @@ function renderSteps(){
   'Mark the first conduit and stagger each following conduit by the calculated adjacent offset.',
   'Make equal-angle bends in matching planes and maintain the same bend radius where possible.',
   'Confirm the finished pipes stay parallel without touching, leaving room for couplings and clamps.');
+ }
+ if(bendShoeMethod==='other'&&['offsetFar','offsetNear','rollFar','rollNear','saddle3','round','saddle4','rect','square','back2back','kick90'].includes(current)){
+  steps=steps.map(text=>/\b(?:HOOK|hook|FLIP|flip|ROLL|roll conduit|centre-notch)\b/.test(text)?'Use the arrow/notch, hook direction and flip/roll procedure in the manual for YOUR shoe; Klein directions are not transferable to different tools.':text);
  }
  ol.innerHTML=steps.map(s=>'<li>'+s+'</li>').join('');
  fieldFocusUpdate();
