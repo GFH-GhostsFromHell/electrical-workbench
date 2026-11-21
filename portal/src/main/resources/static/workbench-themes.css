@@ -526,3 +526,30 @@ html[data-ewb-theme] body main .meta .pill {
  background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
  border:1px solid var(--ewb-border)!important;
 }
+
+/* The original bend menu is a .wrap > .menu, not a <main> element.
+   Make every launcher (including its description) readable wherever mounted. */
+html[data-ewb-theme] body :is(button,a).bendbtn {
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;
+ border:2px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body :is(button,a).bendbtn :is(strong,b) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body :is(button,a).bendbtn span {
+ color:var(--ewb-muted)!important;
+}
+html[data-ewb-theme] body :is(button,a).bendbtn:is(.active,.selected,[aria-pressed=true]){
+ background:var(--ewb-accent)!important;color:var(--ewb-accent-text)!important;
+ border-color:var(--ewb-accent)!important;
+}
+html[data-ewb-theme] body :is(button,a).bendbtn:is(.active,.selected,[aria-pressed=true]) :is(strong,b,span){
+ color:var(--ewb-accent-text)!important;
+}
+html[data-ewb-theme] body p:has(> a[href="/bend-instruction-lab.html"]) {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+html[data-ewb-theme] body p:has(> a[href="/bend-instruction-lab.html"]) > a {
+ color:var(--ewb-accent)!important;
+}
