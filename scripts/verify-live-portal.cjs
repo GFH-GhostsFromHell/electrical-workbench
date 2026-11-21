@@ -17,11 +17,11 @@ function validateBuild(payload,expected) {
     throw Error('Production unexpectedly claims verified numerical Code data.');
   return payload.commit;
 }
-async function get(url,timeoutMs=14000){
+async function get(url,timeoutMs=14000,accept='application/json'){
   const response=await fetch(url,{
     method:'GET',redirect:'manual',cache:'no-store',
     signal:AbortSignal.timeout(timeoutMs),
-    headers:{'Accept':'application/json','Cache-Control':'no-cache'}
+    headers:{'Accept':accept,'Cache-Control':'no-cache'}
   });
   if(!response.ok)throw Error('HTTP '+response.status+' at '+new URL(url).pathname);
   return response;
@@ -39,7 +39,9 @@ async function checkBuild(base,expected){
 }
 async function smoke(base,expected){
   const verified=await checkBuild(base,expected);
-  const home=await get(base+'/index.html');
+  // A real browser requests HTML. JSON Accept causes Spring MVC to reject this
+  // text/html-only controller and can surface as a misleading 401 via /error.
+  const home=await get(base+'/index.html',14000,'text/html');
   if(!/text\/html/i.test(home.headers.get('content-type')||''))
     throw Error('Public sign-in landing page did not return HTML');
   const html=await home.text();
