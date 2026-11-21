@@ -3,7 +3,7 @@
 const assert=require('node:assert/strict'),http=require('node:http'),fs=require('node:fs'),path=require('node:path');
 const {chromium}=require('playwright-core');
 const root=path.resolve('portal/src/main/resources/static');
-const pages=['index.html','portal.html','start.html','guided-calculators.html','calculators.html','advanced-calculations.html','bend-instruction-lab.html','bend-calcs.html','bender-calibration.html','circuit-sizing.html','field-suite.html','troubleshooting-kb.html','account-records.html','account.html','pull-box-calcs.html','cec-reference-status.html','chatgpt.html','industrial-commissioning.html','news.html'];
+const pages=['index.html','portal.html','start.html','guided-calculators.html','calculators.html','advanced-calculations.html','bend-instruction-lab.html','bend-calcs.html','bender-calibration.html','motor-starter-selector.html','circuit-sizing.html','motor-starter-selector.html','field-suite.html','troubleshooting-kb.html','account-records.html','account.html','pull-box-calcs.html','cec-reference-status.html','chatgpt.html','industrial-commissioning.html','news.html'];
 const mobilePages=['index.html','portal.html','start.html','bend-instruction-lab.html','circuit-sizing.html','field-suite.html','troubleshooting-kb.html','account-records.html'];
 const themes=['daylight','midnight','workshop','contrast'];
 const server=http.createServer((req,res)=>{

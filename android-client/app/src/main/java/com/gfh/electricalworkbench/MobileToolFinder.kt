@@ -49,6 +49,7 @@ private val allTasks = listOf(
     MobileTask("service-demand", "Service Load Calculations", "Demand for hospital, schools, apartments and homes", "Calculations", "residential hotel feeder demand", "/guided-calculators.html?tool=service"),
     MobileTask("transformer", "Transformer & Load Sizing - Offline", "Transformer currents and loads", "Calculations", "kva primary secondary", "native:transformer", true),
     MobileTask("motor", "Motor Protection & Starter Sizing", "Fuse, breaker, overload and starter checks", "Calculations", "motor ocpd flc", "/calculators.html?section=s28"),
+    MobileTask("motor-drive-select", "Motor Starter & Drive Selector", "Compare DOL, wye-delta, soft starters, VFD and AC/DC motor controls", "Calculations", "motor starter variable speed vfd softstarter capacitor ac dc", "/motor-starter-selector.html"),
     MobileTask("refrigeration", "Refrigeration Motor Sizing", "Compressor RLA/LRA and MCA/MOCP", "Calculations", "hvac compressor", "/guided-calculators.html?tool=refrig"),
     MobileTask("grounding", "Grounding & Bonding", "Conductors and electrodes", "Calculations", "cec section 10", "/guided-calculators.html?tool=ground"),
     MobileTask("fire-pump", "Fire Pump Circuit", "Pump motor and controller worksheet", "Calculations", "jockey locked rotor", "/guided-calculators.html?tool=firepump"),

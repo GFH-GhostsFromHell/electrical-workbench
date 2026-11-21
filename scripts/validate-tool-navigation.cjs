@@ -79,6 +79,8 @@ for(const file of ['index.html','portal.html','start.html','calculators.html','g
   includes(read(root+file),'/workbench-theme.js','Shared theme logic on '+file);
   includes(read(root+file),'/workbench-themes.css','Shared palette on '+file);
 }
+includes(read(root+'motor-starter-selector.html'),'/motor-drive-selector.js','Motor selector engine is loaded');
+includes(read(root+'motor-starter-selector.html'),'/workbench-themes.css','Motor selector follows the shared themes');
 includes(start, 'new URLSearchParams(window.location.search)', 'Dashboard query reaches canonical finder');
 includes(start, 'alternateIds=new Set(', 'Specialist views are grouped instead of duplicated');
 includes(start, 'Show specialist and alternate tools', 'Full catalog remains accessible');
@@ -105,7 +107,7 @@ for(const text of ['Save input draft','Restore inputs','Export selected JSON','C
   assert.ok(helper.toLowerCase().includes(text.toLowerCase()),'Worksheet workflow missing '+text);
 }
 // Shared task IDs must remain aligned, even if the native destination is offline.
-const sharedTaskIds=['conduit-marks','bend-guide','bender-calibrate','pull-box','conductor-drop','service-demand',
+const sharedTaskIds=['conduit-marks','bend-guide','bender-calibrate','pull-box','conductor-drop','service-demand','motor-drive-select',
   'transformer','motor','advanced-code','relay','power','fault','jobsite','saved','code-updates'];
 for(const id of sharedTaskIds){
   assert.ok(tasks.some(task=>task.id===id),'Web catalog missing '+id);

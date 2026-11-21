@@ -101,7 +101,7 @@ const server = http.createServer((req, res) => {
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-a'));
     assert.equal(await page.locator('.task').count(),8,'Only common tasks should show initially');
     await page.locator('#showAllTools').click();
-    assert.equal(await page.locator('.task').count(),24,'Show all tools reveals full catalog');
+    assert.equal(await page.locator('.task').count(),25,'Show all tools reveals full catalog');
     await page.locator('#showAllTools').click();
     assert.equal(await page.locator('.task').count(),8,'Show common tools reduces screen length');
     await visible('#query');
@@ -199,6 +199,26 @@ const server = http.createServer((req, res) => {
     page.once('dialog', dialog=>dialog.accept());
     await page.locator('#ewbDelete').click();
     assert.equal(await page.locator('#ewbSaved option').count(),1,'Draft deleted');
+
+    // The motor/drive selector is a real interactive tool, not a catalog placeholder.
+    await goto('/motor-starter-selector.html');
+    await visible('#selector');
+    await page.locator('#fla').fill('40');
+    await page.locator('#leads').selectOption('6');
+    await page.locator('#deltaVolts').fill('600');
+    await page.locator('#goal').selectOption('inrush');
+    await page.locator('#calculate').click();
+    await visible('#result');
+    assert.ok((await page.locator('#recommendations').innerText()).includes('soft starter'),'Motor selector recommends soft start for reduced inrush');
+    assert.ok((await page.locator('#methods').innerText()).includes('Wye–delta'),'Star-delta option is available for eligible six-lead motors');
+    await page.locator('#family').selectOption('dc_pm');
+    await page.locator('#volts').fill('180');
+    await page.locator('#motorVolts').fill('180');
+    await page.locator('#supply').selectOption('dc');
+    await page.locator('#calculate').click();
+    assert.ok((await page.locator('#recommendations').innerText()).includes('DC armature drive'),'DC input selects a DC drive');
+    await take('motor-drive-selector.png');
+    await checkNoOverflow('Motor drive selector @390px');
 
     await goto('/field-suite.html#quote');
     await visible('#view-quote.view.active');
