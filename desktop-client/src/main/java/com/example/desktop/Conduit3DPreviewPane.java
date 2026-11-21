@@ -82,10 +82,9 @@ public final class Conduit3DPreviewPane extends BorderPane {
         page.setPadding(new Insets(16));
         page.setStyle("-fx-background-color:#edf4f9;");
 
-        Label heading = new Label("3D conduit bending · interactive preview");
+        Label heading = new Label("3D conduit · field preview");
         heading.setStyle("-fx-font-size:21px;-fx-font-weight:bold;-fx-text-fill:#0f172a;");
-        Label intro = note("Offline, rotatable 3D centreline. Drag with your mouse to rotate, use the scroll wheel or zoom buttons, and step through bends. This is idealized geometry—not production tape marks, clearance, shoe deduct or developed cut length.");
-        page.getChildren().addAll(heading, intro);
+        page.getChildren().add(heading);
 
         preset.getItems().addAll("Kicked 90 + second 90", "90 then kick", "Kick then 90",
                 "Single 90", "Two-bend offset", "Rolling offset", "Back-to-back 90s",
@@ -108,49 +107,67 @@ public final class Conduit3DPreviewPane extends BorderPane {
             shoeStraightField.setText(format(gap));
             status.setText("Loaded verified straight between arcs from "+BenderCalibrationPane.profileDescription()+". Confirm exact shoe and conduit size.");
         });
-        FlowPane setup = new FlowPane(10, 10,
-                labeled("Layout preset", preset),
-                labeled("Centreline radius (mm)", radiusField),
-                labeled("Final straight / tail (mm)", tailField),
-                labeled("Straight stock ≤ 10 ft (mm)", stockField),
-                labeled("Required clear straight between arcs (mm, optional)", shoeStraightField),
-                restore,savedGap);
+        FlowPane quickSetup = new FlowPane(8,8,labeled("Bend layout",preset),restore);
+        quickSetup.setAlignment(Pos.CENTER_LEFT);
+        preset.setOnAction(e -> {loadPreset();renderRows();draw();});
+        page.getChildren().add(quickSetup);
+        FlowPane setup = new FlowPane(9,9,
+                labeled("Centreline radius (mm)",radiusField),
+                labeled("Final straight (mm)",tailField),
+                labeled("10-ft stock or cut length (mm)",stockField),
+                labeled("Verified clear space between arcs (mm)",shoeStraightField),savedGap);
         setup.setAlignment(Pos.CENTER_LEFT);
-        page.getChildren().addAll(card("Preview dimensions", setup));
+        TitledPane setupDetails = new TitledPane("Advanced · radius, stock & shoe clearance",setup);
+        setupDetails.setExpanded(false);
+        page.getChildren().add(setupDetails);
 
-        Button iso = action("Isometric", false);
-        Button front = action("Front", false);
-        Button side = action("Side", false);
-        Button top = action("Top", false);
-        Button zoomIn = action("Zoom +", false);
-        Button zoomOut = action("Zoom −", false);
-        Button reset = action("Reset view", false);
-        iso.setOnAction(e -> view(-.7, .38));
-        front.setOnAction(e -> view(0, 0));
-        side.setOnAction(e -> view(-Math.PI / 2, 0));
-        top.setOnAction(e -> view(0, 1.56));
-        zoomIn.setOnAction(e -> {zoom=Math.min(5, zoom*1.2); draw();});
-        zoomOut.setOnAction(e -> {zoom=Math.max(.2, zoom/1.2); draw();});
-        reset.setOnAction(e -> {zoom=1; view(-.7,.38);});
-        FlowPane cameras = new FlowPane(8, 8, iso, front, side, top, zoomIn, zoomOut, reset);
+        ComboBox<String> cameraChoice = new ComboBox<>();
+        cameraChoice.getItems().addAll("Isometric","Front","Side","Top");
+        cameraChoice.setValue("Isometric");
+        cameraChoice.setPrefWidth(125);
+        cameraChoice.setOnAction(e -> {
+            switch(cameraChoice.getValue()){
+                case "Front" -> view(0,0);
+                case "Side" -> view(-Math.PI/2,0);
+                case "Top" -> view(0,Math.PI/2);
+                default -> view(-.7,.38);
+            }
+        });
+        Button zoomIn = action("Zoom +",false),zoomOut = action("Zoom −",false),reset = action("Fit",false);
+        zoomIn.setOnAction(e -> {zoom=Math.min(4,zoom*1.2);draw();});
+        zoomOut.setOnAction(e -> {zoom=Math.max(.3,zoom/1.2);draw();});
+        reset.setOnAction(e -> {zoom=1;cameraChoice.setValue("Isometric");view(-.7,.38);});
+        FlowPane cameras = new FlowPane(7,7,cameraChoice,zoomIn,zoomOut,reset);
         cameras.setAlignment(Pos.CENTER_LEFT);
 
-        StackPane viewer = new StackPane(canvas);
+        // Canvas is not a resizable JavaFX node. StackPane used its initial 960px
+        // canvas as the minimum layout width and clipped the viewer on small windows.
+        // A Pane lets the viewport size the canvas, never the other way round.
+        Pane viewer = new Pane(canvas);
         viewer.setStyle("-fx-background-color:#102b44;-fx-border-color:#496f87;-fx-border-radius:10;-fx-background-radius:10;");
-        viewer.setMinHeight(360);
-        viewer.setPrefHeight(480);
+        viewer.setMinWidth(0);
+        viewer.setPrefWidth(620);
+        viewer.setMinHeight(250);
+        viewer.setPrefHeight(360);
+        canvas.setWidth(600);canvas.setHeight(340);
+        canvas.relocate(5,5);
         canvas.widthProperty().addListener((o,a,b) -> draw());
         canvas.heightProperty().addListener((o,a,b) -> draw());
-        viewer.widthProperty().addListener((o,a,b) -> canvas.setWidth(Math.max(350,b.doubleValue()-16)));
-        viewer.heightProperty().addListener((o,a,b) -> canvas.setHeight(Math.max(330,b.doubleValue()-12)));
+        viewer.widthProperty().addListener((o,a,b) -> canvas.setWidth(Math.max(1,b.doubleValue()-10)));
+        viewer.heightProperty().addListener((o,a,b) -> canvas.setHeight(Math.max(1,b.doubleValue()-10)));
         canvas.addEventHandler(MouseEvent.MOUSE_PRESSED, e -> { previousX=e.getX(); previousY=e.getY(); });
         canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, e -> {
             yaw += (e.getX()-previousX)*.007;
             pitch = Math.max(-1.54, Math.min(1.54, pitch+(e.getY()-previousY)*.007));
             previousX=e.getX(); previousY=e.getY(); draw();
         });
-        canvas.setOnScroll(e -> {zoom=Math.max(.2,Math.min(5,zoom*(e.getDeltaY()>0?1.1:.9)));draw();e.consume();});
-        Label hint = note("Drag to rotate · mouse wheel to zoom · colour bands identify individual bends");
+        canvas.setOnScroll(e -> {
+            // Allow normal page scrolling over the viewer.
+            if(!e.isControlDown()&&!e.isMetaDown())return;
+            zoom=Math.max(.3,Math.min(4,zoom*(e.getDeltaY()>0?1.1:.9)));
+            draw();e.consume();
+        });
+        Label hint = note("Drag to rotate · Ctrl + scroll or Zoom buttons · coloured arcs show bends");
         frame.setStyle("-fx-background-color:#dff6f6;-fx-text-fill:#0f5168;-fx-background-radius:10;-fx-padding:6 10;");
         Button finished = action("Show finished conduit", true);
         Button through = action("Through selected bend", false);
@@ -164,14 +181,17 @@ public final class Conduit3DPreviewPane extends BorderPane {
         status.setStyle("-fx-text-fill:#be123c;-fx-font-weight:bold;");
         geometry.setWrapText(true);
         geometry.setStyle("-fx-text-fill:#334155;");
-        page.getChildren().addAll(card("Rotate the finished conduit", cameras, viewer, hint, stages, status, geometry));
+        page.getChildren().addAll(card("Rotate the shape · geometry only",cameras,viewer,hint,stages,status,geometry));
 
         Button addBend = action("+ Add bend", true);
         addBend.setOnAction(e -> {
             if(bends.size()>=12) { status.setText("Maximum 12 bends in one preview."); return; }
             bends.add(new Operation(300,30,0)); renderRows(); draw();
         });
-        page.getChildren().addAll(card("Edit the individual 3D bends", note("Each lead is the straight length BEFORE that bend; angles and plane rotations act relative to the preceding bend. Change a value to immediately redraw. These are visual planning entries—not calibrated field marks."), operations, addBend));
+        TitledPane editor = new TitledPane("Advanced · edit bend segments and planes",
+                card("Custom geometry",note("Lengths before bends and bend-plane rotation. These are not shoe alignment marks."),operations,addBend));
+        editor.setExpanded(false);
+        page.getChildren().add(editor);
         page.getChildren().add(note("FIELD CHECK · Confirm exact tool/shoe marks, springback, minimum stub, cumulative shrink, conduit size, bend radius, and the permitted total angle between pull points. Test complex layouts on scrap before installation."));
 
         ScrollPane scroll = new ScrollPane(page);
@@ -333,7 +353,9 @@ public final class Conduit3DPreviewPane extends BorderPane {
                     miny=projected.stream().mapToDouble(p->p.y).min().orElse(0),
                     maxy=projected.stream().mapToDouble(p->p.y).max().orElse(1);
             if(!Double.isFinite(minx+maxx+miny+maxy))throw new IllegalArgumentException("Invalid 3D projection.");
-            double scale=Math.min((w-125)/Math.max(1,maxx-minx),(h-115)/Math.max(1,maxy-miny))*zoom;
+            double safeW=Math.max(35,w-2*Math.min(65,Math.max(24,w*.14)));
+            double safeH=Math.max(35,h-2*Math.min(70,Math.max(28,h*.18)));
+            double scale=Math.min(safeW/Math.max(1,maxx-minx),safeH/Math.max(1,maxy-miny))*zoom;
             double midx=(minx+maxx)/2,midy=(miny+maxy)/2;
             List<ScreenPoint> screen=new ArrayList<>(projected.size());
             for(ScreenPoint p:projected)screen.add(new ScreenPoint(w/2+(p.x-midx)*scale,h/2-(p.y-midy)*scale));
@@ -352,12 +374,12 @@ public final class Conduit3DPreviewPane extends BorderPane {
                 ScreenPoint p=screen.get(point);
                 g.setFill(Color.web("#ffefc3"));g.fillOval(p.x-5,p.y-5,10,10);
                 g.setFill(Color.WHITE);g.setFont(Font.font("System",16));
-                g.fillText("B"+(i+1),p.x+10,p.y-11);
+                drawLabel(g,"B"+(i+1),p.x+8,p.y-11,w,h,Color.WHITE);
             }
             ScreenPoint start=screen.get(0),finish=screen.get(screen.size()-1);
             g.setFill(Color.web("#9cf5ff"));g.setFont(Font.font("System",15));
-            g.fillText("START",start.x+7,start.y-14);
-            g.fillText(partial?"IN PROGRESS":"FINISH",finish.x+7,finish.y+23);
+            drawLabel(g,"START",start.x+7,start.y-14,w,h,Color.web("#9cf5ff"));
+            drawLabel(g,partial?"STEP "+(step+1):"FINISH",finish.x+7,finish.y+23,w,h,Color.web("#9cf5ff"));
             status.setText("");
             double developed=readNonNegative(tailField,"Final straight length",false);
             for(Operation op:bends)developed+=op.before+readNonNegative(radiusField,"Radius",true)*Math.abs(op.angle)*DEG;
@@ -375,6 +397,13 @@ public final class Conduit3DPreviewPane extends BorderPane {
         }
         previous.setDisable(!partial||step<=0);
         next.setDisable(!partial||step>=bends.size()-1);
+    }
+    private static void drawLabel(GraphicsContext g,String text,double x,double y,double w,double h,Color colour) {
+        g.setFill(colour);
+        g.setFont(Font.font("System",13));
+        double textWidth=Math.max(30,text.length()*7.2);
+        g.fillText(text,Math.max(6,Math.min(Math.max(6,w-textWidth-6),x)),
+                Math.max(32,Math.min(Math.max(32,h-9),y)));
     }
     private static void stroke(GraphicsContext g,List<ScreenPoint> points,int first,int last,double width,Color colour) {
         if(last<=first)return;
