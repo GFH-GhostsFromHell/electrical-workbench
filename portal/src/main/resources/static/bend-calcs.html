@@ -591,32 +591,33 @@ function mbCompute(){
  ordered.forEach((o,j)=>{
   const group='G'+(j+1),rad=o.a*Math.PI/180,span=o.h/Math.sin(rad);
   const sequence=[];
-  const put=(position,name,align,hook,action,face='unknown')=>sequence.push({position,name,align,hook,action,face,group});
+  const put=(position,name,align,hook,action,face='none')=>sequence.push({position,name,align,hook,action,face,group});
   switch(o.kind){
    case 'Two-bend offset':
-    put(o.pos,'A','ARROW','HOOK ← away from B','+'+o.a+'° '+o.plane,'left');
-    put(o.pos+span,'B','ARROW','↻ FLIP head and cradle; HOOK ← toward datum','−'+o.a+'° return to parallel','left');break;
+    put(o.pos,'A','ARROW','A FIRST · HOOK ← away from B; FLOOR bend','+'+o.a+'° '+o.plane,'left');
+    put(o.pos+span,'B','ARROW','B SECOND · FLIP handle DOWN + ROLL conduit 180° in cradle; HOOK ← toward datum','−'+o.a+'° AIR bend back to parallel','left');break;
    case 'Rolling offset':
     {const trueRise=Math.hypot(o.h,o.r),plane=Math.atan2(o.r,o.h)*180/Math.PI;
-     put(o.pos,'A','ARROW','HOOK ← · roll plane '+plane.toFixed(1)+'° from vertical','First '+o.a+'° toward '+o.plane,'left');
-     put(o.pos+trueRise/Math.sin(rad),'B','ARROW','↻ FLIP and HOOK ←; preserve roll plane','Return '+o.a+'°','left');}break;
+     put(o.pos,'A','ARROW','A FIRST · HOOK ←; set roll plane '+plane.toFixed(1)+'° from vertical','First '+o.a+'° toward '+o.plane+' (floor bend)','left');
+     put(o.pos+trueRise/Math.sin(rad),'B','ARROW','B SECOND · FLIP handle DOWN, ROLL conduit 180° in cradle, HOOK ←; preserve plane','Return '+o.a+'° (air bend)','left');}break;
    case '90° arrow mark':
-    put(o.pos,'A','ARROW','HOOK toward stub free end','90° toward '+o.plane+'; verify deduct','left');break;
+    put(o.pos,'A','ARROW','HOOK ← toward short datum end; no flip for first 90°','90° toward '+o.plane+'; verify deduct','left');break;
    case 'Single kick':
-    put(o.pos,'A','ARROW / SHOE REF','Confirm head hook and datum','Kick '+o.a+'° toward '+o.plane);break;
+    put(o.pos,'A','USER-PLACED KICK MARK','HOOK toward free end being raised; no automatic flip / 180° roll','Kick '+o.a+'° toward '+o.plane,'kick');break;
    case 'Three-point saddle':
-    {const side=o.a/2,fieldMethod=[30,45].includes(o.a),multiplier=o.a===45?2.5:o.a===30?3.8:1/Math.sin(side*Math.PI/180),flank=o.h*multiplier;
-     const centreRef=fieldMethod?'CENTRE / SADDLE NOTCH':'BEND CENTRE ONLY',outerRef=fieldMethod?'ARROW':'BEND CENTRE ONLY';
-     put(o.pos,'B',centreRef,'Verify centre benchmark','Centre '+o.a+'° toward '+o.plane);
-     put(o.pos-flank,'A',outerRef,'↻ FLIP for outer return','Outer '+side+'° opposite '+o.plane,fieldMethod?'right':'unknown');
-     put(o.pos+flank,'C',outerRef,'Maintain same plane','Outer '+side+'° opposite '+o.plane,fieldMethod?'left':'unknown');
-     if(!fieldMethod)issues.push('Three-point saddle: geometric bend-centre marks only, not calibrated shoe ARROW/NOTCH references.');}break;
+    {const side=o.a/2,fieldMethod=o.a===45,multiplier=o.a===45?2.5:o.a===30?3.8:1/Math.sin(side*Math.PI/180),flank=o.h*multiplier;
+     const centreRef=fieldMethod?'45° CENTRE NOTCH':'BEND CENTRE ONLY',outerRef=fieldMethod?'ARROW':'BEND CENTRE ONLY';
+     put(o.pos,'B',centreRef,fieldMethod?'B FIRST · HOOK ← toward datum; floor bend centre 45°':'Geometry only: choose a calibrated shoe method','Centre '+o.a+'° toward '+o.plane,fieldMethod?'left':'none');
+     put(o.pos-flank,'A',outerRef,fieldMethod?'A SECOND · FLIP handle DOWN and ROLL conduit 180° in cradle; HOOK → toward B':'Geometry only: outer ARROW position not issued','Outer '+side+'° opposite '+o.plane,fieldMethod?'right':'none');
+     put(o.pos+flank,'C',outerRef,fieldMethod?'C THIRD · move bender across B; HOOK ← toward B; same plane':'Geometry only: outer ARROW position not issued','Outer '+side+'° opposite '+o.plane,fieldMethod?'left':'none');
+     if(!fieldMethod)issues.push('Three-point saddle: geometric bend centres only at this angle; use shoe-specific notch/arrow positions before bending.');}break;
    case 'Four-point saddle':
     {const A=o.pos,B=A+span,C=B+o.w,D=C+span;
-     put(A,'A','ARROW','HOOK ← toward datum','Rise '+o.a+'° '+o.plane);
-     put(B,'B','ARROW','↻ FLIP in same plane','Level '+o.a+'°');
-     put(C,'C','ARROW','Opposite offset direction','Return '+o.a+'°');
-     put(D,'D','ARROW','↻ FLIP in same plane','Level '+o.a+'°');}break;
+     put(A,'A','ARROW · PAIRED OFFSET','A FIRST · HOOK ←; first rise','Rise '+o.a+'° '+o.plane,'left');
+     put(B,'B','ARROW · PAIRED OFFSET','B SECOND · FLIP handle DOWN + ROLL conduit 180°; HOOK ←','Level '+o.a+'° at top','left');
+     put(C,'C','ARROW · PAIRED OFFSET','C THIRD · start opposite offset, same plane; HOOK ←','Return '+o.a+'° toward original line','left');
+     put(D,'D','ARROW · PAIRED OFFSET','D FOURTH · FLIP handle DOWN + ROLL conduit 180°; HOOK ←','Level '+o.a+'° on original run','left');
+     issues.push('Four-point setup uses two paired offsets, not a universal shoe-approved hook sequence. Confirm shoe access, arrow marks and bend direction on your own tool.');}break;
   }
   sequence.forEach(m=>{m.order=all.length+1;all.push(m);
     if(m.position<0)hardIssues.push(m.group+' mark '+m.name+' is before datum.');
@@ -643,18 +644,19 @@ function mbCompute(){
  let ticks='<div class="pipe"></div>';
  all.forEach(m=>{
   const left=Math.max(5,Math.min(95,5+90*m.position/scale));
-  ticks+='<div class="tick" style="left:'+left+'%" data-orient="'+(m.face==='left'?'← HOOK':m.face==='right'?'HOOK →':'? VERIFY')+'">'+
+  ticks+='<div class="tick" style="left:'+left+'%" data-orient="'+(bendShoeMethod==='other'?'SHOE GUIDE':m.face==='left'?'← HOOK':m.face==='right'?'HOOK →':m.face==='kick'?'FREE LEG':'PLAN')+'">'+
     '<i>'+m.order+'</i></div>';
  });
  canvas.innerHTML='<div class="markbar">'+ticks+'</div><div class="note">Left = datum end. Mark positions are schematic; exact values follow below. Numbered circles show a proposed forming order.</div>';
+ const hookSetup=m=>bendShoeMethod==='other'&&['left','right'].includes(m.face)?'Use your shoe manufacturer’s hook and flip procedure':m.hook;
  steps.innerHTML=all.map(m=>
   '<div class="advanced-mark"><b>'+m.order+'</b><div><strong>'+m.group+' · mark '+m.name+' · '+mbFormat(m.position)+' from datum</strong>'+
-  m.align+' | '+m.hook+hookFaceBadge(m.face)+'<div style="margin-top:4px">'+m.action+'</div></div></div>').join('');
+  '<div class="bend-action">'+m.align+' | '+hookSetup(m)+'</div>'+hookFaceBadge(m.face)+'<div style="margin-top:4px">'+m.action+'</div></div></div>').join('');
   mbFocusUpdate();
  warnings.textContent=issues.length?'CHECK LAYOUT: '+issues.join(' • '):
   'No range/spacing warnings found. Verify head radius, shoe markers and springback on a test piece.';
  multiReport='MULTI-BEND PIPE LAYOUT\nStock: '+mbFormat(stock)+'; min shoe spacing: '+mbFormat(gap)+'\n\n'+
-  all.map(m=>'BEND '+m.order+' | '+m.group+' '+m.name+' | '+mbFormat(m.position)+' | '+m.align+' | '+hookFaceCaption(m.face)+' | '+m.hook+' | '+m.action).join('\n')+
+  all.map(m=>'BEND '+m.order+' | '+m.group+' '+m.name+' | '+mbFormat(m.position)+' | '+m.align+' | '+hookFaceCaption(m.face)+' | '+hookSetup(m)+' | '+m.action).join('\n')+
   '\n\n'+warnings.textContent;
 }
 function mbCopy(){
