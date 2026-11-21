@@ -261,7 +261,7 @@ const server = http.createServer((req, res) => {
     await page.locator('button.bendbtn').filter({hasText:'Four-bend saddle'}).click();
     await visible('#toolScreen.screen.active');
     const fourMarks=await page.locator('#marks').innerText();
-    for(const note of ['A FIRST','B SECOND','C THIRD','D FOURTH']){
+    for(const note of ['A FIRST','B SECOND','C THIRD','D FOURTH','HOOK TOWARD FAR END','TURN bender AROUND']){
       assert.ok(fourMarks.includes(note),'Four-point saddle sequence: '+note);
     }
     await page.locator('#toolScreen .back').click();
