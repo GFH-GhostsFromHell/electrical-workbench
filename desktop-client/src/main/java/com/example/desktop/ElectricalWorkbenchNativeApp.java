@@ -243,6 +243,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         TilePane tiles=new TilePane();tiles.setHgap(12);tiles.setVgap(12);tiles.setPrefColumns(2);
         tiles.getChildren().addAll(
             tile("🧮 Electrical Calculators","Full section-based calculators: services, busbars, motors, transformers, wiring, fire alarm, welders and more",()->setWorkspace(buildCalculators())),
+            tile("⚙ Motor Starter & Drive Selector","Choose DOL, wye-delta, soft starter, VFD, capacitor-start or DC controls with nameplate and duty checks",()->openFieldPage("/motor-starter-selector.html")),
             tile("⚙ Power System Analysis","Per-unit, base values, transformer impedance, transmission lines, symmetrical components, sequence faults and short-circuit tools",()->setWorkspace(buildEngineering())),
             tile("🎓 Red Seal Study & Daily Quiz","Red Seal daily quiz, CEC navigator, formulas, control trainer and province profile",()->setWorkspace(buildPlatform("Learn"))),
             tile("🛠 Jobsite Tools","Troubleshooting, nameplates, commissioning, inspection, blueprint scaling, fault current and grounding wizard",()->setWorkspace(buildPlatform("Field"))),
