@@ -70,17 +70,19 @@ struct QuickBenderView: View {
     @AppStorage("ewb.ios.calibration.material") private var savedMaterial = "EMT"
     @State private var minimumGap = ""
     @State private var showOptions = false
+    @State private var showMeasureHelp = false
+    @State private var showDetailedPlan = false
 
     @FocusState private var focusedInput: String?
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: 13) {
+            VStack(alignment: .leading, spacing: 9) {
                 VStack(alignment: .leading, spacing: 5) {
                     Text("MEASURE → MARK → BEND")
                         .font(.caption.weight(.bold))
                         .foregroundStyle(WorkbenchStyle.cyan)
-                    Text("Know what to measure first. Get pencil marks instantly.")
+                    Text("Enter measurements. Read the tape marks.")
                         .font(.subheadline)
                         .foregroundStyle(WorkbenchStyle.muted)
                 }
@@ -110,24 +112,30 @@ struct QuickBenderView: View {
                 }
 
                 section {
-                    Label("HOW TO MEASURE", systemImage: "ruler")
-                        .font(.subheadline.weight(.bold))
-                        .foregroundStyle(WorkbenchStyle.cyan)
-                    BendSketch(mode: mode)
-                        .frame(height: 114)
-                        .accessibilityLabel(sketchDescription)
-                    Text(datum)
-                        .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(WorkbenchStyle.text)
-                    ForEach(Array(measureSteps.enumerated()), id: \.offset) { number, line in
-                        Text("\(number + 1). \(line)")
-                            .font(.caption)
-                            .foregroundStyle(WorkbenchStyle.muted)
-                            .fixedSize(horizontal: false, vertical: true)
+                    HStack(alignment: .firstTextBaseline, spacing: 8) {
+                        Text(datum)
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(WorkbenchStyle.text)
+                        Spacer(minLength: 6)
+                        Button(showMeasureHelp ? "Hide guide" : "Measure help") {
+                            showMeasureHelp.toggle()
+                        }
+                        .font(.caption.weight(.bold))
                     }
-                    Text("Sketch shows job dimensions, not exact shoe alignment marks.")
-                        .font(.caption2)
-                        .foregroundStyle(.orange)
+                    if showMeasureHelp {
+                        BendSketch(mode: mode)
+                            .frame(height: 108)
+                            .accessibilityLabel(sketchDescription)
+                        ForEach(Array(measureSteps.enumerated()), id: \.offset) { number, line in
+                            Text("\(number + 1). \(line)")
+                                .font(.caption)
+                                .foregroundStyle(WorkbenchStyle.muted)
+                                .fixedSize(horizontal: false, vertical: true)
+                        }
+                        Text("Job dimensions, not bender shoe alignment marks.")
+                            .font(.caption2)
+                            .foregroundStyle(.orange)
+                    }
                 }
 
                 section {
@@ -154,19 +162,25 @@ struct QuickBenderView: View {
                             .fixedSize(horizontal: false, vertical: true)
                     case .ready(let plan):
                         ForEach(plan.marks) { mark in
-                            VStack(alignment: .leading, spacing: 5) {
-                                Text("MARK \(mark.id) · \(mark.shoeReference)")
-                                    .font(.caption.bold())
-                                    .foregroundStyle(WorkbenchStyle.cyan)
+                            HStack(alignment: .center, spacing: 10) {
+                                VStack(alignment: .leading, spacing: 2) {
+                                    Text("MARK \(mark.id) · \(mark.shoeReference)")
+                                        .font(.caption.weight(.bold))
+                                        .foregroundStyle(WorkbenchStyle.cyan)
+                                    if mark.shoeReference.contains("GEOMETRY") {
+                                        Text("Planning only · not a shoe mark")
+                                            .font(.caption2)
+                                            .foregroundStyle(.orange)
+                                    }
+                                }
+                                Spacer(minLength: 6)
                                 Text(mark.distance.measurement(units))
-                                    .font(.title2.bold().monospacedDigit())
+                                    .font(.title3.bold().monospacedDigit())
                                     .foregroundStyle(WorkbenchStyle.text)
-                                Text(mark.shoeReference.contains("GEOMETRY") ? "Planning coordinate only — DO NOT align a shoe here." : "Measure from the stated datum; verify shoe ARROW/STAR/NOTCH alignment.")
-                                    .font(.caption)
-                                    .foregroundStyle(WorkbenchStyle.muted)
+                                    .minimumScaleFactor(0.8)
+                                    .lineLimit(1)
                             }
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                            .padding(11)
+                            .padding(9)
                             .background(WorkbenchStyle.background, in: RoundedRectangle(cornerRadius: 10))
                         }
                         if let spacing = plan.spacing {
@@ -175,9 +189,15 @@ struct QuickBenderView: View {
                         if let shrink = plan.shrink {
                             summary("Calculated shrink", shrink.measurement(units))
                         }
-                        Text(plan.detail)
-                            .font(.caption)
-                            .foregroundStyle(WorkbenchStyle.muted)
+                        Button(showDetailedPlan ? "Hide bending instructions" : "Read complete bending instructions") {
+                            showDetailedPlan.toggle()
+                        }
+                        .font(.caption.weight(.bold))
+                        if showDetailedPlan {
+                            Text(plan.detail)
+                                .font(.caption)
+                                .foregroundStyle(WorkbenchStyle.muted)
+                        }
                         Label(plan.warning, systemImage: "exclamationmark.shield")
                             .font(.caption)
                             .foregroundStyle(.orange)
@@ -190,7 +210,7 @@ struct QuickBenderView: View {
                         showOptions.toggle()
                     } label: {
                         HStack {
-                            Text(showOptions ? "Hide shoe spacing check" : "More options · shoe spacing")
+                            Text(showOptions ? "Hide shoe spacing check" : "Shoe spacing & options")
                             Spacer()
                             Image(systemName: showOptions ? "chevron.up" : "chevron.down")
                         }
@@ -211,7 +231,7 @@ struct QuickBenderView: View {
                         }
                     }
                     NavigationLink { PortalScreen(title: "3D advanced bender", path: "/bend-instruction-lab.html") } label: {
-                        Label("Full 3D multi-bend and detailed shoe directions", systemImage: "cube.transparent")
+                        Label("Open 3D conduit preview", systemImage: "cube.transparent")
                             .font(.subheadline)
                     }
                     Text("One straight 10-ft EMT length: \(units.stock.measurement(units)). Marks outside stock or overlapping marks are rejected; optional measured spacing checks are applied when entered. Bend arcs, hook access and springback still require a field check.")
