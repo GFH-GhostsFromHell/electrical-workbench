@@ -38,7 +38,15 @@ for(const token of ['function calcOffset()','function calcRoll()','function calc
  'CALCULATION NOT POSSIBLE','BENDS TOO CLOSE','3048','hookFaceBadge','function applySavedCalibration()']){
  if(!stableBender.includes(token)){console.error('Stable bender regression: '+token);failed=true}
 }
-console.log('Stable bender: physical marks, formulas, calibration and optional step focus validated; retired route redirects');
+for(const token of ['id="shoeMethod"','function setShoeMethod(','B FIRST · hook LEFT','A SECOND · FLIP bender handle DOWN',
+ 'B SECOND · FLIP bender handle DOWN','C THIRD · move bender','D FOURTH · FLIP handle DOWN',
+ 'hookFaceCaption','HOOK toward free end being raised','USE MANUFACTURER SHOE PROCEDURE']){
+ if(!stableBender.includes(token)){console.error('Missing bend setup guidance: '+token);failed=true}
+}
+if(stableBender.includes('? VERIFY HOOK DIRECTION')||stableBender.includes("'? VERIFY'")){
+ console.error('Old ambiguous hook warning has returned');failed=true;
+}
+console.log('Stable bender: physical marks, formulas, calibration, explicit shoe method and flip steps validated');
 const kb=fs.readFileSync(path.join(root,'troubleshooting-kb.html'),'utf8');
 const procedures=[...kb.matchAll(/\btopic\('[a-z0-9-]+'/g)].length;
 if(procedures<20){console.error('Expected >=20 troubleshooting procedures, found '+procedures);failed=true}
