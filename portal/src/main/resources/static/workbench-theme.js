@@ -72,6 +72,7 @@
  if(w.matchMedia){
   const query=w.matchMedia('(prefers-color-scheme: dark)');
   if(query.addEventListener)query.addEventListener('change',()=>{if(selection==='system')apply();});
+  else if(query.addListener)query.addListener(()=>{if(selection==='system')apply();});
  }
  w.addEventListener('storage',e=>{if(e.key===KEY){selection=read();apply();}});
 })(window);

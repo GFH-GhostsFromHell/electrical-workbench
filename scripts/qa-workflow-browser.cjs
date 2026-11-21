@@ -72,6 +72,7 @@ const server = http.createServer((req, res) => {
     await page.locator('input[value="system"][name="ewb-appearance"]').check();
     assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'midnight','System dark chosen');
     await page.emulateMedia({colorScheme:'light'});
+    await page.waitForFunction(()=>document.documentElement.getAttribute('data-ewb-theme')==='daylight');
     assert.equal(await page.locator('html').getAttribute('data-ewb-theme'),'daylight','System light auto updates');
     await page.locator('input[value="daylight"][name="ewb-appearance"]').check();
     await page.locator('#ewb-theme-done').click();
