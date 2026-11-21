@@ -72,7 +72,7 @@ html[data-ewb-theme] :is(input,textarea,select,.field input,.field select,.field
 }
 html[data-ewb-theme] :is(input,textarea)::placeholder{color:var(--ewb-muted)!important;opacity:1}
 html[data-ewb-theme] select option{background:var(--ewb-surface)!important;color:var(--ewb-text)!important}
-html[data-ewb-theme] :is(button,.btn,.task .open,.selected .open,.button,button.primary,button[type=submit]):not(#ewb-theme-button):not(#ewb-theme-done) {
+html[data-ewb-theme] :is(button,.btn,.task .open,.selected .open,.button,button.primary,button[type=submit]):not(:where(#ewb-theme-button,#ewb-theme-done)) {
  background:var(--ewb-accent)!important;color:var(--ewb-accent-text)!important;
  border:1px solid var(--ewb-accent)!important;text-shadow:none!important
 }
@@ -408,4 +408,43 @@ html[data-ewb-theme] body main .entry {
 }
 html[data-ewb-theme] body main .entry :is(strong,b,small,span) {
  color:var(--ewb-text)!important;
+}
+
+/* Avoid ID-heavy :not() specificity in the generic button palette.
+   Concrete screen states (nav selection, topic selection) must win. */
+html[data-ewb-theme] body header nav a {
+ background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;
+ border:1px solid var(--ewb-border)!important;
+}
+/* Section browser search lives inside the left navigation, outside <main>. */
+html[data-ewb-theme] body .shell > nav .section-finder :is(label,small,span){
+ color:var(--ewb-nav-text)!important;
+}
+/* The jobsite header is within main; do not inherit the dark portal topbar. */
+html[data-ewb-theme] body main .topbar {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border:1px solid var(--ewb-border)!important;border-radius:12px;padding:10px;
+}
+html[data-ewb-theme] body main .topbar :is(label,span,small,strong,b,.note){
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body main .topbar .note{color:var(--ewb-muted)!important}
+/* Finished pull-box dimensions were a second hard-coded navy block. */
+html[data-ewb-theme] body main .metric {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border:1px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body main .metric :is(strong,b,span){
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body main .metric small{
+ color:var(--ewb-muted)!important;
+}
+html[data-ewb-theme] body main :is(#worked,.warn){
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body main .warn{
+ background:var(--ewb-warning-bg)!important;
+ color:var(--ewb-warning-text)!important;
+ border-color:var(--ewb-warn)!important;
 }
