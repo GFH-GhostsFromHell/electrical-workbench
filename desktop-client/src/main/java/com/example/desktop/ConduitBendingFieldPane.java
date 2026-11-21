@@ -31,9 +31,9 @@ public final class ConduitBendingFieldPane extends BorderPane {
         obstacleReference.setValue("Near bend critical"); tapeMarks.setValue("1 mm");
         saddleMarks.setValue("Traditional centre-notch + outer arrow");
         VBox page = new VBox(12); page.setPadding(new Insets(14));
-        Label title = new Label("Conduit bender · field layout & instructions");
+        Label title = new Label("Detailed conduit marks");
         title.setStyle("-fx-font-size:21px;-fx-font-weight:bold;-fx-text-fill:#0f172a;");
-        Label intro = note("Select the bend you are making, enter your measurements, and follow the numbered marking and bending steps. Calculations are local and work without a connection.");
+        Label intro = note("Select bend · enter job dimensions · verify marks");
         HBox selectors = new HBox(10,label("Bend type"),type,label("Units"),units);
         selectors.setAlignment(Pos.CENTER_LEFT); type.setPrefWidth(240);
         HBox settings = new HBox(10,label("Hand bender"),bender,label("Angle"),angle);
@@ -70,11 +70,11 @@ public final class ConduitBendingFieldPane extends BorderPane {
         Button copy = new Button("Copy field layout");
         copy.setOnAction(e -> { javafx.scene.input.ClipboardContent cb = new javafx.scene.input.ClipboardContent();cb.putString(answer.getText());javafx.scene.input.Clipboard.getSystemClipboard().setContent(cb); });
         calculate.setOnAction(e->calculate());
-        answer.setEditable(false);answer.setWrapText(true);answer.setPrefRowCount(18);
-        help.setEditable(false);help.setWrapText(true);help.setPrefRowCount(9);
+        answer.setEditable(false);answer.setWrapText(true);answer.setPrefRowCount(7);
+        help.setEditable(false);help.setWrapText(true);help.setPrefRowCount(6);
         help.setStyle("-fx-font-size:12px;-fx-control-inner-background:#eff8fc;-fx-text-fill:#0f4c81;");
         TitledPane bendHelp=new TitledPane("Help · exact marking, shoe reference, bender orientation & order",help);
-        bendHelp.setExpanded(true);
+        bendHelp.setExpanded(false);
         bendHelp.setCollapsible(true);
         page.getChildren().addAll(title,intro,selectors,settings,fieldSettings,saddleSettings,inputs,new HBox(10,useCalibration,calculate,copy),visual,bendHelp,answer,
             note("Hand-bender arrows, star/back-of-90 marks, saddle notches, deduct, minimum stub and springback vary by manufacturer, conduit size and type. Field shrink charts are rounded; this calculator shows geometric values. Measure conduit on its centreline, keep bends in the intended plane, and check a test piece before cutting production runs."));
@@ -82,13 +82,13 @@ public final class ConduitBendingFieldPane extends BorderPane {
         TabPane screens=new TabPane();
         screens.setTabClosingPolicy(TabPane.TabClosingPolicy.UNAVAILABLE);
         screens.getTabs().addAll(
-            new Tab("Quick Bend · Fast Field Marks",new QuickConduitBendPane()),
-            new Tab("Single Bend & Field Guide",scroll),
-            new Tab("Advanced · Multiple Bends on One Pipe",new AdvancedConduitBendPane()),
-            new Tab("3D Conduit Preview · Rotate & Zoom",new Conduit3DPreviewPane()),
-            new Tab("Gain, Cut Length & Rack Offsets",new ConduitFabricationToolsPane()),
-             new Tab("Bender Calibration",new BenderCalibrationPane()),
-            new Tab("Multiplier Chart & Quick Sheet",new ConduitBendReferencePane())
+            new Tab("Quick marks",new QuickConduitBendPane()),
+            new Tab("Detailed marks",scroll),
+            new Tab("Multi-bend",new AdvancedConduitBendPane()),
+            new Tab("3D shape",new Conduit3DPreviewPane()),
+            new Tab("Cut lengths",new ConduitFabricationToolsPane()),
+            new Tab("Calibration",new BenderCalibrationPane()),
+            new Tab("Reference",new ConduitBendReferencePane())
         );
         setCenter(screens);
         type.setOnAction(e->{showFields();calculate();});

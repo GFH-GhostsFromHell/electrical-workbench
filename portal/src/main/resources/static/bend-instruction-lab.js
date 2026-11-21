@@ -239,17 +239,21 @@ function checkStockAndSpacing(){
 
 function showQuickSummary(error){
  const box=$('quickSummary');
- if(error){const msg=error.message||String(error);box.innerHTML='<strong>'+(/^Enter /.test(msg)?'Enter your job measurements':'Check these measurements')+'</strong><span>'+html(msg)+'</span>';return}
+ if(error){
+  const msg=error.message||String(error);
+  box.innerHTML='<strong>'+(/^Enter /.test(msg)?'Enter measurements':'Check measurements')+'</strong><span>'+html(msg)+'</span>';
+  return;
+ }
  if(!layout)return;
  const marks=layout.marks.filter(m=>m.tool!=='GEOMETRY ONLY');
  const first=layout.steps[0];
- const markRows=marks.length?marks.map(m=>'<div class="quick-mark">'+html(m.tag)+' · '+html(length(m.pos))+' · '+html(m.tool)+'</div>').join(''):
-  '<div class="quick-alert">No verified physical mark is available here. Confirm the shoe and required dimensions before marking conduit.</div>';
- box.innerHTML='<strong>'+html(layout.name)+'</strong>'+markRows+
- '<span><b>Next:</b> '+html(first.where)+' · '+html(first.reference)+'</span>'+
- '<span><b>Hook:</b> '+html(hookCaption(first.hookSide))+'</span>'+
- '<span><b>Action:</b> '+html(first.label)+' · '+html(first.flip)+'</span>'+
- '<span class="quick-alert">Verify shoe marks, springback and physical dimensions before bending.</span>';
+ const chips=marks.length
+   ?'<div class="quick-mark-row">'+marks.map(m=>'<span class="quick-mark">'+html(m.tag)+' · '+html(length(m.pos))+'</span>').join('')+'</div>'
+   :'<span class="quick-alert">No verified physical marks. Use the manufacturer layout before marking.</span>';
+ box.innerHTML='<strong>'+html(layout.name)+'</strong>'+chips+
+  '<span class="next-move">NEXT: '+html(first.label)+' · '+html(first.where)+' · '+html(first.reference)+'</span>'+
+  '<span>Hook: '+html(hookCaption(first.hookSide))+'</span>'+
+  '<span class="quick-alert">Verify actual bender shoe, clearances and springback.</span>';
 }
 function renderMarks(){
  const $svg=$('markDrawing'),max=Math.max(v('stock')||1,...layout.marks.map(m=>m.pos+(unit()==='mm'?100:4)));
@@ -270,6 +274,7 @@ function renderStep(){
  $('cueMark').textContent=item.where;$('cueReference').textContent=item.reference;$('cueHook').textContent=hookCaption(item.hookSide)+' · '+item.hook;$('cueFlip').textContent=item.flip;
  $('hookVisual').textContent=hookCaption(item.hookSide);
  $('hookVisual').className='hookvisual '+(item.hookSide==='unknown'?'unverified':'');
+ $('stepBrief').textContent=item.label+' · '+item.where+' · '+item.reference;
  $('instruction').textContent=item.body;$('stepWarning').textContent=item.caution;
  $('prev').disabled=step===0;$('next').disabled=step===layout.steps.length-1;
  if(mode==='partial')renderModel();
@@ -329,7 +334,9 @@ function calculatePath(){
   if(i>0&&o.before<=1e-6)
    throw Error('BENDS TOO CLOSE: B'+(i+1)+' has no straight conduit between bend arcs. Confirm shoe clearance.');
  });
- const developed=ops.reduce((sum,o)=>sum+o.before+Math.abs(o.angle)*RAD*radius,toMm(tail));
+ // Operations and the optional tail editor are always in millimetres.
+ // Converting tail by the field-measurement unit inflated the model 25.4x in inch mode.
+ const developed=ops.reduce((sum,o)=>sum+o.before+Math.abs(o.angle)*RAD*radius,tail);
  if(!Number.isFinite(developed)||developed>stock+1e-6)
   throw Error('CALCULATION NOT POSSIBLE on one 10 ft EMT: 3D developed centreline needs '+fmt(developed,1)+' mm, available '+fmt(stock,1)+' mm. Shorten the leads or bends.');
  if(minStraight!==null&&minStraight>0)
@@ -355,66 +362,174 @@ function calculatePath(){
   const nextN=norm(add(times(normal,Math.cos(arc)),times(t,-Math.sin(arc))));
   t=nextT;n=nextN;ends.push(pts.length-1);
  });
- straight(toMm(tail),ops.length+1);
+ straight(tail,ops.length+1);
  // Prevent invalid projected positions from silently drawing an empty canvas.
  if(pts.some(pt=>pt.p.length!==3||pt.p.some(n=>!Number.isFinite(n))))
   throw Error('3D coordinates are invalid. Reset the bend sequence or check its dimensions.');
  return {pts,ends,radius,developed};
 }
 const canvas=$('tubeCanvas'),ctx=canvas.getContext('2d');
-function rotated(v){
+const pointerPositions=new Map();
+let pinchDistance=null;
+let previewIsVisible=false;
+function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+function canvasReady(){
+ if(!ctx)return false;
+ const rect=canvas.getBoundingClientRect();
+ if(rect.width<80||rect.height<80)return false;
+ const dpr=Math.min(2.5,Math.max(1,window.devicePixelRatio||1));
+ const backW=Math.max(1,Math.round(rect.width*dpr)),backH=Math.max(1,Math.round(rect.height*dpr));
+ if(canvas.width!==backW||canvas.height!==backH){canvas.width=backW;canvas.height=backH;}
+ ctx.setTransform(dpr,0,0,dpr,0,0);
+ return true;
+}
+function rotated(point){
  const cy=Math.cos(yaw),sy=Math.sin(yaw),cp=Math.cos(pitch),sp=Math.sin(pitch);
- const x=v[0]*cy-v[1]*sy,y=v[0]*sy+v[1]*cy;
- return [x,v[2]*cp-y*sp,v[2]*sp+y*cp];
+ const x=point[0]*cy-point[1]*sy,y=point[0]*sy+point[1]*cy;
+ return [x,point[2]*cp-y*sp,point[2]*sp+y*cp];
+}
+function drawCanvasMessage(message){
+ if(!canvasReady())return;
+ const rect=canvas.getBoundingClientRect(),W=rect.width,H=rect.height;
+ ctx.clearRect(0,0,W,H);
+ ctx.fillStyle='#102b44';ctx.fillRect(0,0,W,H);
+ ctx.fillStyle='#ffffff';ctx.font='bold 15px system-ui';
+ ctx.fillText('Preview unavailable',16,32);
+ ctx.font='13px system-ui';
+ const line=String(message||'Check dimensions.').slice(0,60);
+ ctx.fillText(line,16,56,Math.max(100,W-32));
 }
 function renderModel(){
- if(!ctx){$('geometryNote').textContent='3D preview unavailable: drawing canvas is not supported.';return}
- try{model=calculatePath()}catch(e){
-  model=null;$('geometryNote').textContent='3D input error: '+e.message;
-  ctx.clearRect(0,0,canvas.width,canvas.height);
-  ctx.fillStyle='#e8f7ff';ctx.font='bold 22px system-ui';
-  ctx.fillText('3D preview unavailable',24,60);
-  ctx.font='18px system-ui';ctx.fillText('Check dimensions or reset the bend sequence.',24,100);
+ if(!ctx){$('geometryNote').textContent='3D preview unavailable: this device does not support 2D canvas.';return;}
+ try{model=calculatePath()}catch(error){
+  model=null;
+  $('geometryNote').textContent='3D preview: '+error.message;
+  if($('threeDDetails').open)drawCanvasMessage('Check bend dimensions or restore sample geometry.');
   return;
  }
- const W=canvas.width,H=canvas.height,end=mode==='partial'?model.ends[Math.min(step,model.ends.length-1)]:model.pts.length-1;
+ const stockMm=toMm(v('stock'));
+ $('geometryNote').textContent='Idealised 3D centreline · '+ops.length+' bends · '+fmt(model.developed,1)+' / '+fmt(stockMm,1)+' mm stock. Actual shoe radius, springback and clearance still require verification.';
+ // A <details> element is display:none until opened. Do not project to its
+ // zero-width canvas; redraw after layout and on responsive changes.
+ if(!$('threeDDetails').open||!canvasReady())return;
+ const rect=canvas.getBoundingClientRect(),W=rect.width,H=rect.height;
+ previewIsVisible=true;
+ const end=mode==='partial'?model.ends[Math.min(step,model.ends.length-1)]:model.pts.length-1;
  const visible=model.pts.slice(0,end+1),camera=visible.map(o=>rotated(o.p));
- const xs=camera.map(p=>p[0]),ys=camera.map(p=>p[1]),minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
- if(![minx,maxx,miny,maxy].every(Number.isFinite)){
-  $('geometryNote').textContent='3D projection error: invalid coordinates. Reset the view or bend sequence.';
-  ctx.clearRect(0,0,W,H);
-  return;
+ if(camera.some(p=>!p.every(Number.isFinite))){drawCanvasMessage('Invalid projected shape. Restore sample geometry.');return;}
+ const xs=camera.map(p=>p[0]),ys=camera.map(p=>p[1]);
+ const minx=Math.min(...xs),maxx=Math.max(...xs),miny=Math.min(...ys),maxy=Math.max(...ys);
+ const mx=(minx+maxx)/2,my=(miny+maxy)/2;
+ const horizontalPad=Math.min(60,Math.max(24,W*.13)),verticalPad=Math.min(67,Math.max(33,H*.17));
+ const availableW=Math.max(40,W-2*horizontalPad),availableH=Math.max(40,H-2*verticalPad);
+ const baseScale=Math.min(availableW/Math.max(1,maxx-minx),availableH/Math.max(1,maxy-miny));
+ const scale=baseScale*zoom;
+ const screen=camera.map(p=>[W/2+(p[0]-mx)*scale,H/2-(p[1]-my)*scale]);
+ const bg=ctx.createLinearGradient(0,0,W,H);
+ bg.addColorStop(0,'#091d30');bg.addColorStop(1,'#21506a');
+ ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+ const tubeWidth=clamp(W/38,8,15);
+ function stroke(first,last,width,colour){
+  if(last<=first)return;
+  ctx.beginPath();
+  for(let i=first;i<=last;i++)i===first?ctx.moveTo(...screen[i]):ctx.lineTo(...screen[i]);
+  ctx.strokeStyle=colour;ctx.lineWidth=width;
+  ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
  }
- const midx=(minx+maxx)/2,midy=(miny+maxy)/2,size=Math.min((W-135)/Math.max(1,maxx-minx),(H-115)/Math.max(1,maxy-miny))*zoom;
- const screen=camera.map(p=>[W/2+(p[0]-midx)*size,H/2-(p[1]-midy)*size]);
- const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#071e30');bg.addColorStop(1,'#1b4966');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
- const draw=(a,b,width,color)=>{
-  if(b<=a)return;ctx.beginPath();for(let i=a;i<=b;i++)i===a?ctx.moveTo(...screen[i]):ctx.lineTo(...screen[i]);
-  ctx.strokeStyle=color;ctx.lineWidth=width;ctx.lineCap='round';ctx.lineJoin='round';ctx.stroke();
- };
- if(screen.length>1){draw(0,screen.length-1,22,'#041622');draw(0,screen.length-1,17,'#64899f');draw(0,screen.length-1,12,'#b0d9e6');draw(0,screen.length-1,3,'#e4fcff')}
- model.ends.forEach((e,i)=>{
-  if(e>=screen.length)return;
-  let j=e;while(j>0&&model.pts[j].bend===i+1)j--;draw(j,e,7,['#f47e90','#64edf0','#ffd485','#b69eff','#91e595'][i%5]);
-  let p=screen[e];ctx.fillStyle='#ffeab5';ctx.beginPath();ctx.arc(p[0],p[1],6,0,Math.PI*2);ctx.fill();ctx.fillStyle='#f7ffff';ctx.font='bold 18px system-ui';ctx.fillText('B'+(i+1),p[0]+10,p[1]-12);
+ function label(text,x,y,colour){
+  ctx.save();ctx.font='bold 12px system-ui';ctx.textBaseline='middle';
+  ctx.textAlign='left';
+  x=clamp(x,8,Math.max(8,W-ctx.measureText(text).width-8));
+  y=clamp(y,26,Math.max(26,H-13));
+  ctx.lineWidth=3;ctx.strokeStyle='#071a2a';ctx.strokeText(text,x,y);
+  ctx.fillStyle=colour;ctx.fillText(text,x,y);ctx.restore();
+ }
+ if(screen.length>1){
+  stroke(0,screen.length-1,tubeWidth+5,'#051523');
+  stroke(0,screen.length-1,tubeWidth+1,'#5e8096');
+  stroke(0,screen.length-1,tubeWidth-2,'#b0dce7');
+  stroke(0,screen.length-1,Math.max(1,tubeWidth*.18),'#e9ffff');
+ }
+ const palette=['#ff889a','#64eff1','#ffdc85','#d2baff','#a3f7bc'];
+ model.ends.forEach((finish,i)=>{
+  if(finish>=screen.length)return;
+  let start=finish;while(start>0&&model.pts[start].bend===i+1)start--;
+  stroke(start,finish,Math.max(4,tubeWidth*.42),palette[i%palette.length]);
+  const p=screen[finish];
+  ctx.beginPath();ctx.arc(p[0],p[1],Math.max(3,tubeWidth*.27),0,Math.PI*2);
+  ctx.fillStyle='#fff3ce';ctx.fill();
+  label('B'+(i+1),p[0]+7,p[1]-13,'#fff5db');
  });
- if(screen.length){ctx.fillStyle='#9cf5ff';ctx.font='bold 17px system-ui';let a=screen[0],b=screen[screen.length-1];ctx.fillText('START',a[0]+8,a[1]-15);ctx.fillText(mode==='partial'?'IN PROGRESS':'FINISH',b[0]+8,b[1]+23)}
- ctx.fillStyle='#d1e7f3';ctx.font='15px system-ui';ctx.fillText('3D CENTRELINE · GEOMETRY ONLY · NOT AN ARROW / STAR SHOP MARK',16,25);
- $('geometryNote').textContent='Bends: '+ops.map((o,i)=>'B'+(i+1)+' '+fmt(o.angle)+'° / plane '+fmt(o.plane)+'° / lead '+fmt(o.before)+' mm').join(' · ')+'. Developed material '+fmt(model.developed,1)+' / '+fmt(toMm(v('stock')),1)+' mm; preview radius '+fmt(model.radius)+' mm. Actual radius and physical shoe clearance must be verified.';
+ if(screen.length){
+  const first=screen[0],last=screen[screen.length-1];
+  label('START',first[0]+8,first[1]-17,'#9cf5ff');
+  label(mode==='partial'?'STEP '+(Math.min(step,ops.length-1)+1):'END',last[0]+8,last[1]+20,'#9cf5ff');
+ }
+ ctx.font='bold 11px system-ui';ctx.fillStyle='#e7f4fd';
+ ctx.fillText('3D SHAPE · NOT SHOE MARKS',12,17,Math.max(70,W-24));
 }
 function view(name){
- const options={iso:[-.7,.38],front:[0,0],side:[-Math.PI/2,0],top:[0,1.56]};
- [yaw,pitch]=options[name]||options.iso;renderModel();
+ const options={iso:[-.7,.38],front:[0,0],side:[-Math.PI/2,0],top:[0,Math.PI/2]};
+ [yaw,pitch]=options[name]||options.iso;
+ zoom=1;renderModel();
 }
 document.querySelectorAll('[data-camera]').forEach(b=>b.onclick=()=>view(b.dataset.camera));
-$('zoomPlus').onclick=()=>{zoom=Math.min(5,zoom*1.2);renderModel()};
-$('zoomMinus').onclick=()=>{zoom=Math.max(.2,zoom/1.2);renderModel()};
+$('zoomPlus').onclick=()=>{zoom=clamp(zoom*1.2,.3,4);renderModel()};
+$('zoomMinus').onclick=()=>{zoom=clamp(zoom/1.2,.3,4);renderModel()};
 $('resetView').onclick=()=>{zoom=1;view('iso')};
-canvas.addEventListener('pointerdown',e=>{drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId)});
-canvas.addEventListener('pointermove',e=>{if(!drag)return;let dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};yaw+=dx*.007;pitch=Math.max(-1.54,Math.min(1.54,pitch+dy*.007));renderModel()});
-canvas.addEventListener('pointerup',()=>drag=null);canvas.addEventListener('pointercancel',()=>drag=null);
-canvas.addEventListener('wheel',e=>{e.preventDefault();zoom=Math.min(5,Math.max(.2,zoom*(e.deltaY>0?.9:1.1)));renderModel()},{passive:false});
-canvas.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')yaw-=.1;else if(e.key==='ArrowRight')yaw+=.1;else if(e.key==='ArrowUp')pitch+=.1;else if(e.key==='ArrowDown')pitch-=.1;else return;e.preventDefault();renderModel()});
+function pointerDistance(){
+ const p=[...pointerPositions.values()];
+ return p.length>=2?Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y):null;
+}
+canvas.addEventListener('pointerdown',event=>{
+ pointerPositions.set(event.pointerId,{x:event.clientX,y:event.clientY});
+ canvas.setPointerCapture(event.pointerId);
+ pinchDistance=pointerDistance();
+});
+canvas.addEventListener('pointermove',event=>{
+ const old=pointerPositions.get(event.pointerId);
+ if(!old)return;
+ pointerPositions.set(event.pointerId,{x:event.clientX,y:event.clientY});
+ if(pointerPositions.size>=2){
+  const distance=pointerDistance();
+  if(pinchDistance&&distance)zoom=clamp(zoom*distance/pinchDistance,.3,4);
+  pinchDistance=distance;
+ }else{
+  yaw+=(event.clientX-old.x)*.007;
+  pitch=clamp(pitch+(event.clientY-old.y)*.007,-1.54,1.54);
+ }
+ renderModel();
+});
+function releasePointer(event){
+ pointerPositions.delete(event.pointerId);
+ pinchDistance=pointerDistance();
+}
+canvas.addEventListener('pointerup',releasePointer);
+canvas.addEventListener('pointercancel',releasePointer);
+canvas.addEventListener('lostpointercapture',releasePointer);
+// Normal scrolling must scroll the job worksheet. Ctrl/Command+wheel zooms.
+canvas.addEventListener('wheel',event=>{
+ if(!event.ctrlKey&&!event.metaKey)return;
+ event.preventDefault();
+ zoom=clamp(zoom*(event.deltaY>0?.9:1.1),.3,4);renderModel();
+},{passive:false});
+canvas.addEventListener('keydown',event=>{
+ if(event.key==='ArrowLeft')yaw-=.1;
+ else if(event.key==='ArrowRight')yaw+=.1;
+ else if(event.key==='ArrowUp')pitch=clamp(pitch+.1,-1.54,1.54);
+ else if(event.key==='ArrowDown')pitch=clamp(pitch-.1,-1.54,1.54);
+ else if(event.key==='+'||event.key==='=')zoom=clamp(zoom*1.2,.3,4);
+ else if(event.key==='-')zoom=clamp(zoom/1.2,.3,4);
+ else if(event.key==='Home'){zoom=1;yaw=-.7;pitch=.38;}
+ else return;
+ event.preventDefault();renderModel();
+});
+if(typeof ResizeObserver==='function'){
+ const observer=new ResizeObserver(()=>{if($('threeDDetails').open)renderModel()});
+ observer.observe(canvas);
+}else{
+ window.addEventListener('resize',()=>{if($('threeDDetails').open)renderModel()});
+}
 $('finished').onclick=()=>{mode='finished';$('previewStatus').textContent='Final shape';renderModel()};
 $('throughStep').onclick=()=>{mode='partial';$('previewStatus').textContent='Up to selected bend';renderModel()};
 $('prev').onclick=()=>{step=Math.max(0,step-1);renderStep()};
@@ -435,6 +550,7 @@ function refresh(reset){
   $('markDrawing').innerHTML='';$('markCards').innerHTML='';
   $('markAlert').textContent=e.message;
   $('instruction').textContent='Correct the measurements. No physical bend plan is approved.';
+  $('stepBrief').textContent='Enter valid measurements before bending.';
   $('geometryNote').textContent='Preview withheld while field stock or mark check fails.';
  }
 }
@@ -445,11 +561,36 @@ $('quickFields').addEventListener('input',e=>{
  clearTimeout(quickInputTimer);
  quickInputTimer=setTimeout(()=>refresh(true),180);
 });
-$('threeDDetails').addEventListener('toggle',()=>{if($('threeDDetails').open)renderModel()});
+$('threeDDetails').addEventListener('toggle',()=>{
+ if($('threeDDetails').open)requestAnimationFrame(()=>renderModel());
+ else previewIsVisible=false;
+});
 $('editorDetails').addEventListener('toggle',()=>{if($('editorDetails').open)renderModel()});
 $('kind').onchange=()=>refresh(true);$('angle').onchange=()=>refresh(true);$('method').onchange=()=>refresh(false);
 $('critical').onchange=()=>refresh(false);
-$('recalc').onclick=()=>{refresh(true);$('quickSummary').scrollIntoView({behavior:'smooth',block:'center'});};
+$('recalc').onclick=()=>{refresh(true);$('quickSummary').scrollIntoView({behavior:'auto',block:'nearest'});};
+function openFieldSection(id){
+ if(!layout)refresh(true);
+ if(!layout){$('quickSummary').scrollIntoView({block:'center',behavior:'auto'});return;}
+ const section=$(id);
+ section.open=true;
+ requestAnimationFrame(()=>{
+  section.scrollIntoView({block:'start',behavior:'auto'});
+  if(id==='threeDDetails')renderModel();
+ });
+}
+// Preserve the field button as the pointer-up/click target even when the
+// expanded section changes document height between press and release.
+for(const id of ['goSteps','open3D']){
+ const btn=$(id);
+ btn.addEventListener('pointerdown',event=>{
+  if(event.isPrimary&&btn.setPointerCapture){
+   try{btn.setPointerCapture(event.pointerId);}catch(_){}
+  }
+ });
+}
+$('goSteps').onclick=()=>openFieldSection('bendSteps');
+$('open3D').onclick=()=>openFieldSection('threeDDetails');
 ['stock','minMarkGap','minStraight'].forEach(id=>$(id).addEventListener('input',()=>refresh(false)));
 $('unit').addEventListener('change',function(){
  const old=this.dataset.previous||'mm',now=this.value,change=old===now?1:now==='mm'?25.4:1/25.4;
@@ -489,7 +630,7 @@ $('copyPlan').onclick=()=>{
  navigator.clipboard.writeText(data).then(()=>alert('Instruction plan copied.'),()=>alert('Clipboard unavailable here.'));
 };
 $('print').onclick=()=>window.print();
-$('quickCopy').onclick=()=>$('copyPlan').click();
+// Copy the detailed plan from the verification panel when needed.
 const items=['Tape zero and reference end are confirmed.','I know which ARROW/STAR/NOTCH belongs on EACH physical mark.','Hook direction matches this exact bender and floor/air method.','I checked whether to FLIP the bender assembly for the next bend.','I checked pipe ROTATION and preserved the intended bend plane.','The finished shape, shoe clearance, radius, springback and bend sum are verified.'];
 $('checks').innerHTML=items.map((t,i)=>'<label class="check"><input type="checkbox" aria-label="Field check '+(i+1)+'"><span>'+html(t)+'</span></label>').join('');
 $('unit').dataset.previous='mm';defaults();refresh(false);

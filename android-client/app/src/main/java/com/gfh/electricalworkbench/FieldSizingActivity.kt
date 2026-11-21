@@ -26,7 +26,7 @@ class FieldSizingActivity : ComponentActivity() {
             ElectricalUiTheme {
                 var tab by remember { mutableStateOf(intent.getStringExtra("toolTab") ?: "Pull box") }
                 Column(Modifier.fillMaxSize().statusBarsPadding().navigationBarsPadding().imePadding().verticalScroll(rememberScrollState()).padding(12.dp),verticalArrangement=Arrangement.spacedBy(9.dp)) {
-                    Text("Field tools · Offline",style=MaterialTheme.typography.titleLarge)
+                    Text(if(tab=="Bender")"Conduit bender · Offline" else "Field tools · Offline",style=MaterialTheme.typography.titleLarge)
                     FieldDropdown(
                         "Choose a field tool", tab,
                         listOf("Pull box", "Bender", "Fabrication", "Calibration", "Troubleshooting")
@@ -253,14 +253,14 @@ private fun pullBoxMath(entries:List<PipeEntry>,type:String,u:String,od:Double):
             if(showMeasureSteps) steps.forEachIndexed { index,item ->
                 Text("${index+1}. $item",color=EWColors.muted,fontSize=13.sp,lineHeight=18.sp)
             }
-            Text("Job measurements are not shoe marks. Verify the reference.",color=EWColors.warning,fontSize=12.sp)
+            if(showMeasureSteps) Text("Job dimensions are not shoe alignment marks.",color=EWColors.warning,fontSize=12.sp)
         }
     }
 }
 @Composable private fun BendMeasureField(label:String,detail:String,value:String,change:(String)->Unit) {
     Column(Modifier.fillMaxWidth(),verticalArrangement=Arrangement.spacedBy(2.dp)) {
         NumberInput(label,value,change)
-        Text(detail,color=Color(0xFFB6D4E5),fontSize=12.sp,lineHeight=16.sp)
+        Text(detail,color=EWColors.muted,fontSize=11.sp,lineHeight=14.sp,maxLines=1)
     }
 }
 
@@ -270,13 +270,13 @@ private val bends=listOf("Offset","Rolling offset","90° stub","Three-point sadd
     var bend by remember{mutableStateOf("Offset")}
     var units by remember{mutableStateOf("mm")}
     var angle by remember{mutableStateOf("30")}
-    var rise by remember{mutableStateOf("150")}
-    var roll by remember{mutableStateOf("100")}
-    var distance by remember{mutableStateOf("600")}
-    var stub by remember{mutableStateOf("500")}
-    var takeup by remember{mutableStateOf("0")}
-    var width by remember{mutableStateOf("200")}
-    var centre by remember{mutableStateOf("600")}
+    var rise by remember{mutableStateOf("")}
+    var roll by remember{mutableStateOf("")}
+    var distance by remember{mutableStateOf("")}
+    var stub by remember{mutableStateOf("")}
+    var takeup by remember{mutableStateOf("")}
+    var width by remember{mutableStateOf("")}
+    var centre by remember{mutableStateOf("")}
     var minimumShoeGap by remember { mutableStateOf("") }
     var result by remember{mutableStateOf("Select a bend and calculate marks.") }
     var offsetReference by remember { mutableStateOf("Near bend critical") }
@@ -284,11 +284,11 @@ private val bends=listOf("Offset","Rolling offset","90° stub","Three-point sadd
     var precision by remember { mutableStateOf("1 mm") }
     var showMoreOptions by remember { mutableStateOf(false) }
     var showOrientationDetails by remember { mutableStateOf(false) }
-    Text("Conduit bending · quick marks",fontSize=19.sp,fontWeight=androidx.compose.ui.text.font.FontWeight.Bold)
-    Text("Pick your bend, measure the job, then read the pencil marks below.",fontSize=13.sp,color=Color(0xFFB6D4E5))
+    var showResultSteps by remember { mutableStateOf(false) }
+    Text("Measure → Mark → Bend",fontSize=19.sp,fontWeight=androidx.compose.ui.text.font.FontWeight.Bold)
     FieldDropdown("Bend",bend,bends){bend=it}
     BendMeasureGuide(bend)
-    Text("Sample numbers are prefilled for learning — replace with actual field measurements.",color=Color(0xFFF2C87F),fontSize=12.sp)
+    Text("Enter actual job measurements. No sample dimensions are prefilled.",color=EWColors.muted,fontSize=12.sp)
     FieldDropdown("Input units",units,listOf("mm","in")){next->
         if(next!=units){
             val factor=if(next=="in")1/25.4 else 25.4
@@ -321,7 +321,7 @@ private val bends=listOf("Offset","Rolling offset","90° stub","Three-point sadd
     if(bend in listOf("Four-point saddle","Back-to-back 90s"))
         BendMeasureField(if(bend=="Back-to-back 90s")"Back-to-back distance ("+units+")" else "Obstacle width ("+units+")",
             if(bend=="Back-to-back 90s")"After first 90: measure from BACK of finished bend to second STAR." else "Measure along the conduit run, including intended clearances.",width){width=it}
-    Text("10 ft EMT stock limit: "+if(units=="mm")"3,048 mm" else "120 in",color=Color(0xFF91E5D5))
+    Text("Stock limit · "+if(units=="mm")"3,048 mm (10 ft)" else "120 in (10 ft)",color=EWColors.muted,fontSize=12.sp)
     OutlinedButton(onClick = { showMoreOptions = !showMoreOptions }, modifier = Modifier.fillMaxWidth()) {
         Text(if (showMoreOptions) "Hide additional settings ▲" else "More options · precision, references & shoe spacing ▼")
     }
@@ -340,21 +340,38 @@ private val bends=listOf("Offset","Rolling offset","90° stub","Three-point sadd
         result=runCatching{
             val gap=if(minimumShoeGap.isBlank())null
                     else minimumShoeGap.toDoubleOrNull()?:error("Enter a valid shoe gap, or leave blank.")
-            bendMath(bend,units,angle.toDouble(),rise.toDouble(),roll.toDouble(),distance.toDouble(),stub.toDouble(),takeup.toDouble(),width.toDouble(),centre.toDouble(),offsetReference,saddleMethod,precision,gap)
+            bendMath(bend,units,angle.toDouble(),rise.toDoubleOrNull()?:0.0,roll.toDoubleOrNull()?:0.0,
+                     distance.toDoubleOrNull()?:0.0,stub.toDoubleOrNull()?:0.0,takeup.toDoubleOrNull()?:0.0,
+                     width.toDoubleOrNull()?:0.0,centre.toDoubleOrNull()?:0.0,offsetReference,saddleMethod,precision,gap)
         }
             .getOrElse{"Check inputs: "+it.message}
     },modifier=Modifier.fillMaxWidth()){Text("Show tape marks & bending steps")}
     OutlinedCard(modifier=Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(14.dp),verticalArrangement=Arrangement.spacedBy(8.dp)) {
-            Text("FIELD RESULT",style=MaterialTheme.typography.labelLarge,color=Color(0xFF93EEEC))
-            Text(result,fontSize=13.sp,lineHeight=19.sp)
+        Column(Modifier.padding(11.dp),verticalArrangement=Arrangement.spacedBy(7.dp)) {
+            Text("TAPE MARKS",style=MaterialTheme.typography.labelLarge,color=EWColors.primary)
+            val important=result.lines().filter { line ->
+                listOf("A near mark:","B far mark:","First arrow mark:","A / B / C:",
+                       "A/B/C/D:","MARK A","MARK B","KICK MARK:","Back of first 90",
+                       "Side spacing:","Spacing:","Center ","True offset:").any { line.startsWith(it) }
+            }
+            val summary=if(result.startsWith("10 FT EMT")&&important.isNotEmpty())
+                important.take(7).joinToString("\n")
+                else result.lineSequence().take(3).joinToString("\n")
+            Text(summary,color=EWColors.text,fontSize=15.sp,lineHeight=22.sp)
+            if(result.startsWith("10 FT EMT")) {
+                OutlinedButton(onClick={showResultSteps=!showResultSteps},
+                    modifier=Modifier.fillMaxWidth()) {
+                    Text(if(showResultSteps)"Hide complete bend steps ▲" else "Complete steps & shoe directions ▼")
+                }
+                if(showResultSteps) Text(result,color=EWColors.text,fontSize=13.sp,lineHeight=19.sp)
+            }
         }
     }
     OutlinedButton(onClick = { showOrientationDetails = !showOrientationDetails },modifier=Modifier.fillMaxWidth()) {
         Text(if(showOrientationDetails) "Hide hook-facing guide ▲" else "Show hook facing for each bend ▼")
     }
     if(showOrientationDetails) BendHookFacingCards(bend,angle,saddleMethod)
-    Text("Field check: use the correct-size shoe and firm foot pressure, keep bend planes aligned, check springback and avoid conduit flattening. Test a piece before cutting to final length.",color=Color(0xFFFFD68A))
+    Text("Verify shoe marks, springback, bend plane and clearance with your actual bender.",color=EWColors.warning,fontSize=12.sp)
 }
 private fun bendMath(type:String,u:String,angle:Double,rise:Double,roll:Double,dist:Double,stub:Double,takeup:Double,width:Double,centre:Double,offsetReference:String,saddleMethod:String,precision:String,minShoeGap:Double?):String {
     require(angle.isFinite()&&angle>0&&angle<90){"Angle must be between 0° and 90°."}
@@ -366,6 +383,10 @@ private fun bendMath(type:String,u:String,angle:Double,rise:Double,roll:Double,d
     fun checkMarks(vararg marks:Double) {
         require(marks.all { it.isFinite()&&it>=0&&it<=stock+0.000001 }) {
             "CALCULATION NOT POSSIBLE on one 10 ft EMT: at least one mark lies outside "+f(stock)+" of stock."
+        }
+        val markPositions=marks.sorted()
+        for(i in 1 until markPositions.size) require(markPositions[i]-markPositions[i-1]>0.000001) {
+            "BENDS TOO CLOSE: physical shoe marks overlap; increase the bend spacing."
         }
         if(minShoeGap!=null&&minShoeGap>0) {
             val sorted=marks.sorted()

@@ -95,6 +95,8 @@
   function update(){
     var help=guides[kind.value]||guides.custom;
     document.getElementById('measureIntro').textContent=help.lead;
+    var quick=document.getElementById('measureShort');
+    if(quick)quick.textContent=help.lead;
     var list=document.getElementById('measureSteps');
     list.replaceChildren();
     help.steps.forEach(function(step){list.appendChild(el('li',step));});
