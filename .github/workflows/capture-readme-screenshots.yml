@@ -45,5 +45,6 @@ jobs:
             echo "Screenshots already up to date."
           else
             git commit -m "docs: capture current Electrical Workbench web UI screenshots"
+            git pull --rebase origin main
             git push origin HEAD:main
           fi
