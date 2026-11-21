@@ -131,3 +131,14 @@ html[data-ewb-theme] #ewb-theme-done {
 }
 @media(max-width:640px){#ewb-theme-host:not(.ewb-theme-floating){margin-left:auto}html[data-ewb-theme] #ewb-theme-panel{top:62px;max-height:calc(100dvh - 76px)}}
 @media print{#ewb-theme-host{display:none!important}}
+
+/* Header text must stay readable on the dark navigation surface.
+   These selectors intentionally outrank the generic link colour override. */
+html[data-ewb-theme] body header nav :is(a,button):not(.btn):not(.open):not(.workflow-link),
+html[data-ewb-theme] body .sidebar .nav :is(a,button):not(.btn):not(.open):not(.workflow-link) {
+  color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body header nav :is(a,button):hover,
+html[data-ewb-theme] body .sidebar .nav :is(a,button):hover {
+  color:var(--ewb-text)!important;
+}
