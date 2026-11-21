@@ -579,6 +579,16 @@ function openFieldSection(id){
   if(id==='threeDDetails')renderModel();
  });
 }
+// Preserve the field button as the pointer-up/click target even when the
+// expanded section changes document height between press and release.
+for(const id of ['goSteps','open3D']){
+ const btn=$(id);
+ btn.addEventListener('pointerdown',event=>{
+  if(event.isPrimary&&btn.setPointerCapture){
+   try{btn.setPointerCapture(event.pointerId);}catch(_){}
+  }
+ });
+}
 $('goSteps').onclick=()=>openFieldSection('bendSteps');
 $('open3D').onclick=()=>openFieldSection('threeDDetails');
 ['stock','minMarkGap','minStraight'].forEach(id=>$(id).addEventListener('input',()=>refresh(false)));
