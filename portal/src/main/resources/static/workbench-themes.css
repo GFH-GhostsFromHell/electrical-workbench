@@ -143,3 +143,198 @@ html[data-ewb-theme] body header nav :is(a,button):hover,
 html[data-ewb-theme] body .sidebar .nav :is(a,button):hover {
   color:var(--ewb-text)!important;
 }
+
+/* ACCESSIBILITY REFINEMENT — visually inspected CSS token pairings and computed
+   WCAG AA checks. Legacy modules set their own dark backgrounds and fixed text
+   colours; these mappings deliberately take precedence without touching math,
+   SVG/canvas diagrams, alerts' meaning or stored field values. */
+html[data-ewb-theme] {
+ --ewb-warning-bg:#fff3dc; --ewb-warning-text:#664000;
+ --ewb-danger-bg:#fff0ed; --ewb-danger-text:#912b22;
+ --ewb-nav-active:var(--ewb-raised);
+ --ewb-control-bg:var(--ewb-surface);
+ --ewb-control-text:var(--ewb-text);
+}
+html[data-ewb-theme="midnight"] {
+ --ewb-warning-bg:#4b321d; --ewb-warning-text:#ffdfb3;
+ --ewb-danger-bg:#4b2727; --ewb-danger-text:#ffcccc;
+}
+html[data-ewb-theme="workshop"] {
+ --ewb-warning-bg:#fff0d5; --ewb-warning-text:#684000;
+ --ewb-danger-bg:#ffefea; --ewb-danger-text:#912d1e;
+}
+html[data-ewb-theme="contrast"] {
+ --ewb-warning-bg:#000000; --ewb-warning-text:#ffe15c;
+ --ewb-danger-bg:#000000; --ewb-danger-text:#ffb5b5;
+}
+/* Old calculators use these private dark-theme variables for helper text. */
+html[data-ewb-theme] {
+ --bg:var(--ewb-bg)!important;
+ --panel:var(--ewb-surface)!important;
+ --panel2:var(--ewb-raised)!important;
+ --card:var(--ewb-surface)!important;
+ --card2:var(--ewb-raised)!important;
+ --text:var(--ewb-text)!important;
+ --muted:var(--ewb-muted)!important;
+ --line:var(--ewb-border)!important;
+ --border:var(--ewb-border)!important;
+ --link:var(--ewb-accent)!important;
+}
+/* Solid, readable top-level surfaces. A heading must not be dark ink on a
+   hard-coded navy section. Nested cards retain their own card surface. */
+html[data-ewb-theme] body :is(.wrap,.main,main.main) {
+ background-color:var(--ewb-bg)!important;
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body .wrap:has(> nav) > main,
+html[data-ewb-theme] body .main:has(> .module) {
+ background:var(--ewb-bg)!important;
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body :is(.module,.section):not(.warning) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body :is(.module,.section) :is(h1,h2,h3,h4) {
+ color:var(--ewb-text)!important;
+}
+/* The injected worksheet save panel carries its own dynamically appended CSS.
+   Override that dark block as a single high-contrast surface. */
+html[data-ewb-theme] body #ewbWorksheetAssist {
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;
+ border:2px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body #ewbWorksheetAssist :is(h2, label, strong) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body #ewbWorksheetAssist :is(.ewb-note,p,.ewb-steps span) {
+ color:var(--ewb-muted)!important;
+}
+html[data-ewb-theme] body #ewbWorksheetAssist .ewb-steps span {
+ background:var(--ewb-raised)!important;border:1px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body #ewbWorksheetAssist .ewb-steps b {
+ background:var(--ewb-accent)!important;color:var(--ewb-accent-text)!important;
+}
+html[data-ewb-theme] body #ewbWorksheetAssist a {
+ color:var(--ewb-accent)!important;
+}
+html[data-ewb-theme] body #ewbWorksheetAssist :is(input,select){
+ background:var(--ewb-surface)!important;color:var(--ewb-text)!important;
+ border:1px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body #ewbWorksheetAssist button {
+ background:var(--ewb-accent)!important;color:var(--ewb-accent-text)!important;
+ border:1px solid var(--ewb-accent)!important;
+}
+/* Form labels and instructions are never allowed to inherit fixed old colours
+   (e.g. #465870 on a midnight input section). */
+html[data-ewb-theme] body main :is(label,.field label,.find-calculator label),
+html[data-ewb-theme] body :is(.find-calculator label,.toolbar label,.field label) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body main :is(small,.field-help,.step small,.tile small,.topic small,.measure-guide small,.cue small,.mark small) {
+ color:var(--ewb-muted)!important;
+}
+html[data-ewb-theme] body :is(.ewb-note,.resultcount,.field-help,.guide-caution,.stock-status) {
+ color:var(--ewb-muted)!important;
+}
+html[data-ewb-theme] body main :is(pre,.result,.out,.reading,.answer,.output) {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+html[data-ewb-theme] body main :is(b,strong):not(.ewb-steps b) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body main :is(summary,.advanced-disclosure summary,.preview-disclosure summary) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body main :is(.advanced-disclosure,.preview-disclosure,.measure-guide,.quick-summary,.quick-card,.stock-status,.tabs,.nav,.mode) {
+ background:var(--ewb-raised)!important;color:var(--ewb-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+html[data-ewb-theme] body main :is(.quick-summary span,.quick-summary strong,.quick-mark,.measure-guide strong,.measure-guide p,.measure-guide ol,.stock-status,.field-help) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body main .quick-summary :is(.quick-alert,.stock-status.pending) {
+ color:var(--ewb-warn)!important;
+}
+/* The legacy left-side nav is a dark surface. Its links must stay light. */
+html[data-ewb-theme] body .wrap > nav,
+html[data-ewb-theme] body .shell > nav {
+ background:var(--ewb-nav)!important;color:var(--ewb-nav-text)!important;
+ border-color:var(--ewb-border)!important;
+}
+html[data-ewb-theme] body .wrap > nav :is(a,button,.navbtn),
+html[data-ewb-theme] body .shell > nav :is(a,button,.navbtn) {
+ color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body .wrap > nav :is(a,button,.navbtn).active,
+html[data-ewb-theme] body .shell > nav :is(a,button,.navbtn).active {
+ background:var(--ewb-nav-active)!important;color:var(--ewb-text)!important;
+}
+/* Header, topbar and dark sidebar titles must be light against navy. */
+html[data-ewb-theme] body header:not(.hero) :is(h1,h2,h3,h4,p,label,b,strong,small,.brand,.eyebrow),
+html[data-ewb-theme] body .topbar :is(h1,h2,h3,h4,p,label,b,strong,small) {
+ color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body header:not(.hero) :is(a,nav a) {
+ color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body .topbar .top-actions a {
+ background:var(--ewb-accent)!important;color:var(--ewb-accent-text)!important;
+}
+html[data-ewb-theme] body .sidebar .nav :is(button,a) {
+ background:transparent!important;color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body .sidebar .nav :is(button,a).active,
+html[data-ewb-theme] body .sidebar .nav :is(button,a):hover {
+ background:var(--ewb-nav-active)!important;
+ color:var(--ewb-text)!important;
+ border:1px solid var(--ewb-border)!important;
+}
+html[data-ewb-theme] body .sidebar .nav :is(button,a) :is(.label,.icon) {
+ color:var(--ewb-nav-text)!important;
+}
+html[data-ewb-theme] body .sidebar .nav :is(button,a).active :is(.label,.icon),
+html[data-ewb-theme] body .sidebar .nav :is(button,a):hover :is(.label,.icon) {
+ color:var(--ewb-text)!important;
+}
+/* Warning text always travels with its matching background, regardless of
+   theme; no white-on-cream or grey-on-alert mismatches. */
+html[data-ewb-theme] body :is(.warning,.notice,.note.warning,.face-direction.unverified,.hookvisual.unverified,.stock-status.pending) {
+ background:var(--ewb-warning-bg)!important;color:var(--ewb-warning-text)!important;
+ border-color:var(--ewb-warn)!important;
+}
+html[data-ewb-theme] body :is(.warning,.notice,.note.warning) :is(b,strong,small,span,p) {
+ color:var(--ewb-warning-text)!important;
+}
+html[data-ewb-theme] body :is(.stock-status.bad,.bad.notice) {
+ background:var(--ewb-danger-bg)!important;color:var(--ewb-danger-text)!important;
+ border-color:var(--ewb-bad)!important;
+}
+/* Tile buttons use the accent fill. Nested b/small text must use the same
+   contrasting foreground, rather than a fixed white/grey/cyan text. */
+html[data-ewb-theme] body :is(button.tile,button.topic,button.primary,.tile[role=button]) :is(b,strong,small,span),
+html[data-ewb-theme] body main .task .open :is(b,small,span) {
+ color:var(--ewb-accent-text)!important;
+}
+html[data-ewb-theme] body :is(button.secondary,button.ghost,button.star) :is(b,strong,small,span) {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body .workflow-steps span {
+ color:var(--ewb-accent)!important;
+}
+html[data-ewb-theme] body .workbench-shortcuts summary {
+ color:var(--ewb-text)!important;
+}
+html[data-ewb-theme] body .workbench-shortcuts summary .muted {
+ color:var(--ewb-muted)!important;
+}
+/* Keep the high-contrast theme genuinely high contrast, including placeholder
+   text, borders and controls. No low-opacity disabled labels. */
+html[data-ewb-theme="contrast"] body :is(button:disabled,.btn:disabled,input:disabled,select:disabled) {
+ opacity:1!important;border:2px dashed var(--ewb-border)!important;
+}
+html[data-ewb-theme] :is(input,select,textarea,button,a,summary):focus-visible {
+ outline:3px solid var(--ewb-focus)!important;outline-offset:3px!important;
+}
