@@ -233,8 +233,8 @@ public final class ConduitBendingFieldPane extends BorderPane {
                 if(A<0)throw new IllegalArgumentException("First mark is before reference end; increase clearance to near face.");
                 visualMarks.add(new BendMarkStripPane.Mark(A,1,"A","ARROW · PAIRED OFFSET","A FIRST · HOOK ←, rise with first offset bend","Bend "+a+"° rise"));
                 visualMarks.add(new BendMarkStripPane.Mark(B,2,"B","ARROW · PAIRED OFFSET","B SECOND · FLIP handle DOWN / roll conduit 180° · HOOK ←","Return "+a+"° to level"));
-                visualMarks.add(new BendMarkStripPane.Mark(C,3,"C","ARROW · PAIRED OFFSET","C THIRD · opposite offset in same plane · HOOK ←","Bend "+a+"° back toward datum plane"));
-                visualMarks.add(new BendMarkStripPane.Mark(D,4,"D","ARROW · PAIRED OFFSET","D FOURTH · FLIP handle DOWN / roll conduit 180° · HOOK ←","Return "+a+"° to original run"));
+                visualMarks.add(new BendMarkStripPane.Mark(C,3,"C","ARROW · PAIRED OFFSET","C THIRD · TURN BENDER AROUND, HOOK → toward far end · same plane","Bend "+a+"° back toward datum plane"));
+                visualMarks.add(new BendMarkStripPane.Mark(D,4,"D","ARROW · PAIRED OFFSET","D FOURTH · FLIP handle DOWN / roll conduit 180° · HOOK →","Return "+a+"° to original run"));
                 s.append("Each offset bend: ").append(a).append("°\nSide spacing: ").append(measure(spacing)).append("\nShrink per offset: ")
                  .append(measure(sh)).append("\nTotal shrink: ").append(measure(2*sh)).append("\n")
                  .append("Marks A/B/C/D: ").append(measure(A)).append(" / ").append(measure(B)).append(" / ")
@@ -242,7 +242,7 @@ public final class ConduitBendingFieldPane extends BorderPane {
                  .append("\nFIELD STEPS\n1. Measure A, B, C and D from the SAME reference end and mark all four points.\n")
                  .append("2. Make equal-angle bends at A and B to rise over the obstacle, reversing the conduit 180° between bends.\n")
                  .append("3. Make equal-angle bends at C and D in the opposite offset direction to return to the starting plane.\n")
-                  .append("4. This is two paired offsets: flip the handle down and roll the conduit 180° before each return bend B and D. The hook is shown LEFT for the Klein-style example. Confirm arrow placement, shoe radius and access on your own bender before production.\n");
+                  .append("4. This is two paired offsets: flip the handle down and roll the conduit 180° before each return bend B and D. The hook points LEFT for A/B and RIGHT for C/D in the paired-offset example. Confirm arrow placement, shoe radius and access on your own bender before production.\n");
             } else {
                 double r=positive(rise,"centreline radius");int n=(int)nonNegative(segments,"segments");
                 if(n<3||n>12)throw new IllegalArgumentException("Use 3 to 12 segments.");
