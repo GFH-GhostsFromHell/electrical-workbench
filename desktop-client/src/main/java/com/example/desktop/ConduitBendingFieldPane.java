@@ -225,7 +225,7 @@ public final class ConduitBendingFieldPane extends BorderPane {
                   .append("4. A SECOND: flip handle DOWN and roll conduit 180° in the cradle, HOOK RIGHT toward B, align ARROW and bend ").append(side).append("°. C THIRD: move to the far side of B, HOOK LEFT toward B, bend ").append(side).append("° in the SAME plane.\n")
                  .append("5. The traditional field values of 2.5 for a 45° centre and 3.8 for a 30° centre assume centre-notch and outer-arrow benchmarks; geometric centre-to-centre distances are NOT interchangeable with these shoe markings.\n")
                   .append("6. Hook arrows shown are for the documented 45° Klein-style hand-bender method only. Use your own shoe maker's arrow/notch and handle setup where different.\n");
-                if(!traditional||a!=45)s.append("WARNING: this angle or method has no validated physical arrow/notch setup in this guide. Geometry is for planning only.\n"); //
+                if(!traditional||a!=45)s.append("WARNING: this angle or method has no validated physical arrow/notch setup in this guide. Geometry is for planning only.\n");
             } else if(t.equals("Four-point saddle")){
                 double h=positive(rise,"saddle height"), w=positive(width,"obstacle width"),d=positive(distance,"distance to near face");
                 double spacing=h*mult,sh=h*shrinkFactor;
