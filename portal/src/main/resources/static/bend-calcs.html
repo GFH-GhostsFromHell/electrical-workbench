@@ -298,8 +298,8 @@ function bendReference(currentBend,mark,index){
   const seq={
    A:[1,'ARROW · PAIRED OFFSET','A FIRST · hook LEFT; make the first offset bend to rise.','← HOOK','left'],
    B:[2,'ARROW · PAIRED OFFSET','B SECOND · FLIP handle DOWN and roll conduit 180°; hook LEFT. Return to the upper flat.','← HOOK','left'],
-   C:[3,'ARROW · PAIRED OFFSET','C THIRD · begin the opposite offset in the same plane; reverse the rise direction. For this paired-offset setup, hook LEFT.','← HOOK','left'],
-   D:[4,'ARROW · PAIRED OFFSET','D FOURTH · FLIP handle DOWN and roll conduit 180°; hook LEFT. Return to the original run.','← HOOK','left']
+   C:[3,'ARROW · PAIRED OFFSET','C THIRD · TURN bender AROUND to face the hook RIGHT (away from tape zero). Begin the second, opposite offset in the SAME plane.','HOOK →','right'],
+   D:[4,'ARROW · PAIRED OFFSET','D FOURTH · FLIP handle DOWN and roll conduit 180° in the cradle; hook RIGHT, returning to the original run.','HOOK →','right']
   };
   ref=seq[mark]||[index+1,'GEOMETRY ONLY','No physical shoe alignment mark was produced.','GEOMETRY','none'];
  }else if(currentBend==='stub'||currentBend==='kick90')
@@ -347,9 +347,9 @@ function benderHelpText(which){
   rollNear:'Rolling offset: use true offset for spacing. Bend A first, B second. Do not twist the plane between bends or the final run will not be parallel.',
   saddle3:'Three-point saddle: bend B (centre) FIRST, using the saddle/centre notch. Bend A SECOND and C THIRD using appropriate outer ARROW marks, each at half centre angle.',
   round:'Round saddle: B centre FIRST with notch, A SECOND and C THIRD with outside reference. Verify diameter and over-obstacle clearance.',
-  saddle4:'Four-point saddle: first A then B to rise over the obstruction; C then D to return to the initial plane. Keep pairs coplanar and check the shoe clearance.',
-  rect:'Rectangular four-point saddle: A→B creates first offset, C→D returns. Verify the top flat section can clear the obstruction and bender shoe.',
-  square:'Square-obstacle saddle: use four marks A, B, C and D in that order; align ARROW as appropriate for the head and flip for return bends.',
+  saddle4:'Four-point saddle: A/B form the first offset with hook toward tape zero. Turn the bender around for C/D, so hook points toward the far end. Flip/roll before the return bends B and D; keep both offsets coplanar.',
+  rect:'Rectangular saddle: A/B hook toward tape zero; reverse hook toward far end for C/D. Flip/roll for B and D. Check top flat clearance and tool access.',
+  square:'Square-obstacle saddle: A/B form first offset, reverse bender hook for C/D; flip/roll before return bends B and D, maintaining the same plane.',
   stub:'90° stub: ARROW mark = requested stub height − verified head deduct. Hook faces the short free end. Bend first 90 and check actual stub height.',
   kick90:'Kicked 90: bend the 90 using ARROW first. The kick location is a separate measurement; rise alone does not determine an absolute shoe mark.',
   segment90:'Segmented 90: make the listed small bends in order, all in the same plane. The shoe centreline/radius changes actual mark positions; check a test piece.',
@@ -389,7 +389,7 @@ function renderSteps(){
  }else if(['saddle4','rect','square'].includes(current)){
   steps=make('Measure the actual obstacle height and width, including chosen clearances. Use all four calculated marks A, B, C and D.',
    'A: hook LEFT and bend the first rise. B: flip handle DOWN and roll conduit 180° in the cradle, hook LEFT, and return to the upper flat using the paired-offset method.',
-   'C: start the opposite offset while keeping the original bend plane. D: flip handle DOWN and roll conduit 180° in the cradle again, hook LEFT, returning to the original run.',
+   'C: TURN the bender AROUND so hook faces RIGHT, away from tape zero; start the opposite offset in the same plane. D: FLIP handle DOWN and roll conduit 180° in the cradle; hook RIGHT, returning to the original run.',
   'Keep all bends in one plane, inspect the horizontal section across the obstruction, and verify total shrink and shoe-radius clearance.');
  }else if(current==='stub'){
   steps=make('Check the stamped take-up/deduct on the EXACT bender and conduit type; the preset is only a starting value.',
@@ -615,8 +615,8 @@ function mbCompute(){
     {const A=o.pos,B=A+span,C=B+o.w,D=C+span;
      put(A,'A','ARROW · PAIRED OFFSET','A FIRST · HOOK ←; first rise','Rise '+o.a+'° '+o.plane,'left');
      put(B,'B','ARROW · PAIRED OFFSET','B SECOND · FLIP handle DOWN + ROLL conduit 180°; HOOK ←','Level '+o.a+'° at top','left');
-     put(C,'C','ARROW · PAIRED OFFSET','C THIRD · start opposite offset, same plane; HOOK ←','Return '+o.a+'° toward original line','left');
-     put(D,'D','ARROW · PAIRED OFFSET','D FOURTH · FLIP handle DOWN + ROLL conduit 180°; HOOK ←','Level '+o.a+'° on original run','left');
+     put(C,'C','ARROW · PAIRED OFFSET','C THIRD · TURN bender AROUND; HOOK → away from datum; opposite offset in same plane','Return '+o.a+'° toward original line','right');
+     put(D,'D','ARROW · PAIRED OFFSET','D FOURTH · FLIP handle DOWN + ROLL conduit 180°; HOOK →','Level '+o.a+'° on original run','right');
      issues.push('Four-point setup uses two paired offsets, not a universal shoe-approved hook sequence. Confirm shoe access, arrow marks and bend direction on your own tool.');}break;
   }
   sequence.forEach(m=>{m.order=all.length+1;all.push(m);
