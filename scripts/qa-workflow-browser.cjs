@@ -229,30 +229,17 @@ const server = http.createServer((req, res) => {
     await page.locator('#distance').fill('600');
     await page.waitForFunction(()=>Boolean(document.querySelector('#quickSummary .quick-mark')),{timeout:5000});
     assert.ok((await page.locator('#quickSummary').innerText()).includes('A'),'Live tape marks appear');
-    await page.evaluate(()=>{
-      window.__bendClickTrace=[];
-      for(const type of ['pointerdown','pointerup','click'])document.addEventListener(type,e=>{
-        if(window.__bendClickTrace.length<20)window.__bendClickTrace.push({type,target:e.target.id,closest:e.target.closest('button,summary')?.id||''});
-      },true);
-    });
+    await page.waitForTimeout(300); // debounce and layout settle before a real field tap
+    await page.locator('#goSteps').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(120);
     await page.locator('#goSteps').click();
-    console.log('BEND POINTER DEBUG '+JSON.stringify(await page.evaluate(()=>window.__bendClickTrace)));
-    const bendPanelState=await page.evaluate(()=>{
-      const panel=document.getElementById('bendSteps'),brief=document.getElementById('stepBrief');
-      return {open:panel.open,display:getComputedStyle(panel).display,briefDisplay:getComputedStyle(brief).display,
-        briefRect:brief.getBoundingClientRect().toJSON(),text:brief.textContent,
-        summary:document.getElementById('quickSummary').textContent.slice(0,200)};
-    });
-    console.log('BEND PANEL DEBUG '+JSON.stringify(bendPanelState));
-    console.log('BEND CLICK DEBUG '+JSON.stringify(await page.evaluate(()=>{
-      const b=document.getElementById('goSteps'),d=document.getElementById('bendSteps');
-      const before=d.open; b.click();
-      return {buttonParent:b.closest('details')?.id,handler:String(b.onclick),before,after:d.open,
-       attributes:Array.from(d.attributes).map(x=>x.name+'='+x.value)};
-    })));
+    await page.waitForFunction(()=>document.getElementById('bendSteps').open);
     await visible('#stepBrief');
     assert.equal(await page.locator('#bendSteps').getAttribute('open'),'','Bend steps open in one tap');
+    await page.locator('#open3D').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(120);
     await page.locator('#open3D').click();
+    await page.waitForFunction(()=>document.getElementById('threeDDetails').open);
     await visible('#tubeCanvas');
     assert.equal(await page.locator('#threeDDetails').getAttribute('open'),'','3D opens with one tap');
     const snapshot=async()=>page.locator('#tubeCanvas').evaluate(canvas=>{
@@ -268,17 +255,19 @@ const server = http.createServer((req, res) => {
       return {width:bounds.width,height:bounds.height,backing:canvas.width,backingHeight:canvas.height,dpr,light,hash};
     });
     let frame=await snapshot();
-    console.log('BEND CANVAS DEBUG '+JSON.stringify(frame));
     assert.ok(frame.width>180&&frame.height>=230,'3D viewer visible on a phone');
     assert.ok(Math.abs(frame.backing-frame.width*frame.dpr)<3,'Canvas is resolution-matched to the display width');
     assert.ok(Math.abs(frame.backingHeight-frame.height*frame.dpr)<3,'Canvas is resolution-matched to the display height');
     assert.ok(frame.light>15,'3D conduit rendered bright line pixels, not only a dark background');
+    await page.waitForTimeout(220); // ensure viewport is stationary before dragging
     const box=await page.locator('#tubeCanvas').boundingBox();
     await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
     await page.mouse.down();await page.mouse.move(box.x+box.width/2+95,box.y+box.height/2+35,{steps:5});await page.mouse.up();
+    await page.waitForTimeout(60);
     let rotated=await snapshot();
     assert.notEqual(rotated.hash,frame.hash,'Dragging rotates 3D conduit');
     await page.locator('#zoomPlus').click();
+    await page.waitForTimeout(60);
     let zoomed=await snapshot();
     assert.notEqual(zoomed.hash,rotated.hash,'Zoom button changes projected 3D shape');
     await page.locator('#resetView').click();
