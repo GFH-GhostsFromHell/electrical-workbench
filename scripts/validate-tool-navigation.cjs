@@ -21,7 +21,7 @@ assert.ok(!dashboard.includes('id="toolDirectory"'), 'Dashboard must not duplica
 includes(dashboard, 'action="/start.html"', 'Dashboard search delegates to canonical task finder');
 includes(dashboard, 'class="card workbench-shortcuts"', 'Personal shortcuts are collapsible');
 for (const link of [
-  '/bend-instruction-lab.html', '/guided-calculators.html',
+  '/bend-calcs.html', '/guided-calculators.html',
   '/troubleshooting-kb.html', '/account-records.html'
 ]) includes(dashboard, 'class="workflow-link" href="' + link + '"', 'Quick task route');
 includes(dashboard, '.nav .label{display:inline!important', 'Mobile navigation must keep labels');
@@ -50,6 +50,8 @@ includes(mobileCatalog, 'IndustrialFieldActivity::class.java', 'Native relay sho
 includes(ios, '.searchable(text: $searchText', 'Native iOS tool search');
 includes(ios, 'toggleFavourite(tool.id)', 'Native iOS favourites');
 includes(desktop, 'Search by job:', 'Windows task search');
+assert.ok(!desktop.includes('Conduit Bends + 3D Preview'), 'Experimental bender is no longer a separate Windows tool');
+includes(read('android-client/app/src/main/java/com/gfh/electricalworkbench/MainActivity.kt'), 'onOpenWeb("/bend-calcs.html")', 'Android opens the stable web bender');
 includes(desktop, 'toolPreferenceKey(', 'Windows account-scoped favourites');
 const vm = require('node:vm');
 for (const file of ['tool-catalog.js','tool-state.js','dashboard-tools.js','worksheet-actions.js']) {
@@ -75,7 +77,7 @@ for(const name of ['daylight','midnight','workshop','contrast','system'])
   includes(themeScript,"'"+name+"'",'Theme preference');
 for(const name of ['daylight','midnight','workshop','contrast'])
   includes(themeStyles,'data-ewb-theme='+name,'Theme colour palette');
-for(const file of ['index.html','portal.html','start.html','calculators.html','guided-calculators.html','advanced-calculations.html','bend-instruction-lab.html','bend-calcs.html','field-suite.html','troubleshooting-kb.html','account-records.html']){
+for(const file of ['index.html','portal.html','start.html','calculators.html','guided-calculators.html','advanced-calculations.html','bend-calcs.html','field-suite.html','troubleshooting-kb.html','account-records.html']){
   includes(read(root+file),'/workbench-theme.js','Shared theme logic on '+file);
   includes(read(root+file),'/workbench-themes.css','Shared palette on '+file);
 }
@@ -92,6 +94,7 @@ for (const token of ['Find a tool for this job','COMMON WORKFLOWS','Resume saved
 includes(iosHome, 'title: "Find a Tool"', 'iOS home uses the canonical task finder');
 assert.ok(!androidHome.includes('Mobile report history, saved calculations and usage statistics will appear here'), 'Remove unimplemented Android dashboard placeholders');
 assert.ok(!iosHome.includes('title: "Conduit Bends + 3D Preview"'), 'Alternate conduit view belongs in full catalog, not home');
+includes(read(root+'bend-instruction-lab.html'), 'location.replace("/bend-calcs.html")', 'Old bender links redirect without breaking bookmarks');
 includes(start, '<details class="panel shortlists"', 'Optional shortcuts collapse for readability');
 for(const token of ['id="query"','id="catalog"','id="favourites"','id="recent"','tool-catalog.js','tool-state.js','Save or export'])includes(start,token,'Task launcher');
 const script= start.match(/<script>([\s\S]*?)<\/script>/);

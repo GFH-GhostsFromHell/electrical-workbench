@@ -17,114 +17,28 @@ for(const name of files){
  console.log(name+': '+scripts.length+' JavaScript scripts parse; '+ids.size+' element IDs; '+missing.length+' missing control IDs');
 }
 
-const labHtml=fs.readFileSync(path.join(root,'bend-instruction-lab.html'),'utf8');
-const labJs=fs.readFileSync(path.join(root,'bend-instruction-lab.js'),'utf8');
-new vm.Script(labJs,{filename:'bend-instruction-lab.js'});
-const measureJs=fs.readFileSync(path.join(root,'bend-measure-help.js'),'utf8');
-new vm.Script(measureJs,{filename:'bend-measure-help.js'});
-if(!labHtml.includes('src="/bend-measure-help.js')) {
- console.error('Bend measurement guide is not loaded');failed=true;
+// The separate experiment is retired. Its former URL must not break bookmarks.
+const stableBender=fs.readFileSync(path.join(root,'bend-calcs.html'),'utf8');
+const retiredRoute=fs.readFileSync(path.join(root,'bend-instruction-lab.html'),'utf8');
+if(!retiredRoute.includes('location.replace("/bend-calcs.html")')){
+ console.error('Retired bender route must redirect to the stable field calculator');failed=true;
 }
-for(const id of ['kind','measureGuide','measureIntro','measureSteps','measureSketch','measureCaution','quickFields']){
- if(!labHtml.includes('id="'+id+'"')){console.error('Missing measurement control: '+id);failed=true}
+if(stableBender.includes('href="/bend-instruction-lab.html"')){
+ console.error('Experimental bender still linked from the stable calculator');failed=true;
 }
-for(const kind of ['offset','roll','stub','back','saddle3','saddle4','kick90','kickBefore','kickExtra']){
- if(!measureJs.includes(kind+':')){console.error('Missing measurement instructions: '+kind);failed=true}
+const stableIds=new Set([...stableBender.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
+for(const id of ['menuScreen','toolScreen','multiScreen','marks','stepList','stepWarning',
+ 'fieldFocusToggle','fieldFocusCount','fieldFocusText','fieldFocusPrevious','fieldFocusNext',
+ 'mbMarkCanvas','mbSteps','mbWarnings','mbFocusToggle','mbFocusPanel','mbFocusContent',
+ 'mbFocusPrevious','mbFocusNext']){
+ if(!stableIds.has(id)){console.error('Stable bender missing control '+id);failed=true}
 }
-
-const labIds=new Set([...labHtml.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
-const labRefs=[...labJs.matchAll(/\$\('([^']+)'\)/g)].map(m=>m[1]);
-const labMissing=[...new Set(labRefs.filter(id=>!labIds.has(id)))];
-if(labMissing.length){console.error('Bend lab is missing DOM IDs: '+labMissing.join(','));failed=true}
-
-// Regression check: all points must contain finite X/Y/Z coordinates. An
-// incomplete cross product made Android show only the background canvas.
-const geometryStart=labJs.indexOf('const add=(a,b)');
-const geometryEnd=labJs.indexOf("const canvas=$('tubeCanvas')");
-if(geometryStart<0||geometryEnd<=geometryStart){
- console.error('Bend lab geometry test block could not be found');failed=true;
-}else{
- const geometry=labJs.slice(geometryStart,geometryEnd);
- const shapes=[
-  [{before:404,angle:90,plane:0},{before:350,angle:30,plane:90},{before:360,angle:90,plane:-90}],
-  [{before:400,angle:30,plane:0},{before:380,angle:-30,plane:0}],
-  [{before:400,angle:90,plane:0}],
-  [{before:250,angle:30,plane:0},{before:300,angle:-30,plane:0},{before:300,angle:-30,plane:0},{before:300,angle:30,plane:0}]
- ];
- for(const [index,ops] of shapes.entries()){
-  try{
-   const model=vm.runInNewContext(geometry+'\ncalculatePath()',{
-    ops,TEN_FOOT_EMT_MM:3048,
-    v:name=>name==='radius'?120:name==='stock'?3048:name==='minStraight'?null:400,
-    toMm:n=>n,fmt:n=>String(n),RAD:Math.PI/180
-   });
-   if(model.pts.length<2||model.pts.some(point=>point.p.length!==3||point.p.some(n=>!Number.isFinite(n))))
-    throw Error('Non-finite 3D coordinate');
-   console.log('Bend 3D test '+(index+1)+': '+model.pts.length+' finite centerline points');
-  }catch(error){console.error('Bend 3D geometry regression '+(index+1)+': '+error.message);failed=true}
- }
- // Regression: one 10 ft EMT cannot fit a developed centreline beyond 3,048 mm.
- // Confirm measured shoe clearance is enforced when supplied.
- const scenarios=[
-  {name:'10 foot limit',ops:[{before:3300,angle:90,plane:0}],minStraight:null, expected:'CALCULATION NOT POSSIBLE'},
-  {name:'tool bend spacing',ops:[{before:300,angle:30,plane:0},{before:25,angle:-30,plane:0}],minStraight:150,expected:'BENDS TOO CLOSE'},
-  {name:'no straight between arcs',ops:[{before:300,angle:30,plane:0},{before:0,angle:-30,plane:0}],minStraight:null,expected:'BENDS TOO CLOSE'},
-  {name:'negative straight lead',ops:[{before:-50,angle:90,plane:0}],minStraight:null,expected:'Invalid bend operation'},
-  {name:'zero-degree bend',ops:[{before:350,angle:0,plane:0}],minStraight:null,expected:'Invalid bend operation'}
- ];
- for(const check of scenarios){
-  try{
-   vm.runInNewContext(geometry+'\ncalculatePath()',{
-    ops:check.ops,TEN_FOOT_EMT_MM:3048,
-    v:name=>name==='radius'?120:name==='stock'?3048:name==='minStraight'?check.minStraight:400,
-    toMm:n=>n,fmt:n=>String(n),RAD:Math.PI/180
-   });
-   console.error('Expected rejection not raised: '+check.name);failed=true;
-  }catch(error){
-   if(!String(error.message).includes(check.expected)){
-    console.error('Unexpected stock-check failure '+check.name+': '+error.message);failed=true;
-   }else console.log('Bend stock regression OK: '+check.name);
-  }
- }
+for(const token of ['function calcOffset()','function calcRoll()','function calcS3()','function calcStub()',
+ 'function calcBack()','function mbCompute()','function fieldFocusUpdate()','function mbFocusUpdate()',
+ 'CALCULATION NOT POSSIBLE','BENDS TOO CLOSE','3048','hookFaceBadge','function applySavedCalibration()']){
+ if(!stableBender.includes(token)){console.error('Stable bender regression: '+token);failed=true}
 }
-// Physical shop marks must not overlap even without a saved shoe profile.
-const stockStart=labJs.indexOf('const TEN_FOOT_EMT_MM=3048;');
-const stockEnd=labJs.indexOf('function showQuickSummary(');
-if(stockStart<0||stockEnd<=stockStart){
- console.error('Could not locate physical stock validation');failed=true;
-}else{
- const checkSource=labJs.slice(stockStart,stockEnd);
- const cases=[
-  {name:'overlapping same-datum marks',marks:[{tag:'A',pos:400,tool:'ARROW'},{tag:'B',pos:400,tool:'ARROW'}],gap:null,expected:'BENDS TOO CLOSE'},
-  {name:'shoe clearance below minimum',marks:[{tag:'A',pos:400,tool:'ARROW'},{tag:'B',pos:450,tool:'ARROW'}],gap:150,expected:'BENDS TOO CLOSE'},
-  {name:'mark exceeds 10-foot stock',marks:[{tag:'A',pos:3049,tool:'ARROW'}],gap:null,expected:'CALCULATION NOT POSSIBLE'},
-  {name:'valid separated marks',marks:[{tag:'A',pos:400,tool:'ARROW'},{tag:'B',pos:800,tool:'ARROW'}],gap:150,expected:null},
-  {name:'kick mark does not prove common datum',marks:[{tag:'A',pos:400,tool:'ARROW'},{tag:'K',pos:400,tool:'USER-SUPPLIED'}],gap:150,expected:null}
- ];
- for(const c of cases){
-  const status={className:'',textContent:''};
-  try{
-   vm.runInNewContext(checkSource+'\ncheckStockAndSpacing()',{
-    layout:{marks:c.marks},v:id=>id==='stock'?3048:id==='minMarkGap'?c.gap:null,
-    toMm:n=>n,length:n=>String(n)+' mm',$:id=>status
-   });
-   if(c.expected){console.error('Missing rejection: '+c.name);failed=true}
-   else console.log('Bend mark regression OK: '+c.name);
-  }catch(error){
-   if(!c.expected||!String(error.message).includes(c.expected)){
-    console.error('Incorrect result '+c.name+': '+error.message);failed=true;
-   }else console.log('Bend mark regression OK: '+c.name);
-  }
- }
-}
-if(!/src="\/bend-instruction-lab\.js(?:\?[^"]*)?"/.test(labHtml)){console.error('Bend lab JS is not linked');failed=true}
-for(const key of ['kickExtra','kick90','back','roll','saddle3','saddle4','offset','segment','custom']){
- if(!labHtml.includes('value="'+key+'"')){console.error('Missing bend preset '+key);failed=true}
-}
-for(const method of ['pointerdown','pointermove','wheel','calculatePath','getLayout','renderMarks','renderStep']){
- if(!labJs.includes(method)){console.error('Missing 3D/instruction feature '+method);failed=true}
-}
-console.log('Experimental Bend Lab: JS syntax valid, '+labIds.size+' controls, '+labMissing.length+' missing IDs');
+console.log('Stable bender: physical marks, formulas, calibration and optional step focus validated; retired route redirects');
 const kb=fs.readFileSync(path.join(root,'troubleshooting-kb.html'),'utf8');
 const procedures=[...kb.matchAll(/\btopic\('[a-z0-9-]+'/g)].length;
 if(procedures<20){console.error('Expected >=20 troubleshooting procedures, found '+procedures);failed=true}

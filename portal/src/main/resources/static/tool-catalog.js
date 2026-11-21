@@ -2,11 +2,11 @@
 (function(g){'use strict';g.EWBTaskCatalog=Object.freeze([
   {
     "id": "conduit-marks",
-    "name": "Conduit Bend Marks + 3D",
-    "description": "Conduit bending with tape marks, shoe direction and a rotatable preview.",
+    "name": "Conduit Bender · Field Marks",
+    "description": "Bend diagrams, tape marks, shoe-facing cues and optional step-by-step field view.",
     "category": "installation",
     "keywords": "offset saddle kick 90 stub mark hook flip pipe",
-    "path": "/bend-instruction-lab.html",
+    "path": "/bend-calcs.html",
     "steps": [
       "Enter the conduit size and required bend measurements.",
       "Confirm every mark and shoe orientation against your bender.",

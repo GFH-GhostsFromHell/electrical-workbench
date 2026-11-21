@@ -112,34 +112,34 @@ const server = http.createServer((req, res) => {
     await page.locator('button[data-category="installation"]').click();
     assert.ok((await page.locator('.task').count())>=3,'Installation filter');
     await page.locator('button[data-category="all"]').click();
-    const conduit=page.locator('.task:has(h3:text-is("Conduit Bend Marks + 3D"))');
+    const conduit=page.locator('.task:has(h3:text-is("Conduit Bender · Field Marks"))');
     await conduit.getByRole('button',{name:/Add to favourites/}).click();
     await page.locator('.shortlists summary').click();
-    await visible('#favourites a:text-is("Conduit Bend Marks + 3D")');
+    await visible('#favourites a:text-is("Conduit Bender · Field Marks")');
     await page.reload({waitUntil:'load'});
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-a'));
     await page.locator('.shortlists summary').click();
-    await visible('#favourites a:text-is("Conduit Bend Marks + 3D")');
+    await visible('#favourites a:text-is("Conduit Bender · Field Marks")');
     await conduit.getByRole('button',{name:'Preview steps'}).click();
     await visible('#selectedTask');
     assert.ok((await page.locator('#selectedTask').innerText()).includes('Your workflow'),'Guidance explains next steps');
     await conduit.locator('a.open').click();
-    await page.waitForURL('**/bend-instruction-lab.html');
+    await page.waitForURL('**/bend-calcs.html');
     await goto('/start.html');
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-a'));
     await page.locator('.shortlists summary').click();
-    await visible('#recent a:text-is("Conduit Bend Marks + 3D")');
+    await visible('#recent a:text-is("Conduit Bender · Field Marks")');
 
     activeUser='qa-account-b';
     await page.reload({waitUntil:'load'});
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-b'));
     await page.locator('.shortlists summary').click();
-    assert.ok(!(await page.locator('#favourites').innerText()).includes('Conduit Bend Marks + 3D'),'Account B should not see A favourites');
+    assert.ok(!(await page.locator('#favourites').innerText()).includes('Conduit Bender · Field Marks'),'Account B should not see A favourites');
     activeUser='qa-account-a';
     await page.reload({waitUntil:'load'});
     await page.waitForFunction(()=>document.getElementById('accountStatus').textContent.includes('qa-account-a'));
     await page.locator('.shortlists summary').click();
-    await visible('#favourites a:text-is("Conduit Bend Marks + 3D")');
+    await visible('#favourites a:text-is("Conduit Bender · Field Marks")');
 
     for(const width of [320,360,390,768,1280]){
       await page.setViewportSize({width,height:860});
@@ -220,72 +220,54 @@ const server = http.createServer((req, res) => {
     await take('motor-drive-selector.png');
     await checkNoOverflow('Motor drive selector @390px');
 
-    // The field bender should open with concise marks, not four expanded panels.
+    // The retired URL must redirect; the regular bender retains all original calculators.
     await goto('/bend-instruction-lab.html');
-    for(const id of ['measurementHelp','markingInstructions','bendSteps','threeDDetails','editorDetails']){
-      assert.equal(await page.locator('#'+id).getAttribute('open'),null,id+' should start collapsed');
-    }
-    await page.locator('#height').fill('120');
-    await page.locator('#distance').fill('600');
-    await page.waitForFunction(()=>Boolean(document.querySelector('#quickSummary .quick-mark')),{timeout:5000});
-    assert.ok((await page.locator('#quickSummary').innerText()).includes('A'),'Live tape marks appear');
-    await page.waitForTimeout(300); // debounce and layout settle before a real field tap
-    await page.locator('#goSteps').scrollIntoViewIfNeeded();
-    await page.waitForTimeout(120);
-    await page.locator('#goSteps').click();
-    await page.waitForFunction(()=>document.getElementById('bendSteps').open);
-    await visible('#stepBrief');
-    assert.equal(await page.locator('#bendSteps').getAttribute('open'),'','Bend steps open in one tap');
-    await page.locator('#open3D').scrollIntoViewIfNeeded();
-    await page.waitForTimeout(120);
-    await page.locator('#open3D').click();
-    await page.waitForFunction(()=>document.getElementById('threeDDetails').open);
-    await visible('#tubeCanvas');
-    assert.equal(await page.locator('#threeDDetails').getAttribute('open'),'','3D opens with one tap');
-    const snapshot=async()=>page.locator('#tubeCanvas').evaluate(canvas=>{
-      const bounds=canvas.getBoundingClientRect();
-      const dpr=Math.min(2.5,Math.max(1,window.devicePixelRatio||1));
-      const data=canvas.getContext('2d').getImageData(0,0,canvas.width,canvas.height).data;
-      let light=0,hash=0;
-      for(let y=0;y<canvas.height;y+=5)for(let x=0;x<canvas.width;x+=5){
-        const i=(y*canvas.width+x)*4;
-        if(data[i]>140&&data[i+1]>140&&data[i+2]>150)light++;
-        hash=(hash*31+data[i]+3*data[i+1]+7*data[i+2])%1000000007;
-      }
-      return {width:bounds.width,height:bounds.height,backing:canvas.width,backingHeight:canvas.height,dpr,light,hash};
-    });
-    await page.waitForTimeout(250); // expand/render/resize observer settles
-    let frame=await snapshot();
-    console.log('BENDER 3D FIRST FRAME '+JSON.stringify(frame));
-    assert.ok(frame.width>180&&frame.height>=230,'3D viewer visible on a phone');
-    assert.ok(Math.abs(frame.backing-frame.width*frame.dpr)<3,'Canvas is resolution-matched to the display width');
-    assert.ok(Math.abs(frame.backingHeight-frame.height*frame.dpr)<3,'Canvas is resolution-matched to the display height');
-    assert.ok(frame.light>15,'3D conduit rendered bright line pixels, not only a dark background');
-    await page.waitForTimeout(220); // ensure viewport is stationary before dragging
-    const box=await page.locator('#tubeCanvas').boundingBox();
-    await page.mouse.move(box.x+box.width/2,box.y+box.height/2);
-    await page.mouse.down();await page.mouse.move(box.x+box.width/2+95,box.y+box.height/2+35,{steps:5});await page.mouse.up();
-    await page.waitForTimeout(60);
-    let rotated=await snapshot();
-    assert.notEqual(rotated.hash,frame.hash,'Dragging rotates 3D conduit');
-    await page.locator('#zoomPlus').click();
-    await page.waitForTimeout(60);
-    let zoomed=await snapshot();
-    assert.notEqual(zoomed.hash,rotated.hash,'Zoom button changes projected 3D shape');
-    await page.locator('#resetView').click();
-    await page.locator('#unit').selectOption('in');
-    await page.waitForTimeout(120);
-    assert.ok((await page.locator('#geometryNote').innerText()).includes('mm stock'),'3D geometry remains valid in inches mode; tail stays in mm');
-    assert.ok((await snapshot()).light>15,'3D remains visible after changing units');
+    await page.waitForURL('**/bend-calcs.html');
+    await visible('#menuScreen.screen.active');
+    await page.locator('button.bendbtn').filter({hasText:'Offset · far bend critical'}).click();
+    await visible('#toolScreen.screen.active');
+    await page.locator('#off').fill('2');
+    await page.locator('#dist').fill('30');
+    await page.locator('#marks .markitem').first().waitFor({state:'visible'});
+    const regularMarks=await page.locator('#marks').innerText();
+    const stepTotal=await page.locator('#stepList li').count();
+    assert.ok(stepTotal>=4,'Working calculator still has the complete field steps');
+    await page.locator('#fieldFocusToggle').click();
+    await visible('#fieldFocus');
+    assert.ok((await page.locator('#fieldFocusCount').innerText()).includes('Step 1 of'),'Field focus begins at the first instruction');
+    assert.equal(await page.locator('#stepList').isVisible(),false,'One-step view hides long steps list');
+    await page.locator('#fieldFocusNext').click();
+    assert.ok((await page.locator('#fieldFocusCount').innerText()).includes('Step 2 of'),'Next advances only the guide');
+    await page.locator('#fieldFocusToggle').click();
+    await visible('#stepList');
+    assert.equal(await page.locator('#marks').innerText(),regularMarks,'Guided mode never changes the physical mark calculation');
+    await page.locator('#toolScreen .back').click();
+
+    // Multi-bend mark math stays intact; only the step presentation changes.
+    await page.locator('button.bendbtn').filter({hasText:'Advanced · multiple bends on one pipe'}).click();
+    await visible('#multiScreen.screen.active');
+    await page.locator('#mbMarkCanvas .tick').first().waitFor({state:'visible'});
+    const multiCount=await page.locator('#mbSteps .advanced-mark').count();
+    assert.ok(multiCount>=2,'Working multi-bend example produces numbered marks');
+    const multiMarks=await page.locator('#mbMarkCanvas').innerText();
+    await page.locator('#mbFocusToggle').click();
+    await visible('#mbFocusPanel');
+    assert.equal(await page.locator('#mbSteps').isVisible(),false,'Focused multi-bend view reduces scrolling');
+    await page.locator('#mbFocusNext').click();
+    assert.ok((await page.locator('#mbFocusCount').innerText()).includes('Bend 2 of'),'Next highlights the second bend');
+    assert.equal(await page.locator('#mbMarkCanvas').innerText(),multiMarks,'Focused mode does not recalculate marks');
+    await page.locator('#mbStock').fill('121');
+    await page.waitForFunction(()=>document.getElementById('mbWarnings').textContent.includes('CALCULATION NOT POSSIBLE'));
+    assert.equal(await page.locator('#mbFocusPanel').isVisible(),false,'Invalid stock never leaves stale focused instructions');
+    await page.locator('#mbStock').fill('120');
+    await visible('#mbFocusPanel');
+    await page.locator('#mbFocusToggle').click();
+    await page.locator('#mbSteps .advanced-mark').first().waitFor({state:'visible'});
     for(const width of [320,390,768,1280]){
       await page.setViewportSize({width,height:820});
-      await page.waitForTimeout(100);
-      await checkNoOverflow('Conduit field view at '+width);
-      const resized=await snapshot();
-      assert.ok(Math.abs(resized.backing-resized.width*resized.dpr)<3,'3D backing follows resized width at '+width);
-      assert.ok(resized.light>15,'3D still visible at '+width);
-      if(width===390)await take('conduit-bender-field-3d-mobile.png');
-      if(width===1280)await take('conduit-bender-field-3d-desktop.png');
+      await checkNoOverflow('Stable conduit bender at '+width);
+      if(width===390)await take('conduit-bender-stable-mobile.png');
+      if(width===1280)await take('conduit-bender-stable-desktop.png');
     }
     await page.setViewportSize({width:390,height:860});
     await goto('/field-suite.html#quote');

@@ -102,7 +102,7 @@ checkFile('desktop-client/src/main/java/com/example/desktop/DesktopAccountSync.j
   ['"minMarkGap"']);
 checkFile('portal/src/main/resources/static/bender-calibration.html',
   ['id="minMarkGap"','id="minStraight"','Verified shoe clearance']);
-checkFile('portal/src/main/resources/static/bend-instruction-lab.js',
-  ['profileNumber(\'minMarkGap\')','profileNumber(\'minStraight\')']);
+checkFile('portal/src/main/resources/static/bend-calcs.html',
+  ['id="mbGap"','id="singleShoeGap"','function mbCompute()','function applySavedCalibration()','function mbFocusUpdate()']);
 console.log('Cross-platform bender safety contract passed: 10 ft stock, same-datum spacing and measured shoe profile sync.');
 console.log('iOS parity validation passed: 25 questions across five categories, native safety/field/account/ChatGPT/enterprise links, release manifest valid.');

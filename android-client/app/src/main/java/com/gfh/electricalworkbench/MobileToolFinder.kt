@@ -41,7 +41,7 @@ private data class MobileTask(
 
 private val allTasks = listOf(
     MobileTask("quick-bender-offline", "Quick Conduit Bender - Offline", "Tape marks and instructions with 10-ft stock checks", "Installation", "conduit emt bend offset saddle kick 90", "native:bender", true),
-    MobileTask("conduit-marks", "Conduit Bend Marks + 3D", "Tape marks, facing and a finished bend preview", "Installation", "conduit offset saddle kick 90 hook shoe", "/bend-instruction-lab.html"),
+    MobileTask("conduit-marks", "Conduit Bender · Field Marks", "Tape marks, facing and guided bend steps", "Installation", "conduit offset saddle kick 90 hook shoe", "/bend-calcs.html"),
     MobileTask("bend-guide", "Conduit Bend Diagrams", "Bend layouts and mark instructions", "Installation", "emt pipe bend offset saddle", "/bend-calcs.html"),
     MobileTask("bender-calibrate", "Calibrate a Conduit Bender", "Measure shoe deduct and gain", "Installation", "shoe profile", "/bender-calibration.html"),
     MobileTask("pull-box", "Pull Box Dimensions - Offline", "Straight, angle and U-pull sizing", "Installation", "junction box wall", "native:pull", true),
