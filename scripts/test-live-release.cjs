@@ -27,6 +27,9 @@ const server=http.createServer((req,res)=>{
    res.setHeader('Content-Type','application/json');
    res.end(JSON.stringify({password:true,google:false}));
  }else if(endpoint==='/index.html'){
+   if(!(req.headers.accept||'').includes('text/html')){
+     res.writeHead(406);res.end('HTML content negotiation required');return;
+   }
    if(blockedHome){res.writeHead(401);res.end('Unauthorized');return;}
    res.setHeader('Content-Type',badHome?'text/plain':'text/html');
    res.end('<title>Electrical Workbench</title>');
@@ -46,7 +49,7 @@ server.listen(0,'127.0.0.1',async()=>{
    await assert.rejects(()=>smoke(url,sha),/HTTP 401 at \/index.html/);
    blockedHome=false;badHome=true;
    await assert.rejects(()=>smoke(url,sha),/did not return HTML/);
-   console.log('Production smoke verifier tests passed: exact commit, healthy endpoints, 401 login distinguished from deploy drift, no false approval.');
+   console.log('Production smoke verifier tests passed: HTML Accept header, exact commit, healthy endpoints, 401 login distinguished from deploy drift, no false approval.');
  }catch(e){console.error(e);process.exitCode=1;}
  finally{server.close();}
 });
