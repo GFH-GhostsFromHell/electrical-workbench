@@ -50,6 +50,14 @@
 .field-step-focus p{font-size:15px;line-height:1.6;margin:8px 0}
 .field-step-focus[hidden],#stepList[hidden],#mbSteps[hidden],#mbFocusPanel[hidden]{display:none!important}
 .advanced-actions button:disabled{opacity:.48;cursor:not-allowed}
+
+/* Keep the existing calculator usable on narrow phones without a horizontal page scroll. */
+@media(max-width:760px){
+ .top{flex-wrap:wrap;align-items:flex-start}
+ .brand{min-width:0}
+ .toplinks{display:flex;flex-wrap:wrap;justify-content:flex-start;flex:1 1 100%;width:100%;max-width:100%;gap:6px}
+ .toplinks a{flex:0 1 auto;min-width:0;max-width:100%;font-size:11px;padding:7px 8px;white-space:normal}
+}
 </style>
 <link rel="stylesheet" href="/readable-daylight.css?v=1">
 <link rel="stylesheet" href="/workbench-themes.css">
