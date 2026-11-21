@@ -22,7 +22,7 @@ final class QuickConduitBendPane extends BorderPane {
     private final ChoiceBox<String> units = new ChoiceBox<>(FXCollections.observableArrayList("Millimetres","Inches"));
     private final ChoiceBox<Double> angle = new ChoiceBox<>(FXCollections.observableArrayList(10d,15d,22.5d,30d,45d,60d));
     private static final double STOCK_MM = 3048.0;
-    private final TextField rise = field("150"), datum = field("600"), deduct = field(""), roll = field("100"), span = field("300");
+    private final TextField rise = field(""), datum = field(""), deduct = field(""), roll = field(""), span = field("");
     private final TextField minShoeMarkGap = field("");
     private final VBox riseBox=labeled("Offset rise / stub height",rise),datumBox=labeled("Reference from tape end",datum),
             deductBox=labeled("Actual bender take-up / deduct",deduct),rollBox=labeled("Horizontal roll",roll),
@@ -41,16 +41,16 @@ final class QuickConduitBendPane extends BorderPane {
         VBox content=new VBox(12);
         content.setPadding(new Insets(15));
         content.setStyle("-fx-background-color:#edf5f9;");
-        Label title=new Label("Quick Bend · get your marks in seconds");
+        Label title=new Label("Measure → Mark → Bend");
         title.setStyle("-fx-font-size:21px;-fx-font-weight:bold;-fx-text-fill:#0f172a;");
-        Label intro=note("Pick a bend and type the dimensions shown. Results update automatically. Verified tool-specific references still matter.");
+        Label intro=note("Enter job measurements. Tape marks update as you type.");
         FlowPane selectors=new FlowPane(10,10,labeled("Bend type",kind),labeled("Units",units));
         selectors.setAlignment(Pos.CENTER_LEFT);
         kind.setPrefWidth(225);
         FlowPane measurements=new FlowPane(12,10,riseBox,datumBox,angleBox,deductBox,rollBox,spanBox);
         measurements.setAlignment(Pos.CENTER_LEFT);
         VBox shoeGapBox=labeled("Verified minimum shoe mark spacing (optional)",minShoeMarkGap);
-        Label clearanceNote=note("Tool clearance varies by shoe. Leave spacing blank if unknown; the result will say NOT VERIFIED.");
+        Label clearanceNote=note("Leave the shoe gap blank if not measured; clearance stays unverified.");
         stockNotice.setWrapText(true);
         stockNotice.setStyle("-fx-font-size:14px;-fx-font-weight:bold;-fx-text-fill:#166534;");
         Button load=primary("Use saved shoe measurements");
@@ -73,17 +73,20 @@ final class QuickConduitBendPane extends BorderPane {
             Clipboard.getSystemClipboard().setContent(data);
         });
         headline.setWrapText(true);
-        headline.setStyle("-fx-font-size:clamp(18px,2vw,23px);-fx-font-weight:bold;-fx-text-fill:#0e7490;");
+        headline.setStyle("-fx-font-size:21px;-fx-font-weight:bold;-fx-text-fill:#0e7490;");
         instructions.setWrapText(true);
         instructions.setStyle("-fx-font-size:14px;-fx-text-fill:#1e293b;");
         notice.setWrapText(true);
         notice.setStyle("-fx-text-fill:#9a3412;-fx-font-size:13px;");
-        VBox results=new VBox(10,stockNotice,headline,instructions,copy,notice);
-        results.setPadding(new Insets(15));
+        TitledPane fullInstructions=new TitledPane("Complete bending steps · hook and flip",instructions);
+        fullInstructions.setExpanded(false);
+        VBox results=new VBox(7,headline,stockNotice,fullInstructions,copy,notice);
+        results.setPadding(new Insets(12));
         results.setStyle("-fx-background-color:white;-fx-border-color:#b8dae5;-fx-border-radius:12;-fx-background-radius:12;");
-        content.getChildren().addAll(title,intro,selectors,measurements,shoeGapBox,clearanceNote,load,results,
-                note("The tape-zero end is LEFT. For offsets, the near-bend-critical geometric reference is used. Check whether your actual obstruction measurement and bender method match that convention."),
-                markStrip,note("FIELD SAFETY · Confirm the stamped ARROW/STAR/NOTCH, manufacturer instructions, actual take-up, springback and minimum bend radius. Layout marks do not verify tool access or final fit."));
+        TitledPane shoeDetails=new TitledPane("Shoe settings · measured clearance",new VBox(6,shoeGapBox,clearanceNote,load));
+        shoeDetails.setExpanded(false);
+        content.getChildren().addAll(title,intro,selectors,measurements,results,markStrip,shoeDetails,
+                note("Field check · Verify ARROW/STAR, shoe deduct, springback and available clearance."));
 
         ScrollPane scroll=new ScrollPane(content);
         scroll.setFitToWidth(true);
