@@ -105,7 +105,20 @@
     ]
   },
   {
-    "id": "refrigeration",
+    {
+    "id": "motor-drive-select",
+    "name": "Motor Starter & Drive Selector",
+    "description": "Compare DOL, wye–delta, soft starters, VFDs, capacitor-start and DC controllers by motor nameplate and duty.",
+    "category": "calculations",
+    "keywords": "motor starter soft start softstarter softstarter vfd variable frequency drive inverter star delta wye delta capacitor start psc dc brushed brushless selection sizing current",
+    "path": "/motor-starter-selector.html",
+    "steps": [
+      "Enter motor construction, supply, nameplate voltage and rated full-load current.",
+      "Compare compatible methods and validate starting load, duty, wiring and controller current.",
+      "Export the provisional shortlist and verify manufacturer data and CEC/OESC requirements."
+    ]
+  },
+  "id": "refrigeration",
     "name": "Refrigeration Motor Sizing",
     "description": "Size compressor circuits using MCA/MOCP and motor data.",
     "category": "calculations",
