@@ -20,6 +20,8 @@ assert.equal(r.calculations.suppliedLraA,120);
 assert.equal(r.calculations.idealWyeDeltaStartingLineA,40);
 assert.equal(r.calculations.insideDeltaWindingA,Number((20/Math.sqrt(3)).toFixed(2)));
 assert.equal(r.recommendations[0].id,'soft');cases++;
+r=check({...base,leads:'9',deltaVolts:600});
+assert.equal(method(r,'wye_delta').status,'not_suitable');cases++;
 r=check({...base,leads:'6',deltaVolts:400});
 assert.equal(method(r,'wye_delta').status,'not_suitable');cases++;
 r=check({...base,leads:'6',deltaVolts:600,load:'heavy',goal:'torque'});
