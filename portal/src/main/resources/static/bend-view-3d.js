@@ -158,7 +158,21 @@
   const colors=['#a6bdcb','#a0d8d8','#c2b9db','#b9d3aa','#dad0a4'];
   for(const [index,path] of state.model.paths.entries()){
    const pix=path.points.map(x=>toScreen(x.p));if(pix.length<2)continue;
-   const drawPath=()=>{ctx.beginPath();pix.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));};
+   // Round each displayed corner smoothly. This is a visual-only fillet, NOT the actual shoe radius.
+   const drawPath=()=>{
+    ctx.beginPath();ctx.moveTo(...pix[0]);
+    for(let j=1;j<pix.length-1;j++){
+     const previous=pix[j-1],here=pix[j],next=pix[j+1];
+     const lenIn=Math.hypot(here[0]-previous[0],here[1]-previous[1]);
+     const lenOut=Math.hypot(next[0]-here[0],next[1]-here[1]);
+     if(lenIn<.01||lenOut<.01){ctx.lineTo(...here);continue;}
+     const f=Math.min(28,lenIn*.27,lenOut*.27);
+     const before=[here[0]+(previous[0]-here[0])*f/lenIn,here[1]+(previous[1]-here[1])*f/lenIn];
+     const after=[here[0]+(next[0]-here[0])*f/lenOut,here[1]+(next[1]-here[1])*f/lenOut];
+     ctx.lineTo(...before);ctx.quadraticCurveTo(...here,...after);
+    }
+    ctx.lineTo(...pix[pix.length-1]);
+   };
    ctx.lineCap='round';ctx.lineJoin='round';
    drawPath();ctx.shadowColor='#000a';ctx.shadowBlur=14;ctx.shadowOffsetY=6;ctx.strokeStyle='#233a48';ctx.lineWidth=18;ctx.stroke();ctx.shadowBlur=0;ctx.shadowOffsetY=0;
    drawPath();ctx.strokeStyle=colors[index%colors.length];ctx.lineWidth=13;ctx.stroke();
