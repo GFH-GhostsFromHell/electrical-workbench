@@ -16,13 +16,13 @@ h1{font-size:clamp(23px,4.4vw,32px);margin:0 0 8px}h2{font-size:20px;margin:0 0 
 .step b{display:block;color:#075985;margin-bottom:4px}.step.active{background:#e8f8fc;border-color:#0891b2}
 label{font-weight:750;display:block;margin:8px 0}input[type=search]{min-height:49px;width:100%;border:1px solid #899eaf;border-radius:10px;padding:11px;font:inherit}input:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid #0e7490;outline-offset:2px}
 .filters{display:flex;gap:7px;flex-wrap:wrap;margin:13px 0}button{cursor:pointer;font:inherit;min-height:44px}button.filter{padding:8px 12px;border:1px solid #adc4d6;background:#f5f9fc;color:#153d55;border-radius:999px;font-weight:750}button.filter[aria-pressed=true]{background:#0c506c;color:white;border-color:#0c506c}
-.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.task{border:1px solid #cfdee9;background:white;border-radius:13px;padding:16px;display:flex;flex-direction:column;gap:9px;min-width:0}.task h3{font-size:17px;margin:0}.task p{margin:0;line-height:1.45;color:#455a6f;font-size:13px;flex:1}.task .tag{font-size:11px;color:#08627d;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.task .buttons{display:flex;align-items:center;gap:9px}.task .open{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:#075985;color:white;padding:11px 14px;border-radius:9px;font-weight:800;min-height:44px;flex:1}.task .star{background:white;border:1px solid #a8becd;border-radius:9px;min-width:46px;padding:9px;color:#305065;font-size:18px}.task .star[aria-pressed=true]{color:#995c00;background:#fff4d5;border-color:#d1a741}
+.cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.cards.calculation-mode{grid-template-columns:repeat(2,minmax(0,1fr))}.task .calc-options{margin-top:0;border:1px solid var(--ewb-border,#bdd1df);border-radius:9px;padding:8px 10px;background:var(--ewb-surface,#fff);color:var(--ewb-text,#14283e)}.task .calc-options summary{font-size:13px;font-weight:800;cursor:pointer;color:var(--ewb-text,#14283e)}.task .calc-option{display:block;padding:9px 0;border-top:1px solid var(--ewb-border,#cbdbe8);text-decoration:none;color:var(--ewb-accent,#075985)!important;font-weight:800;font-size:13px}.task .calc-option small{display:block;font-weight:500;color:var(--ewb-muted,#455a6f)!important;line-height:1.45}.task .calc-option:first-of-type{margin-top:8px}.task .calc-options[open] summary{margin-bottom:8px}.task{border:1px solid #cfdee9;background:white;border-radius:13px;padding:16px;display:flex;flex-direction:column;gap:9px;min-width:0}.task h3{font-size:17px;margin:0}.task p{margin:0;line-height:1.45;color:#455a6f;font-size:13px;flex:1}.task .tag{font-size:11px;color:#08627d;font-weight:800;letter-spacing:.04em;text-transform:uppercase}.task .buttons{display:flex;align-items:center;gap:9px}.task .open{display:inline-flex;align-items:center;justify-content:center;text-decoration:none;background:#075985;color:white;padding:11px 14px;border-radius:9px;font-weight:800;min-height:44px;flex:1}.task .star{background:white;border:1px solid #a8becd;border-radius:9px;min-width:46px;padding:9px;color:#305065;font-size:18px}.task .star[aria-pressed=true]{color:#995c00;background:#fff4d5;border-color:#d1a741}
 .shortlists{display:grid;grid-template-columns:1fr 1fr;gap:15px}.shortlists h2{margin-bottom:7px}.shortlists ul{padding-left:18px;margin:6px 0}.shortlists li{margin:8px 0}.muted{color:#536779;font-size:13px}.secondary{background:white;border:1px solid #9cbbcf;border-radius:9px;padding:8px 12px;color:#174962;font-weight:700}#showAllTools{display:block;width:100%;margin-top:14px}#showAllTools[hidden]{display:none}
 .selected{border-left:4px solid #0e7490;padding-left:16px}.selected ol{padding-left:19px}.selected li{margin:7px 0}.selected .open{display:inline-block;background:#075985;color:white;border-radius:9px;padding:12px 16px;text-decoration:none;font-weight:800}
 #none[hidden],#selectedTask[hidden]{display:none}#none{padding:18px;background:white;border:1px dashed #7d9bae;border-radius:9px}
 footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
 @media(max-width:850px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:590px){main{padding:15px 12px 42px}.cards,.shortlists{grid-template-columns:1fr}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:14px}.step{min-height:73px}}
+@media(max-width:590px){main{padding:15px 12px 42px}.cards,.cards.calculation-mode,.shortlists{grid-template-columns:1fr}.steps{grid-template-columns:repeat(2,minmax(0,1fr))}.panel{padding:14px}.step{min-height:73px}}
 </style>
 <link rel="stylesheet" href="/workbench-flow.css">
 <link rel="stylesheet" href="/workbench-themes.css">
@@ -31,7 +31,7 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
 <header><strong>⚡ Electrical Workbench</strong><nav><a href="/portal.html">Dashboard</a><a href="/account-records.html">Saved cloud records</a></nav></header>
 <main>
 <h1>Find the right tool for your job</h1>
-<p class="lead">One clear starting point for each job. Search by what you need to do, then follow the three-step guide. Specialist or alternate views are available on request.</p>
+<p class="lead">One search for your entire Electrical Workbench—conduit, CEC calculations, motor protection, troubleshooting and jobsite tools. Choose a category to narrow the list.</p>
 <div class="steps" aria-label="Recommended work sequence">
 <div class="step active"><b>1 · Find a task</b>Search or choose below</div>
 <div class="step"><b>2 · Enter values</b>Only the required measurements</div>
@@ -43,7 +43,7 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
 <div class="filters" role="group" aria-label="Task category">
 <button type="button" class="filter" data-category="all" aria-pressed="true">All tools</button>
 <button type="button" class="filter" data-category="installation" aria-pressed="false">Bending & layout</button>
-<button type="button" class="filter" data-category="calculations" aria-pressed="false">Calculations</button>
+<button type="button" class="filter" data-category="calculations" aria-pressed="false">CEC Calculators</button>
 <button type="button" class="filter" data-category="engineering" aria-pressed="false">Power & protection</button>
 <button type="button" class="filter" data-category="troubleshooting" aria-pressed="false">Troubleshooting</button>
 <button type="button" class="filter" data-category="projects" aria-pressed="false">Projects</button>
@@ -66,8 +66,9 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
  var tasks=window.EWBTaskCatalog||[];
  var store=window.EWBToolState;
  var input=document.getElementById('query'), category='all', current=null, viewAll=false;
- var alternateIds=new Set(["bend-guide","advanced-code"]);
- var featured=['cec-sections','conduit-marks','conductor-drop','motor','service-demand','pull-box','fault','jobsite'];
+ var alternateIds=new Set(['bend-guide']);
+ var legacyCalculatorIds=new Set(['conductor-drop','service-demand','transformer','motor','motor-drive-select','refrigeration','grounding','fire-pump','neutral','fire-alarm','advanced-code','cec-sections']);
+ var featured=['conduit-marks','calc-voltage','calc-service','calc-motors','pull-box','strut-rack','fault','jobsite'];
  var filters=Array.from(document.querySelectorAll('button.filter'));
  function el(name,cls,txt){var n=document.createElement(name);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;}
  function link(item,txt){var a=el('a',null,txt||item.name);a.href=item.path;a.addEventListener('click',function(){store.visit(item.id);});return a;}
@@ -91,14 +92,21 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
   var ol=el('ol');
   [item.steps[0],item.steps[1],item.steps[2]].forEach(function(step,i){ol.append(el('li',null,(i===0?'Enter inputs: ':i===1?'Verify: ':'Finish: ')+step));});
   box.append(ol);
+  if(item.alternatives&&item.alternatives.length){
+   var related=el('div'),heading=el('h3',null,'Other calculations for this topic');
+   related.append(heading);
+   item.alternatives.forEach(function(opt){var a=el('a',null,opt.label);a.href=opt.url;a.style.display='block';a.style.marginBottom='8px';related.append(a);if(opt.purpose)related.append(el('p','muted',opt.purpose));});
+   box.append(related);
+  }
   var go=link(item,'Open '+item.name);go.className='open';box.append(go);
   box.hidden=false;
  }
  function render(){
   var q=input.value,shown=0,zone=document.getElementById('catalog');
   zone.replaceChildren();
+  zone.classList.toggle('calculation-mode',category==='calculations');
   var state=store.snapshot();
-  var filtered=tasks.filter(function(task){return (task.id!=='advanced-code'||state.favourites.includes(task.id))&&(category==='all'||task.category===category)&&match(task,q)&&(viewAll||!!q.trim()||!alternateIds.has(task.id)||state.favourites.includes(task.id));}).sort(function(a,b){
+  var filtered=tasks.filter(function(task){return (!legacyCalculatorIds.has(task.id)||state.favourites.includes(task.id))&&(category==='all'||task.category===category)&&match(task,q)&&(viewAll||!!q.trim()||!alternateIds.has(task.id)||state.favourites.includes(task.id));}).sort(function(a,b){
    var af=state.favourites.includes(a.id)?0:1,bf=state.favourites.includes(b.id)?0:1;
    var ai=featured.indexOf(a.id),bi=featured.indexOf(b.id);ai=ai<0?999:ai;bi=bi<0?999:bi;
    return af-bf||ai-bi||a.name.localeCompare(b.name);
@@ -118,18 +126,40 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
    buttons.append(open,star);card.append(buttons);
    var explain=el('button','secondary','Preview steps');explain.type='button';
    explain.addEventListener('click',function(){choose(item);document.getElementById('selectedTask').scrollIntoView({behavior:'smooth',block:'start'});});
-   card.append(explain);zone.append(card);
+   if(item.category==='calculations'&&item.id.startsWith('calc-')){
+    var alts=item.alternatives||[];
+    if(alts.length){
+     var details=el('details','calc-options'),summary=el('summary',null,'Different calculations ('+alts.length+')');
+     details.append(summary);
+     alts.forEach(function(opt){
+      var a=el('a','calc-option',opt.label);a.href=opt.url;
+      if(opt.purpose)a.append(el('small',null,opt.purpose));
+      details.append(a);
+     });
+     card.append(details);
+    }
+   }else card.append(explain);
+   zone.append(card);
   });
   document.getElementById('none').hidden=shown!==0;
   document.getElementById('count').textContent=shown+' of '+filtered.length+' tools shown';
   var showAll=document.getElementById('showAllTools');
-  showAll.hidden=!!q.trim();
-  showAll.textContent=viewAll?'Hide specialist and alternate tools':'Show specialist and alternate tools';
+  showAll.hidden=!!q.trim()||category!=='all';
+  showAll.textContent=viewAll?'Show common tools':'Show all tools';
  }
  filters.forEach(function(btn){btn.addEventListener('click',function(){category=btn.dataset.category;filters.forEach(function(b){b.setAttribute('aria-pressed',String(b===btn));});render();});});
  input.addEventListener('input',render);
- var initialQuery=new URLSearchParams(window.location.search).get('q');
+ var initialParams=new URLSearchParams(window.location.search);
+ var initialCategory=initialParams.get('category');
+ if(initialCategory&&filters.some(function(btn){return btn.dataset.category===initialCategory;})){category=initialCategory;}
+ var initialQuery=initialParams.get('q');
  if(initialQuery){input.value=initialQuery.slice(0,160);}
+ var requestedTopic=initialParams.get('topic');
+ if(!initialQuery&&requestedTopic){
+  var requested=window.EWBCalculatorTopics&&window.EWBCalculatorTopics.find(function(t){return t.id===requestedTopic;});
+  if(requested){category='calculations';input.value=requested.name;}
+ }
+ filters.forEach(function(btn){btn.setAttribute('aria-pressed',String(btn.dataset.category===category));});
  document.getElementById('showAllTools').addEventListener('click',function(){viewAll=!viewAll;render();});
  document.getElementById('clearRecent').addEventListener('click',function(){store.clearRecent();renderShortlists();});
  window.addEventListener('ewb-tool-state-change',function(){renderShortlists();render();});
