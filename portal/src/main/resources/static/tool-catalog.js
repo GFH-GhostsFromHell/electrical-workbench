@@ -201,7 +201,7 @@
     "description": "Older favourite: opens the unified calculator finder. Different specialist checks are available under their own calculation tasks.",
     "category": "calculations",
     "keywords": "advanced electrical conductor welders fire pumps protection",
-    "path": "/calculator-center.html",
+    "path": "/start.html?category=calculations",
     "steps": [
       "Choose the job you need to calculate.",
       "Check the cited Code path and equipment data.",
@@ -210,11 +210,11 @@
   },
   {
     "id": "cec-sections",
-    "name": "All Electrical Calculators · Find by Job",
-    "description": "One searchable directory for conductor sizing, motors, services, busbars, welders, HVAC and every CEC section.",
+    "name": "CEC Calculators",
+    "description": "Open the CEC Calculators category inside Find a Tool.",
     "category": "calculations",
     "keywords": "cec 2024 ontario oesc code calculators advanced regular guided sections conductor wire derating voltage drop busbar motor service transformer fire pump alarm welder capacitor conduit box fill hvac hospital hotel school apartment breaker fuse",
-    "path": "/calculator-center.html",
+    "path": "/start.html?category=calculations",
     "steps": [
       "Search the job or equipment name, not the worksheet level.",
       "Open the recommended calculation or choose another method.",
