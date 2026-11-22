@@ -16,6 +16,12 @@ import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.*;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.oidc.user.*;
+import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import jakarta.servlet.http.HttpSession;
+import java.time.Instant;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.*;
@@ -44,14 +50,63 @@ public class SecurityConfig {
     OidcUserService delegate = new OidcUserService();
     return request -> {
       OidcUser google = delegate.loadUser(request);
-      String email = google.getEmail();
-      if (email == null || email.isBlank()) throw new IllegalArgumentException("Google account did not provide an email address");
-      accounts.ensureGoogleAccount(email, google.getFullName(), google.getSubject());
+      if (!Boolean.TRUE.equals(google.getEmailVerified())
+          || google.getEmail() == null || google.getEmail().isBlank()) {
+        throw new OAuth2AuthenticationException(new OAuth2Error("unverified_email"),
+            "The Google account must provide a verified email address.");
+      }
+
+      String localUsername;
+      try {
+        HttpSession session = null;
+        if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes webRequest)
+          session = webRequest.getRequest().getSession(false);
+
+        String pending = session == null ? null : (String) session.getAttribute("googleLinkAccount");
+        Long issued = session == null ? null : (Long) session.getAttribute("googleLinkIssuedAt");
+        if (pending != null) {
+          // Single-use link request made after the user re-entered their password.
+          session.removeAttribute("googleLinkAccount");
+          session.removeAttribute("googleLinkIssuedAt");
+          if (issued == null || issued > Instant.now().getEpochSecond()
+              || Instant.now().getEpochSecond() - issued > 300)
+            throw new IllegalStateException("The Google linking request expired. Start again from your profile.");
+          localUsername = accounts.linkGoogleAccount(pending, google.getEmail(), google.getSubject());
+        } else {
+          localUsername = accounts.ensureGoogleAccount(google.getEmail(), google.getFullName(), google.getSubject());
+        }
+      } catch (RuntimeException failure) {
+        throw new OAuth2AuthenticationException(new OAuth2Error("google_account_unavailable"),
+            "Google sign-in could not be completed. If you have a password account, sign in first and connect Google from your profile.",
+            failure);
+      }
+
       Set<GrantedAuthority> authorities = new LinkedHashSet<>(google.getAuthorities());
       authorities.add(new SimpleGrantedAuthority("ROLE_CLIENT"));
-      if (google.getUserInfo() != null) return new DefaultOidcUser(authorities, google.getIdToken(), google.getUserInfo(), "email");
-      return new DefaultOidcUser(authorities, google.getIdToken(), "email");
+      // Spring's default Google principal name is the OIDC subject or email.
+      // All existing portal APIs use the LOCAL username as their account key.
+      // Expose the local username while preserving signed Google ID token claims.
+      if (google.getUserInfo() != null)
+        return new LocalOidcUser(authorities, google.getIdToken(), google.getUserInfo(), localUsername);
+      return new LocalOidcUser(authorities, google.getIdToken(), localUsername);
     };
+  }
+
+  static final class LocalOidcUser extends DefaultOidcUser {
+    private final String localUsername;
+    LocalOidcUser(Collection<? extends GrantedAuthority> authorities,
+        org.springframework.security.oauth2.core.oidc.OidcIdToken idToken,
+        org.springframework.security.oauth2.core.oidc.OidcUserInfo info,
+        String localUsername) {
+      super(authorities, idToken, info, "sub");
+      this.localUsername=localUsername;
+    }
+    LocalOidcUser(Collection<? extends GrantedAuthority> authorities,
+        org.springframework.security.oauth2.core.oidc.OidcIdToken idToken, String localUsername) {
+      super(authorities, idToken, "sub");
+      this.localUsername=localUsername;
+    }
+    @Override public String getName() { return localUsername; }
   }
 
   @Bean
