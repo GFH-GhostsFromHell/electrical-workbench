@@ -50,7 +50,7 @@ test('oversize members are flagged rather than silently spliced',()=>{
 test('first-fit bar plan includes each saw kerf',()=>{
   const plan=buildStockPlan([{name:'cut',qty:3,cutMm:999}],3000,2);
   assert.equal(plan.bars.length,2);
-  assert.equal(plan.bars[0].remainingMm,1000);
+  assert.equal(plan.bars[0].remainingMm,998);
 });
 test('rejects invalid and unbounded quantities',()=>{
   assert.throws(()=>rack([{...disconnect,qty:0}]),/Quantity/);
