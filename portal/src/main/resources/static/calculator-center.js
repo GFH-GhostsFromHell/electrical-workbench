@@ -6,7 +6,7 @@ const tasks=root.EWBCalculatorTopics||[];
 const by=id=>document.getElementById(id);
 const input=by('query'),results=by('results'),groups=Array.from(document.querySelectorAll('[data-group]'));
 const common=['conductor','voltage','service','transformer','motors','busbar','tap','firealarm'];
-let group='all',browseAll=false,selectedId=null,firstRender=true;
+let group='all',browseAll=false,selectedId=null;
 function el(tag,className,text){
   const node=document.createElement(tag);
   if(className)node.className=className;
@@ -19,7 +19,6 @@ function matches(t,q){
     t.primary.label+' '+t.alternatives.map(x=>x.label+' '+(x.purpose||'')).join(' ')).toLowerCase();
   return words.every(w=>source.includes(w));
 }
-function labelFor(id){return {busbar:'Busbar',motors:'Motor',service:'Service',voltage:'Voltage drop'}[id]||'Electrical';}
 function currentMatches(){
   const q=input.value.trim();
   let visible=tasks.filter(t=>q?matches(t,q):(group==='all'||t.group===group));
@@ -32,7 +31,10 @@ function currentMatches(){
       if(phrase===needle)return 0;
       if(phrase.startsWith(needle))return 1;
       if(phrase.includes(needle))return 2;
-      return 3;
+      // Common field calculations come before general reference topics
+      // when a search term applies to both (e.g. "hospital").
+      const commonIndex=common.indexOf(t.id);
+      return commonIndex>=0?3+commonIndex/100:4;
     };
     visible.sort((a,b)=>rank(a)-rank(b)||a.name.localeCompare(b.name));
   }else visible.sort((a,b)=>a.name.localeCompare(b.name));
@@ -96,7 +98,6 @@ function render(){
   by('browseAll').textContent=browseAll?'Show common':'See all '+tasks.length;
   by('browseAll').setAttribute('aria-expanded',String(browseAll));
   showDetail(shown.find(t=>t.id===selectedId)||null);
-  firstRender=false;
 }
 input.addEventListener('input',()=>{
   if(input.value.trim())group='all';
