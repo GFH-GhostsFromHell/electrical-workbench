@@ -226,7 +226,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         root.setLeft(navScroll);
 
         workspace=new StackPane();workspace.setPadding(new Insets(22));root.setCenter(workspace);
-        home.setOnAction(e->setWorkspace(buildHome()));calculators.setOnAction(e->openFieldPage("/calculator-center.html"));engineering.setOnAction(e->setWorkspace(buildEngineering()));learn.setOnAction(e->setWorkspace(buildPlatform("Learn")));field.setOnAction(e->setWorkspace(buildPlatform("Field")));safety.setOnAction(e->setWorkspace(buildSafety()));projects.setOnAction(e->setWorkspace(buildPlatform("Projects")));career.setOnAction(e->setWorkspace(buildPlatform("Career")));business.setOnAction(e->setWorkspace(new EnterpriseTeamPane(portal,currentUsername,currentPassword)));news.setOnAction(e->setWorkspace(buildNews()));chatgpt.setOnAction(e->setWorkspace(AskChatGptView.create(currentUsername)));profile.setOnAction(e->setWorkspace(buildProfile()));setWorkspace(buildHome());
+        home.setOnAction(e->setWorkspace(buildHome()));calculators.setOnAction(e->openFieldPage("/start.html?category=calculations"));engineering.setOnAction(e->setWorkspace(buildEngineering()));learn.setOnAction(e->setWorkspace(buildPlatform("Learn")));field.setOnAction(e->setWorkspace(buildPlatform("Field")));safety.setOnAction(e->setWorkspace(buildSafety()));projects.setOnAction(e->setWorkspace(buildPlatform("Projects")));career.setOnAction(e->setWorkspace(buildPlatform("Career")));business.setOnAction(e->setWorkspace(new EnterpriseTeamPane(portal,currentUsername,currentPassword)));news.setOnAction(e->setWorkspace(buildNews()));chatgpt.setOnAction(e->setWorkspace(AskChatGptView.create(currentUsername)));profile.setOnAction(e->setWorkspace(buildProfile()));setWorkspace(buildHome());
         stage.setScene(new Scene(root,1320,830));
         applyAppearance(root);
     }
@@ -242,7 +242,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         }));
         TilePane tiles=new TilePane();tiles.setHgap(12);tiles.setVgap(12);tiles.setPrefColumns(2);
         tiles.getChildren().addAll(
-            tile("🧮 Find a Calculator","Search CEC worksheets by job: busbars, welders, transformers, motors, services, conductors and specialist formulas",()->openFieldPage("/calculator-center.html")),
+            tile("🧮 Find a Calculator","Search CEC worksheets by job: busbars, welders, transformers, motors, services, conductors and specialist formulas",()->openFieldPage("/start.html?category=calculations")),
             tile("▣ Native Calculator Workspace","Use the original JavaFX calculation interface when you prefer the native workflow",()->setWorkspace(buildCalculators())),
             tile("⚙ Motor Starter & Drive Selector","Choose DOL, wye-delta, soft starter, VFD, capacitor-start or DC controls with nameplate and duty checks",()->openFieldPage("/motor-starter-selector.html")),
             tile("⚙ Power System Analysis","Per-unit, base values, transformer impedance, transmission lines, symmetrical components, sequence faults and short-circuit tools",()->setWorkspace(buildEngineering())),
