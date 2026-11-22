@@ -21,7 +21,7 @@ assert.ok(!dashboard.includes('id="toolDirectory"'), 'Dashboard must not duplica
 includes(dashboard, 'action="/start.html"', 'Dashboard search delegates to canonical task finder');
 includes(dashboard, 'class="card workbench-shortcuts"', 'Personal shortcuts are collapsible');
 for (const link of [
-  '/bend-calcs.html', '/calculator-center.html',
+  '/bend-calcs.html', '/start.html?category=calculations',
   '/troubleshooting-kb.html', '/account-records.html'
 ]) includes(dashboard, 'class="workflow-link" href="' + link + '"', 'Quick task route');
 includes(dashboard, '.nav .label{display:inline!important', 'Mobile navigation must keep labels');
@@ -85,9 +85,9 @@ includes(read(root+'motor-starter-selector.html'),'/motor-drive-selector.js','Mo
 includes(read(root+'motor-starter-selector.html'),'/workbench-themes.css','Motor selector follows the shared themes');
 includes(start, 'new URLSearchParams(window.location.search)', 'Dashboard query reaches canonical finder');
 includes(start, 'alternateIds=new Set(', 'Specialist views are grouped instead of duplicated');
-includes(start, 'Show specialist and alternate tools', 'Full catalog remains accessible');
+includes(start, 'Show all tools', 'Full catalog remains accessible');
 includes(start, '/calculator-topics.js', 'Shared calculator topic directory loaded into Find a Tool');
-includes(read(root+'calculator-center.html'), '/calculator-topics.js', 'One central calculator directory');
+includes(read(root+'calculator-center.html'), "window.location.replace('/start.html?'", 'Old calculator link redirects to the unified finder');
 includes(dashboard, '/workbench-flow.css', 'Readable shared UI styles');
 includes(start, '/workbench-flow.css', 'Readable styles are shared with task finder');
 const androidHome = read('android-client/app/src/main/java/com/gfh/electricalworkbench/MainActivity.kt');
