@@ -1,0 +1,30 @@
+name: Verify Strut Rack Builder
+on:
+  push:
+    paths:
+      - 'portal/src/main/resources/static/strut-rack-*.js'
+      - 'portal/src/main/resources/static/strut-rack-builder.html'
+      - 'portal/src/test/js/strut-rack-math.test.cjs'
+      - '.github/workflows/verify-strut-rack-builder.yml'
+  pull_request:
+    paths:
+      - 'portal/src/main/resources/static/strut-rack-*.js'
+      - 'portal/src/main/resources/static/strut-rack-builder.html'
+      - 'portal/src/test/js/strut-rack-math.test.cjs'
+      - '.github/workflows/verify-strut-rack-builder.yml'
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check JavaScript syntax
+        run: |
+          node --check portal/src/main/resources/static/strut-rack-math.js
+          node --check portal/src/main/resources/static/strut-rack-builder.js
+      - name: Run strut rack geometry and material tests
+        run: node --test portal/src/test/js/strut-rack-math.test.cjs
