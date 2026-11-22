@@ -197,13 +197,13 @@
   },
   {
     "id": "advanced-code",
-    "name": "Specialist CEC Formula Worksheets",
-    "description": "Optional detailed formulas after selecting a task in the main calculator directory.",
+    "name": "Previous Advanced CEC Shortcut",
+    "description": "Older favourite: opens the unified calculator finder. Different specialist checks are available under their own calculation tasks.",
     "category": "calculations",
     "keywords": "advanced electrical conductor welders fire pumps protection",
-    "path": "/advanced-calculations.html",
+    "path": "/calculator-center.html",
     "steps": [
-      "Choose a specialist worksheet.",
+      "Choose the job you need to calculate.",
       "Check the cited Code path and equipment data.",
       "Save calculations before leaving."
     ]
