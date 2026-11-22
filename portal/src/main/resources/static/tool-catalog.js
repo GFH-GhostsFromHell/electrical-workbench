@@ -1,5 +1,5 @@
 /* Shared task catalog for web navigation. Keep stable IDs in other clients. */
-(function(g){'use strict';g.EWBTaskCatalog=Object.freeze([
+(function(g){'use strict';const base=[
   {
     "id": "conduit-marks",
     "name": "Conduit Bender · Field Marks",
@@ -197,8 +197,8 @@
   },
   {
     "id": "advanced-code",
-    "name": "Advanced CEC Calculators",
-    "description": "More detailed Code worksheets: HVAC, welders, neutral and more.",
+    "name": "Specialist CEC Formula Worksheets",
+    "description": "Optional detailed formulas after selecting a task in the main calculator directory.",
     "category": "calculations",
     "keywords": "advanced electrical conductor welders fire pumps protection",
     "path": "/advanced-calculations.html",
@@ -210,15 +210,15 @@
   },
   {
     "id": "cec-sections",
-    "name": "Electrical Calculators by CEC Section",
-    "description": "Browse all calculations grouped by electrical code section.",
+    "name": "All Electrical Calculators · Find by Job",
+    "description": "One searchable directory for conductor sizing, motors, services, busbars, welders, HVAC and every CEC section.",
     "category": "calculations",
-    "keywords": "cec 2024 ontario rules section 4 8 12 14 26 28",
-    "path": "/calculators.html",
+    "keywords": "cec 2024 ontario oesc code calculators advanced regular guided sections conductor wire derating voltage drop busbar motor service transformer fire pump alarm welder capacitor conduit box fill hvac hospital hotel school apartment breaker fuse",
+    "path": "/calculator-center.html",
     "steps": [
-      "Pick the applicable CEC section.",
-      "Enter exact problem and equipment values.",
-      "Save the worksheet for reuse."
+      "Search the job or equipment name, not the worksheet level.",
+      "Open the recommended calculation or choose another method.",
+      "Verify the Code inputs and save your worksheet."
     ]
   },
   {
@@ -338,4 +338,11 @@
       "Keep the official reference for the job."
     ]
   }
-]);})(window);
+];
+ const extra=(g.EWBCalculatorTopics||[]).filter(t=>t.findable).map(t=>({
+   id:'calc-'+t.id, name:t.name, description:t.description, category:'calculations',
+   keywords:t.terms+' '+t.group+' calculator', path:t.primary.url,
+   steps:['Enter the equipment and circuit data.','Confirm applicable CEC/OESC tables and manufacturer data.','Review and save the result.']
+ }));
+ g.EWBTaskCatalog=Object.freeze(base.concat(extra));
+})(window);
