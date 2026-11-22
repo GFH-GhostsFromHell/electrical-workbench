@@ -46,6 +46,12 @@ private val allTasks = listOf(
     MobileTask("bender-calibrate", "Calibrate a Conduit Bender", "Measure shoe deduct and gain", "Installation", "shoe profile", "/bender-calibration.html"),
     MobileTask("pull-box", "Pull Box Dimensions - Offline", "Straight, angle and U-pull sizing", "Installation", "junction box wall", "native:pull", true),
     MobileTask("strut-rack", "3D Strut Rack Builder", "Panel and disconnect frames, channel cuts, hardware estimates and 3D layout (online)", "Installation", "unistrut channel rack panel disconnect frame stand cut list", "/strut-rack-builder.html"),
+    MobileTask("calculator-center", "All Electrical Calculators · Find by Job", "One searchable directory for CEC calculations and specialist formulas", "Calculations", "cec code regular advanced guided busbar welder transformer capacitor conduit fill motor tap neutral hospital load service", "/calculator-center.html"),
+    MobileTask("busbar", "Busbar & Parallel Straps", "Size busbars and parallel strap count", "Calculations", "busbar number of straps copper aluminum section 4", "/calculators.html?section=s4&tab=1"),
+    MobileTask("welder", "Welder Circuit Calculations", "Single / multiple welder duty-cycle sizing", "Calculations", "welder arc resistance feeder duty cycle", "/calculators.html?section=s42&tab=0"),
+    MobileTask("capacitor", "Capacitor & Power Factor", "kVAR and capacitor bank calculations", "Calculations", "capacitor power factor pf correction kvar", "/calculators.html?section=s26&tab=5"),
+    MobileTask("conduit-fill", "Conduit & Box Fill", "Raceway and box fill CEC worksheets", "Calculations", "conduit wire fill box junction emt pvc", "/calculators.html?section=s12&tab=0"),
+    MobileTask("heating", "Electric Heating", "Electric heater current and continuous-load review", "Calculations", "heater heating watts continuous hvac", "/advanced-calculations.html?tool=hvac"),
     MobileTask("conductor-drop", "Circuit Sizing & Voltage Drop - Offline", "Ampacity, derating, voltage drop and length", "Calculations", "wire cable table d3", "native:circuit", true),
     MobileTask("service-demand", "Service Load Calculations", "Demand for hospital, schools, apartments and homes", "Calculations", "residential hotel feeder demand", "/guided-calculators.html?tool=service"),
     MobileTask("transformer", "Transformer & Load Sizing - Offline", "Transformer currents and loads", "Calculations", "kva primary secondary", "native:transformer", true),
@@ -54,7 +60,7 @@ private val allTasks = listOf(
     MobileTask("refrigeration", "Refrigeration Motor Sizing", "Compressor RLA/LRA and MCA/MOCP", "Calculations", "hvac compressor", "/guided-calculators.html?tool=refrig"),
     MobileTask("grounding", "Grounding & Bonding", "Conductors and electrodes", "Calculations", "cec section 10", "/guided-calculators.html?tool=ground"),
     MobileTask("fire-pump", "Fire Pump Circuit", "Pump motor and controller worksheet", "Calculations", "jockey locked rotor", "/guided-calculators.html?tool=firepump"),
-    MobileTask("advanced-code", "Advanced CEC Calculators", "Complex Code worksheets", "Calculations", "neutral hvac derating", "/advanced-calculations.html"),
+    MobileTask("advanced-code", "Specialist CEC Formula Worksheets", "Optional detailed formulas after choosing a job", "Calculations", "advanced cec hvac neutral derating", "/advanced-calculations.html"),
     MobileTask("relay", "Protection & Relay Calculators - Offline", "CT/PT ratios and relay pickup", "Power & Protection", "4 20ma", "native:relay", true),
     MobileTask("power", "Power System Analysis - Web", "Per-unit, short-circuit and sequence studies (connection required)", "Power & Protection", "fault impedance", "native:power"),
     MobileTask("fault-offline", "Equipment Troubleshooting - Offline", "Fault isolation and work orders", "Troubleshooting", "vfd plc mine motor", "native:fault", true),
@@ -116,9 +122,9 @@ internal fun MobileToolFinder(username:String,onOpenWeb:(String)->Unit,
             }
     }.sortedWith(compareBy<MobileTask>{if(favourites.contains(it.id))0 else 1}
         .thenBy{val n=recent.indexOf(it.id);if(n<0)1000 else n}.thenBy{it.title})
-    val featured=setOf("quick-bender-offline","conductor-drop","pull-box","motor","fault-offline","jobsite")
+    val featured=setOf("calculator-center","quick-bender-offline","conductor-drop","pull-box","motor","fault-offline","jobsite")
     val compact=query.isBlank()&&group=="All"&&!offlineOnly&&!showAll
-    val visibleTasks=if(compact)filtered.filter{it.id in featured && it.id !in favourites}.take(6) else filtered
+    val visibleTasks=if(compact)filtered.filter{it.id in featured && it.id !in favourites}.take(7) else filtered
     val pinned=if(compact)favourites.mapNotNull{id->allTasks.find{it.id==id}}.take(3) else emptyList()
     val recentlyUsed=if(compact)recent.firstNotNullOfOrNull{id->allTasks.find{it.id==id}} else null
 
