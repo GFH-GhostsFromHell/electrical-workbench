@@ -96,7 +96,7 @@ public class ClientAccountStore {
     if(existing!=null&&existing>0)
       throw new IllegalStateException("An account with this email already exists. Sign in with its current method before connecting Google.");
 
-    String unusablePassword=encoder.encode(UUID.randomUUID()+":google-only:"+UUID.randomUUID());
+    String unusablePassword=encoder.encode("GOOGLE_ONLY_"+UUID.randomUUID());
     db.update("insert into client_account(username,display_name,email,password_hash,enabled,subscription_tier,avatar_data,auth_provider,google_subject,email_verified) values(?,?,?,?,?,?,?,?,?,?)",
         verifiedEmail,name,verifiedEmail,unusablePassword,true,"TIER_1",null,"GOOGLE",subject,true);
     return verifiedEmail;
