@@ -28,7 +28,7 @@ if(stableBender.includes('href="/bend-instruction-lab.html"')){
 }
 const stableIds=new Set([...stableBender.matchAll(/\bid="([^"]+)"/g)].map(m=>m[1]));
 for(const id of ['menuScreen','toolScreen','multiScreen','marks','stepList','stepWarning',
- 'fieldFocusToggle','fieldFocusCount','fieldFocusText','fieldFocusPrevious','fieldFocusNext',
+ 'fieldFocusToggle','fieldFocusCount','fieldFocusHeading','fieldFocusText','fieldFocusPrevious','fieldFocusNext',
  'mbMarkCanvas','mbSteps','mbWarnings','mbFocusToggle','mbFocusPanel','mbFocusContent',
  'mbFocusPrevious','mbFocusNext']){
  if(!stableIds.has(id)){console.error('Stable bender missing control '+id);failed=true}
@@ -58,7 +58,13 @@ for(const token of ["BendView3D.single(","BendView3D.multi(","BendView3D.mount("
 for(const token of ['pointerdown','pointermove','pointercancel','canvas','function orient(','function single(','function multi(']){
  if(!viewer.includes(token)){console.error('3D viewer regression: '+token);failed=true}
 }
-console.log('Stable bender: formulas, calibrated marks, 2D/3D orbit viewer and precise field steps validated');
+for(const token of ['id="beginnersStart"','beginnerStartDiagram()','START END','Measuring tape hook','FROM START END','Walk me through it','function measureNote()']){
+ if(!stableBender.includes(token)){console.error('Beginner field guide regression: '+token);failed=true}
+}
+if(stableBender.includes('Tape ZERO at the marked left end')){
+ console.error('Ambiguous tape-zero instruction has returned');failed=true;
+}
+console.log('Stable bender: math, calibrated marks, 2D/3D viewer and beginner measurement guide validated');
 const kb=fs.readFileSync(path.join(root,'troubleshooting-kb.html'),'utf8');
 const procedures=[...kb.matchAll(/\btopic\('[a-z0-9-]+'/g)].length;
 if(procedures<20){console.error('Expected >=20 troubleshooting procedures, found '+procedures);failed=true}
