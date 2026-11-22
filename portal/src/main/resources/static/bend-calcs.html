@@ -262,13 +262,13 @@ function addCalibrationBar(html){
 }
 function renderTool(){let d=defaults[unit],html='';if(current==='offsetFar'||current==='offsetNear')html=layout(`<div class="inputs">${f('Offset / rise','off',d.offset[0])}${f('Distance to obstacle / critical reference','dist',d.offset[1])}${chips([10,22.5,30,45,60])}</div>`);else if(current==='rollFar'||current==='rollNear')html=layout(`<div class="inputs">${f('Vertical rise','rise',d.roll[0])}${f('Horizontal roll','roll',d.roll[1])}${f('Distance to obstacle / critical reference','dist',d.roll[2])}${chips([22.5,30,45,60])}</div>`);else if(current==='saddle3')html=layout(`<div class="inputs">${f('Saddle height','height',d.s3[0])}${f('Obstacle center distance','center',d.s3[1])}${sel('Center bend angle','centerAngle',[30,45,60],45,'angle=parseFloat(this.value);recalc()')}${sel('Marking convention','saddleMethod',['Traditional centre-notch + outside arrows','Geometric bend centres (NOT shoe marks)'],'Traditional centre-notch + outside arrows')}</div>`);else if(current==='saddle4'||current==='rect'||current==='square'){let width=current==='square'?d.s4[0]:d.s4[1];html=layout(`<div class="inputs">${f('Obstacle height','height',d.s4[0])}${f(current==='square'?'Square width':'Obstacle width','width',width)}${f('Distance to near face','dist',d.s4[2])}${chips([15,22.5,30,45,60])}</div>`)}else if(current==='round')html=layout(`<div class="inputs">${f('Obstruction diameter','diam',d.round[0])}${f('Clearance over obstruction','clear',d.round[1])}${f('Obstruction center distance','center',d.round[2])}${sel('Center bend angle','centerAngle',[30,45,60],45,'angle=parseFloat(this.value);recalc()')}${sel('Marking convention','saddleMethod',['Traditional centre-notch + outside arrows','Geometric bend centres (NOT shoe marks)'],'Traditional centre-notch + outside arrows')}</div>`);else if(current==='stub')html=layout(`<div class="inputs">${sel('Conduit / common hand-bender starting point','size',['1/2 EMT','3/4 EMT','1 EMT','1-1/4 EMT','Custom'],'1/2 EMT','stubPreset(this.value)')}${f('Desired stub-up','stub',d.stub[0])}${f('Take-up / deduct (confirm on bender)','take',d.stub[1])}</div>`);else if(current==='kick90')html=layout(`<div class="inputs">${f('Desired 90° stub','stub',d.kick[0])}${f('90° take-up / deduct','take',d.kick[1])}${f('Kick rise','kick',d.kick[2])}${chips([10,15,22.5,30,45])}</div>`);else if(current==='segment90')html=layout(`<div class="inputs">${f('Target centerline radius','radius',d.segment[0])}${sel('Number of equal bends','segments',[3,4,5,6,8,9,10,12],6)}</div>`);else if(current==='parallel')html=layout(`<div class="inputs">${f('Center-to-center conduit spacing','sep',d.parallel[0])}${sel('Number of parallel conduits','count',[2,3,4,5,6,8,10],4)}${chips([10,15,22.5,30,45,60])}</div>`);else if(current==='back2back')html=layout(`<div class="inputs">${f('First stub height','stub',d.back[0])}${f('First 90 take-up / deduct','take',d.back[1])}${f('Desired back-to-back distance','backdist',d.back[2])}${f('Bender star/reference correction','star',0)}</div>`);else if(current==='gainCut')html=layout(`<div class="inputs">${sel('Bend arrangement','cutShape',['Single 90','Back-to-back 90s'],'Single 90')}${f('Finished first leg / stub','cutFirst',d.gain[0])}${f('Finished second leg / stub','cutSecond',d.gain[1])}${f('Back-to-back distance (two 90s only)','cutSpan',d.gain[2])}${f('MEASURED gain per 90 (required)','cutGain','')}<div class="wide"><button onclick="gainFromScrap()">Calculate gain from test piece below</button></div>${f('Straight test piece before bend','testStock',d.gain[3])}${f('First finished test leg','testA',d.gain[4])}${f('Second finished test leg','testB',d.gain[5])}</div>`);document.getElementById('toolBody').innerHTML=addCalibrationBar(html);recalc()}
 function stubPreset(x){let map=unit==='in'?{'1/2 EMT':5,'3/4 EMT':6,'1 EMT':8,'1-1/4 EMT':11}:{'1/2 EMT':127,'3/4 EMT':152,'1 EMT':203,'1-1/4 EMT':279};if(map[x]!=null)document.getElementById('take').value=map[x];recalc()}
-function recalc(){try{if(current.startsWith('offset'))calcOffset();else if(current.startsWith('roll'))calcRoll();else if(current==='saddle3')calcS3();else if(current==='round')calcRound();else if(['saddle4','rect','square'].includes(current))calcS4();else if(current==='stub')calcStub();else if(current==='kick90')calcKick();else if(current==='segment90')calcSegment();else if(current==='parallel')calcParallel();else if(current==='back2back')calcBack();else if(current==='gainCut')calcGainCut();  renderSteps();decorateBendMarks();
+function recalc(){try{if(current.startsWith('offset'))calcOffset();else if(current.startsWith('roll'))calcRoll();else if(current==='saddle3')calcS3();else if(current==='round')calcRound();else if(['saddle4','rect','square'].includes(current))calcS4();else if(current==='stub')calcStub();else if(current==='kick90')calcKick();else if(current==='segment90')calcSegment();else if(current==='parallel')calcParallel();else if(current==='back2back')calcBack();else if(current==='gainCut')calcGainCut();  renderSteps();decorateBendMarks();refreshBendView();
  }catch(e){
   document.getElementById('results').innerHTML=result('CALCULATION NOT POSSIBLE',e.message,'amber');
   document.getElementById('marks').innerHTML='';
   document.getElementById('diagram').innerHTML='';
   document.getElementById('stepList').innerHTML='';fieldFocusUpdate();
-  document.getElementById('stepWarning').textContent='CALCULATION NOT POSSIBLE: no field bend sequence issued.';
+  document.getElementById('stepWarning').textContent='CALCULATION NOT POSSIBLE: no field bend sequence issued.';refreshBendView();
   document.getElementById('note').textContent='No fabrication marks issued. Correct the stock limit, shoe spacing or dimensions.';
  }}
 function calcOffset(){let o=v('off'),D=v('dist'),S=o/sin(angle),sh=o*tan(angle/2),far=current==='offsetFar',A=far?D+sh-S:D+sh,B=A+S;document.getElementById('diagram').innerHTML=offsetSvg(o,S,sh,false);document.getElementById('results').innerHTML=result('Bend spacing',L(S),'green')+result('Total shrink',L(sh),'amber')+result('Mark A',L(A),'cyan')+result('Mark B',L(B),'cyan');document.getElementById('marks').innerHTML=marks({A,B});document.getElementById('formula').textContent=`spacing = offset ÷ sin(${angle}°) = ${num(S)}\nshrink = offset × tan(${angle/2}°) = ${num(sh)}\n${far?'far-critical: B = distance + shrink; A = B − spacing':'near-critical: A = distance + shrink; B = A + spacing'}`;document.getElementById('note').textContent='Use the distance convention shown by the selected critical-bend mode. Verify the actual bender arrow/tangent reference before bending.'}
@@ -625,10 +625,11 @@ function mbCompute(){
  const canvas=document.getElementById('mbMarkCanvas');
  const warnings=document.getElementById('mbWarnings');
  const steps=document.getElementById('mbSteps');
+ multiPreviewData=null;
  let stock,gap;
  try{stock=mbNum('mbStock');gap=mbNum('mbGap');if(stock<=0)throw Error('Enter a positive straight-pipe stock length.');if(stock>(unit==='mm'?3048:120)+1e-6)throw Error('CALCULATION NOT POSSIBLE: one standard 10 ft EMT stick is 3,048 mm / 120 in. Choose a stock length within that limit.')}
- catch(e){warnings.textContent=e.message;canvas.innerHTML='';steps.innerHTML='';mbFocusUpdate();return}
- if(!multiOps.length){canvas.innerHTML='';steps.innerHTML='';warnings.textContent='Add bend operations to see a combined plan.';mbFocusUpdate();return}
+ catch(e){warnings.textContent=e.message;canvas.innerHTML='';steps.innerHTML='';mbFocusUpdate();refreshMultiBendView();return}
+ if(!multiOps.length){canvas.innerHTML='';steps.innerHTML='';warnings.textContent='Add bend operations to see a combined plan.';mbFocusUpdate();refreshMultiBendView();return}
  const all=[],issues=[],hardIssues=[];
  const gapVerified=document.getElementById('mbGap').value.trim()!=='';
  let totalAngles=0;
@@ -683,7 +684,7 @@ function mbCompute(){
    const message=hardIssues.join(' • ');
    warnings.textContent='CALCULATION NOT POSSIBLE on one 10 ft EMT: '+message;
    canvas.innerHTML='';steps.innerHTML='<div class="warn">No fabrication plan issued. Change the dimensions or use a longer / separately joined installation if permitted.</div>';
-   multiReport='CALCULATION NOT POSSIBLE\n'+message;mbFocusUpdate();return;
+   multiReport='CALCULATION NOT POSSIBLE\n'+message;mbFocusUpdate();refreshMultiBendView();return;
  }
  const scale=Math.max(stock,...all.map(m=>m.position),1)*1.06;
  let ticks='<div class="pipe"></div>';
@@ -698,6 +699,7 @@ function mbCompute(){
   '<div class="advanced-mark"><b>'+m.order+'</b><div><strong>'+m.group+' · mark '+m.name+' · '+mbFormat(m.position)+' from datum</strong>'+
   '<div class="bend-action">'+m.align+' | '+hookSetup(m)+'</div>'+hookFaceBadge(m.face)+'<div style="margin-top:4px">'+m.action+'</div></div></div>').join('');
   mbFocusUpdate();
+ multiPreviewData={ops:multiOps.map(o=>({...o})),stock};refreshMultiBendView();
  warnings.textContent=issues.length?'CHECK LAYOUT: '+issues.join(' • '):
   'No range/spacing warnings found. Verify head radius, shoe markers and springback on a test piece.';
  multiReport='MULTI-BEND PIPE LAYOUT\nStock: '+mbFormat(stock)+'; min shoe spacing: '+mbFormat(gap)+'\n\n'+
