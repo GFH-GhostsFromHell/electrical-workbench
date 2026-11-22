@@ -202,7 +202,7 @@ public class ClientAccountStore {
     Integer count = db.queryForObject("select count(*) from client_account where lower(username)=lower(?)", Integer.class, username);
     if (count != null && count > 0) {
       if (password != null && !password.isBlank()) {
-        db.update("update client_account set display_name=?,email=?,password_hash=?,enabled=?,subscription_tier=?,auth_provider='PASSWORD' where lower(username)=lower(?)",
+        db.update("update client_account set display_name=?,email=?,password_hash=?,enabled=?,subscription_tier=?,auth_provider=case when google_subject is null then 'PASSWORD' else 'PASSWORD_GOOGLE' end where lower(username)=lower(?)",
             displayName, email, encoder.encode(password), enabled, normalizedTier, username);
       } else {
         db.update("update client_account set display_name=?,email=?,enabled=?,subscription_tier=? where lower(username)=lower(?)",
