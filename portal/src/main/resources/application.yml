@@ -1,5 +1,8 @@
 server:
   port: ${SERVER_PORT:8080}
+  # Google must see Render's public HTTPS scheme/host when Spring constructs
+  # /login/oauth2/code/google behind the Render reverse proxy.
+  forward-headers-strategy: framework
 management:
   endpoints:
     web:
