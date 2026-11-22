@@ -45,6 +45,7 @@ private val allTasks = listOf(
     MobileTask("bend-guide", "Conduit Bend Diagrams", "Bend layouts and mark instructions", "Installation", "emt pipe bend offset saddle", "/bend-calcs.html"),
     MobileTask("bender-calibrate", "Calibrate a Conduit Bender", "Measure shoe deduct and gain", "Installation", "shoe profile", "/bender-calibration.html"),
     MobileTask("pull-box", "Pull Box Dimensions - Offline", "Straight, angle and U-pull sizing", "Installation", "junction box wall", "native:pull", true),
+    MobileTask("burial-depth", "Underground Burial Depth · LV & HV", "CEC Table 53 cover, HV and utility trench planning (online)", "Installation", "high voltage low voltage cable conduit direct burial table 53 trench depths 12-012 36 excavation", "/burial-depth.html"),
     MobileTask("strut-rack", "3D Strut Rack Builder", "Panel and disconnect frames, channel cuts, hardware estimates and 3D layout (online)", "Installation", "unistrut channel rack panel disconnect frame stand cut list", "/strut-rack-builder.html"),
     MobileTask("calculator-center", "CEC Calculators · Find a Tool", "One searchable directory for CEC calculations and specialist formulas", "Calculations", "cec code regular advanced guided busbar welder transformer capacitor conduit fill motor tap neutral hospital load service", "/start.html?category=calculations"),
     MobileTask("busbar", "Busbar & Parallel Straps", "Size busbars and parallel strap count", "Calculations", "busbar number of straps copper aluminum section 4", "/calculators.html?section=s4&tab=1"),
