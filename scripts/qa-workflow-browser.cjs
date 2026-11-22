@@ -234,6 +234,26 @@ const server = http.createServer((req, res) => {
     assert.ok(regularMarks.includes('FLIP bender handle DOWN'),'Offset return identifies when to flip the bender');
     assert.ok(regularMarks.includes('roll conduit 180°'),'Offset return identifies required cradle roll');
     assert.ok(!regularMarks.includes('? VERIFY HOOK'),'No generic verify hook warning');
+    assert.ok((await page.locator('#stepList li strong').allInnerTexts()).some(s=>s.includes('FLIP, THEN BEND B')),'Action steps identify the exact bend to flip before');
+    await page.locator('#bendView3d').click();
+    await visible('#bend3dPanel');
+    assert.equal(await page.locator('#diagram').isVisible(),false,'3D selection hides only the original 2D illustration');
+    assert.equal(await page.locator('#bendView3d').getAttribute('aria-pressed'),'true','3D toggle reports selection');
+    const rendered=await page.evaluate(()=>{const c=document.getElementById('bend3dCanvas');return {
+      width:c.width,height:c.height,alpha:c.getContext('2d').getImageData(2,2,1,1).data[3]};});
+    assert.ok(rendered.width>250&&rendered.height>200&&rendered.alpha===255,'3D canvas draws its own background and conduit');
+    await page.locator('#offsetPlane').selectOption('Right');
+    const turned=await page.evaluate(()=>{
+      const model=BendView3D.orient(BendView3D.single(current,angle,unit,v),current,id=>document.getElementById(id)?.value);
+      return model.paths[0].points[2].p;});
+    assert.ok(turned[1]>0&&Math.abs(turned[2])<.00001,'Rightward offset is actually displayed in sideways axis');
+    await page.locator('#offsetPlane').selectOption('Up');
+    await page.locator('#bend3dPanel button[aria-label="Rotate left"]').click();
+    await page.locator('#bend3dPanel button[aria-label="Zoom in"]').click();
+    await page.locator('#bendView2d').click();
+    await visible('#diagram');
+    assert.equal(await page.locator('#bend3dPanel').isVisible(),false,'Switch back to original 2D diagram');
+    assert.equal(await page.locator('#marks').innerText(),regularMarks,'2D/3D mode and direction never change physical mark values');
     await page.locator('#shoeMethod').selectOption('other');
     const otherMarks=await page.locator('#marks').innerText();
     assert.ok(otherMarks.includes('USE MANUFACTURER SHOE PROCEDURE'),'Other brands do not inherit the Klein arrow directions');
@@ -273,22 +293,43 @@ const server = http.createServer((req, res) => {
     const multiCount=await page.locator('#mbSteps .advanced-mark').count();
     assert.ok(multiCount>=2,'Working multi-bend example produces numbered marks');
     const multiMarks=await page.locator('#mbMarkCanvas').innerText();
+    await page.locator('#mbView3d').click();
+    await visible('#mb3dPanel');
+    assert.ok((await page.locator('#mb3dNote').innerText()).includes('SCHEMATIC ONLY'),'Advanced 3D states that the shape is not fabrication verified');
+    assert.ok((await page.locator('#mb3dCanvas').evaluate(c=>c.width))>200,'Advanced 3D canvas renders');
+    await page.locator('#mbView2d').click();
+    await visible('#mb2dPanel');
+    assert.equal(await page.locator('#mbMarkCanvas').innerText(),multiMarks,'Advanced switching preserves original stock marks');
     await page.locator('#mbFocusToggle').click();
     await visible('#mbFocusPanel');
     assert.equal(await page.locator('#mbSteps').isVisible(),false,'Focused multi-bend view reduces scrolling');
     await page.locator('#mbFocusNext').click();
     assert.ok((await page.locator('#mbFocusCount').innerText()).includes('Bend 2 of'),'Next highlights the second bend');
     assert.equal(await page.locator('#mbMarkCanvas').innerText(),multiMarks,'Focused mode does not recalculate marks');
+    await page.locator('#mbView3d').click();
+    await visible('#mb3dPanel');
     await page.locator('#mbStock').fill('121');
     await page.waitForFunction(()=>document.getElementById('mbWarnings').textContent.includes('CALCULATION NOT POSSIBLE'));
     assert.equal(await page.locator('#mbFocusPanel').isVisible(),false,'Invalid stock never leaves stale focused instructions');
+    assert.equal(await page.locator('#mb3dCanvas').isVisible(),false,'Invalid stock clears 3D shape rather than showing a stale fabrication preview');
     await page.locator('#mbStock').fill('120');
+    await visible('#mb3dCanvas');
     await visible('#mbFocusPanel');
     await page.locator('#mbFocusToggle').click();
     await page.locator('#mbSteps .advanced-mark').first().waitFor({state:'visible'});
+    await page.locator('#mbView2d').click();
     for(const width of [320,390,768,1280]){
       await page.setViewportSize({width,height:820});
       await checkNoOverflow('Stable conduit bender at '+width);
+      if(width===320||width===390){
+        await page.locator('#mbView3d').click();
+        await visible('#mb3dCanvas');
+        await checkNoOverflow('Rotatable 3D conduit preview at '+width);
+        const ratio=await page.locator('#mb3dCanvas').evaluate(el=>el.getBoundingClientRect().width/window.innerWidth);
+        assert.ok(ratio>0&&ratio<=1,'3D preview remains within the mobile viewport');
+        if(width===390)await take('conduit-bender-3d-mobile.png');
+        await page.locator('#mbView2d').click();
+      }
       if(width===390)await take('conduit-bender-stable-mobile.png');
       if(width===1280)await take('conduit-bender-stable-desktop.png');
     }
