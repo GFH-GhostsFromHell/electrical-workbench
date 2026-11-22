@@ -22,6 +22,7 @@ struct WorkbenchTools: View {
 
     // Stable identifiers match the web tool catalog and Android where tools overlap.
     private let tools: [ElectricalTool] = [
+        .init(id: "burial-depth", name: "Underground Burial Depth · LV & HV", description: "CEC Table 53 cover and trench-depth planning for underground cables", category: "Installation", terms: "underground cable conduit high voltage burial depth table 53 trench", icon: "arrow.down.to.line.compact", path: "/burial-depth.html"),
         .init(id: "conduit-marks", name: "Conduit Bender · Field Marks", description: "Bend marks, shoe facing and simple guided steps", category: "Installation", terms: "conduit offset saddle 90 kick pipe hook", icon: "ruler", path: "/bend-calcs.html"),
         .init(id: "bend-guide", name: "Conduit Bend Diagrams", description: "Offsets, saddles and parallel conduit", category: "Installation", terms: "emt pipe bending", icon: "ruler", path: "/bend-calcs.html"),
         .init(id: "bender-calibrate", name: "Calibrate a Conduit Bender", description: "Save your shoe deduct and gain", category: "Installation", terms: "shoe gain calibration", icon: "slider.horizontal.3", path: nil),
