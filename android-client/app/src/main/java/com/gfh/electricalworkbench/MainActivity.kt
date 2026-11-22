@@ -527,7 +527,7 @@ private fun DashboardScreen(session: Session, onOpenWeb: (String) -> Unit) {
             Text("COMMON WORKFLOWS", color = ElectricCyan, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
             Spacer(Modifier.height(9.dp))
             OutlinedButton(onClick = { onOpenWeb("/bend-calcs.html") }, modifier = Modifier.fillMaxWidth()) { Text("Conduit bends & tape marks") }
-            OutlinedButton(onClick = { onOpenWeb("/guided-calculators.html") }, modifier = Modifier.fillMaxWidth()) { Text("Circuit, motor & service calculations") }
+            OutlinedButton(onClick = { onOpenWeb("/calculator-center.html") }, modifier = Modifier.fillMaxWidth()) { Text("Find an electrical calculator") }
             OutlinedButton(onClick = { onOpenWeb("/troubleshooting-kb.html") }, modifier = Modifier.fillMaxWidth()) { Text("Troubleshoot equipment") }
             OutlinedButton(onClick = { onOpenWeb("/account-records.html") }, modifier = Modifier.fillMaxWidth()) { Text("Resume saved work") }
         }
@@ -553,31 +553,30 @@ private fun CalculatorsScreen(onOpenWeb: (String) -> Unit) {
         modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(18.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        Text("Electrical calculations", fontSize = 25.sp, fontWeight = FontWeight.Black)
-        Text("Choose the result you need. The same specialist tools are listed once in Find a Tool.",
+        Text("Find an electrical calculation", fontSize = 25.sp, fontWeight = FontWeight.Black)
+        Text("Search by the job or equipment. You do not need to choose between regular and advanced CEC calculators.",
             color = TextSecondary, fontSize = 15.sp, lineHeight = 21.sp)
         ElectricalCard {
-            Text("RECOMMENDED START", color = ElectricCyan, fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+            Text("ALL ELECTRICAL CALCULATORS", color = ElectricCyan,
+                fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { onOpenWeb("/guided-calculators.html") }, modifier = Modifier.fillMaxWidth()) {
-                Text("Step-by-step electrical calculation")
+            Button(onClick = { onOpenWeb("/calculator-center.html") }, modifier = Modifier.fillMaxWidth()) {
+                Text("Search all calculations", fontWeight = FontWeight.Bold)
             }
-            Text("Enter your system and load, review the formula and assumptions, then save or export.",
+            Text("One recommended worksheet per task, with optional detailed formulas and CEC section methods.",
                 color = TextSecondary, fontSize = 13.sp, lineHeight = 19.sp)
         }
-        OutlinedButton(onClick = { onOpenWeb("/circuit-sizing.html") }, modifier = Modifier.fillMaxWidth()) {
-            Text("Circuit & conductor review")
-        }
-        OutlinedButton(onClick = { onOpenWeb("/start.html?q=motor") }, modifier = Modifier.fillMaxWidth()) {
-            Text("Find motor, transformer or service tools")
-        }
-        OutlinedButton(onClick = { onOpenWeb("/calculators.html") }, modifier = Modifier.fillMaxWidth()) {
-            Text("Browse by CEC section")
-        }
-        OutlinedButton(onClick = { onOpenWeb("/advanced-calculations.html") }, modifier = Modifier.fillMaxWidth()) {
-            Text("Specialist calculations")
-        }
-        Text("Verify the current CEC/OESC references and equipment details before installation.",
+        Text("COMMON CALCULATIONS", color = ElectricCyan,
+            fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
+        OutlinedButton(onClick = { onOpenWeb("/guided-calculators.html?tool=conductor") },
+            modifier = Modifier.fillMaxWidth()) { Text("Conductor sizing & voltage drop") }
+        OutlinedButton(onClick = { onOpenWeb("/guided-calculators.html?tool=service") },
+            modifier = Modifier.fillMaxWidth()) { Text("Service load & demand") }
+        OutlinedButton(onClick = { onOpenWeb("/calculators.html?section=s28&tab=0") },
+            modifier = Modifier.fillMaxWidth()) { Text("Motor conductor & protection") }
+        OutlinedButton(onClick = { onOpenWeb("/calculators.html?section=s4&tab=1") },
+            modifier = Modifier.fillMaxWidth()) { Text("Busbar sizing & parallel straps") }
+        Text("Use the applicable CEC/OESC edition, equipment nameplate and manufacturer instructions to verify all results.",
             color = TextSecondary, fontSize = 12.sp, lineHeight = 18.sp)
     }
 }
