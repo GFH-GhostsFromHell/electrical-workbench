@@ -213,7 +213,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
 
         VBox nav=new VBox(6);nav.setPadding(new Insets(18,12,18,12));nav.setPrefWidth(225);nav.setStyle("-fx-background-color:#07111f;");
         Label navTitle=new Label("WORKSPACE");navTitle.setStyle("-fx-text-fill:#67e8f9;-fx-font-size:10px;-fx-font-weight:bold;-fx-padding:0 8 7 8;");
-        Button home=navButton("⌂  Home"), calculators=navButton("🧮  Electrical Calculators"), engineering=navButton("⚙  Power Systems"), learn=navButton("🎓  Learn"), field=navButton("🛠  Jobsite Tools"), safety=navButton("🦺  Safety"), projects=navButton("📁  Saved Projects"), career=navButton("📈  Trade Hours & Career"), business=navButton("🏢  Business Team"), news=navButton("⚡  Code News"), chatgpt=navButton("🤖  Ask ChatGPT"), profile=navButton("👤  Profile");
+        Button home=navButton("⌂  Home"), calculators=navButton("🧮  Find a Calculator"), engineering=navButton("⚙  Power Systems"), learn=navButton("🎓  Learn"), field=navButton("🛠  Jobsite Tools"), safety=navButton("🦺  Safety"), projects=navButton("📁  Saved Projects"), career=navButton("📈  Trade Hours & Career"), business=navButton("🏢  Business Team"), news=navButton("⚡  Code News"), chatgpt=navButton("🤖  Ask ChatGPT"), profile=navButton("👤  Profile");
         nav.getChildren().addAll(navTitle,home,calculators,engineering,learn,field,safety,projects,career);
         if(isEnterpriseOwner()) nav.getChildren().add(business);
         nav.getChildren().addAll(news,chatgpt,profile);
@@ -226,7 +226,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         root.setLeft(navScroll);
 
         workspace=new StackPane();workspace.setPadding(new Insets(22));root.setCenter(workspace);
-        home.setOnAction(e->setWorkspace(buildHome()));calculators.setOnAction(e->setWorkspace(buildCalculators()));engineering.setOnAction(e->setWorkspace(buildEngineering()));learn.setOnAction(e->setWorkspace(buildPlatform("Learn")));field.setOnAction(e->setWorkspace(buildPlatform("Field")));safety.setOnAction(e->setWorkspace(buildSafety()));projects.setOnAction(e->setWorkspace(buildPlatform("Projects")));career.setOnAction(e->setWorkspace(buildPlatform("Career")));business.setOnAction(e->setWorkspace(new EnterpriseTeamPane(portal,currentUsername,currentPassword)));news.setOnAction(e->setWorkspace(buildNews()));chatgpt.setOnAction(e->setWorkspace(AskChatGptView.create(currentUsername)));profile.setOnAction(e->setWorkspace(buildProfile()));setWorkspace(buildHome());
+        home.setOnAction(e->setWorkspace(buildHome()));calculators.setOnAction(e->openFieldPage("/calculator-center.html"));engineering.setOnAction(e->setWorkspace(buildEngineering()));learn.setOnAction(e->setWorkspace(buildPlatform("Learn")));field.setOnAction(e->setWorkspace(buildPlatform("Field")));safety.setOnAction(e->setWorkspace(buildSafety()));projects.setOnAction(e->setWorkspace(buildPlatform("Projects")));career.setOnAction(e->setWorkspace(buildPlatform("Career")));business.setOnAction(e->setWorkspace(new EnterpriseTeamPane(portal,currentUsername,currentPassword)));news.setOnAction(e->setWorkspace(buildNews()));chatgpt.setOnAction(e->setWorkspace(AskChatGptView.create(currentUsername)));profile.setOnAction(e->setWorkspace(buildProfile()));setWorkspace(buildHome());
         stage.setScene(new Scene(root,1320,830));
         applyAppearance(root);
     }
@@ -242,7 +242,8 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         }));
         TilePane tiles=new TilePane();tiles.setHgap(12);tiles.setVgap(12);tiles.setPrefColumns(2);
         tiles.getChildren().addAll(
-            tile("🧮 Electrical Calculators","Full section-based calculators: services, busbars, motors, transformers, wiring, fire alarm, welders and more",()->setWorkspace(buildCalculators())),
+            tile("🧮 Find a Calculator","Search CEC worksheets by job: busbars, welders, transformers, motors, services, conductors and specialist formulas",()->openFieldPage("/calculator-center.html")),
+            tile("▣ Native Calculator Workspace","Use the original JavaFX calculation interface when you prefer the native workflow",()->setWorkspace(buildCalculators())),
             tile("⚙ Motor Starter & Drive Selector","Choose DOL, wye-delta, soft starter, VFD, capacitor-start or DC controls with nameplate and duty checks",()->openFieldPage("/motor-starter-selector.html")),
             tile("⚙ Power System Analysis","Per-unit, base values, transformer impedance, transmission lines, symmetrical components, sequence faults and short-circuit tools",()->setWorkspace(buildEngineering())),
             tile("🎓 Red Seal Study & Daily Quiz","Red Seal daily quiz, CEC navigator, formulas, control trainer and province profile",()->setWorkspace(buildPlatform("Learn"))),
@@ -280,7 +281,7 @@ public final class ElectricalWorkbenchNativeApp extends Application {
         finder.setStyle("-fx-padding:8 0;");
         final List<Node> originalTiles=new ArrayList<>(tiles.getChildren());
         final Set<String> commonJobs=Set.of(
-            "🧮 Electrical Calculators","⚙ Power System Analysis",
+            "🧮 Find a Calculator","⚙ Power System Analysis",
             "🎓 Red Seal Study & Daily Quiz","🛠 Jobsite Tools",
             "↪ Conduit Bend Marks & Calibration","🛠 Equipment Troubleshooting · Offline",
             "🦺 Electrical Safety","📁 Saved Projects");
