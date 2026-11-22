@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en"><head>
+<script src="/workbench-theme.js"></script>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Find an Electrical Calculator · Electrical Workbench</title>
+<style>
+:root{font:15px/1.5 Inter,Segoe UI,Arial,sans-serif;color:#172f42;background:#eef4f8}
+*{box-sizing:border-box}
+body{margin:0;background:#eef4f8;color:#172f42}
+header{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:14px max(16px,calc((100vw - 1200px)/2));background:#0b263b;color:#fff}
+header a{color:#e1f9ff;text-decoration:none;font-weight:700}
+header nav{display:flex;gap:15px;flex-wrap:wrap}header strong{font-size:18px}
+main{max-width:1210px;margin:auto;padding:22px 16px 65px}
+h1{font-size:clamp(25px,3.7vw,34px);margin:0 0 6px;line-height:1.2}
+h2{font-size:20px;margin:0 0 9px}p{margin:6px 0 15px;color:#456077}
+.hero{background:#fff;border:1px solid #c8d8e4;padding:24px;border-radius:18px;box-shadow:0 8px 22px #0d385109;margin-bottom:16px}
+.hero p{max-width:850px}
+label{display:block;font-weight:800;margin:12px 0 6px;font-size:13px}
+input[type=search]{width:100%;min-height:52px;border:2px solid #819caf;border-radius:12px;font:inherit;font-size:17px;padding:12px 14px;background:#fff;color:#102e44}
+input:focus-visible,button:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid #0c819e;outline-offset:2px}
+.categories,.quick{display:flex;flex-wrap:wrap;gap:8px}
+button{cursor:pointer;font:inherit;min-height:42px;font-weight:700}
+.categories button,.quick button{border:1px solid #abc0d1;background:#f5faff;color:#1d4057;border-radius:999px;padding:8px 12px}
+.categories button[aria-pressed=true]{background:#0c536d;color:#fff;border-color:#0c536d}
+.quick button{border-radius:9px;background:#e8f3f8}
+.searchRow{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+.searchRow p{font-size:13px;margin:0}
+.sectionBar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:16px 0 8px}
+#browseAll{padding:8px 12px;border:1px solid #a6bece;border-radius:9px;background:#fff;color:#124763}
+#results{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.topic{padding:18px;border-radius:14px;background:#fff;border:1px solid #cddce7;min-width:0;display:flex;flex-direction:column;gap:9px}
+.topic h3{font-size:17px;margin:0;line-height:1.3;color:#183a50}
+.topic .tag{font-size:11px;text-transform:uppercase;letter-spacing:.04em;font-weight:850;color:#08637d}
+.topic p{margin:0;color:#415c71;font-size:13px;flex:1}
+.open{background:#075985;color:white;padding:11px 14px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;font-weight:800;min-height:46px}
+.open:hover{background:#0e7490}
+.topic details{border-top:1px solid #e0e9ef;margin-top:2px;padding-top:8px}
+.topic summary{font-size:13px;font-weight:750;color:#16556e;cursor:pointer;padding:5px 0;list-style:revert}
+.other{display:grid;grid-template-columns:1fr;gap:5px;margin:7px 0}
+.other a{color:#135f80;font-size:13px;padding:6px 0;line-height:1.4}
+.hint{color:#546e80;font-size:12px;margin:0}
+#noResults{background:#fff;padding:24px;border:1px dashed #a9c0cf;border-radius:12px}
+#noResults[hidden],#browseAll[hidden]{display:none}
+.footer{font-size:12px;color:#506a7b;padding:18px 0 0}
+@media(max-width:700px){main{padding:12px 11px 36px}.hero{padding:15px}#results{grid-template-columns:1fr}.topic{padding:15px}.searchRow{display:block}.categories{gap:6px}.categories button{font-size:13px}.quick button{font-size:13px}}
+</style>
+<link rel="stylesheet" href="/workbench-themes.css">
+</head><body>
+<header><strong>⚡ Electrical Workbench · Calculators</strong><nav><a href="/start.html">Find a tool</a><a href="/field-suite.html">Jobsite tools</a><a href="/portal.html">Dashboard</a></nav></header>
+<main>
+<section class="hero">
+<h1>What do you need to calculate?</h1>
+<p>One search for every CEC calculation. Choose the job first; the recommended worksheet opens directly. Specialist formulas and the original CEC section worksheets are still available under <b>Other methods</b>—you don't need to choose between “regular” and “advanced” calculators.</p>
+<label for="query">Find a calculator</label>
+<input id="query" type="search" autocomplete="off" placeholder="Try busbars, hospital service, neutral, tap conductors, welder, or fire pump">
+<div class="searchRow" style="margin-top:12px">
+<div class="categories" role="group" aria-label="Calculator topics">
+<button type="button" data-group="all" aria-pressed="true">Common jobs</button>
+<button type="button" data-group="Conductors & Wiring" aria-pressed="false">Wiring & conductors</button>
+<button type="button" data-group="Motors & Protection" aria-pressed="false">Motors & protection</button>
+<button type="button" data-group="Services & Equipment" aria-pressed="false">Services & equipment</button>
+<button type="button" data-group="Code & Reference" aria-pressed="false">Code & reference</button>
+</div>
+</div>
+<div class="quick" style="margin-top:15px" aria-label="Popular calculator searches">
+<button type="button" data-search="voltage drop">Voltage drop</button>
+<button type="button" data-search="busbar">Busbars</button>
+<button type="button" data-search="hospital">Hospital service</button>
+<button type="button" data-search="transformer">Transformer</button>
+<button type="button" data-search="motor feeder">Motor feeder</button>
+<button type="button" data-search="welders">Welders</button>
+</div>
+</section>
+<div class="sectionBar"><div><h2 id="sectionHeading">Common electrical calculations</h2><p id="count" class="hint" role="status" aria-live="polite"></p></div><button type="button" id="browseAll">Browse every calculation</button></div>
+<div id="results" aria-live="polite"></div>
+<div id="noResults" hidden><b>No matching calculation found.</b><p>Try fewer words, another equipment name, or <button type="button" id="clear">show all calculations</button>.</p></div>
+<p class="footer">Engineering and CEC calculations are advisory. Verify the current official CEC/OESC, actual equipment ratings, licensed table data, and installation conditions. Existing worksheet URLs and saved links continue to work.</p>
+</main>
+<script src="/calculator-topics.js"></script><script src="/calculator-center.js"></script>
+</body></html>
