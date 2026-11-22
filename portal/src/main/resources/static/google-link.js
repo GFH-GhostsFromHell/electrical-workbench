@@ -14,6 +14,8 @@ root.loadGoogleLinkSettings=async function(profile){
     const provider=String(profile.authProvider||'PASSWORD').toUpperCase();
     const form=document.getElementById('googleLinkForm');
     const info=document.getElementById('googleProfileInfo');
+    const passwordFields=document.getElementById('passwordLoginFields');
+    if(passwordFields)passwordFields.style.display=provider==='GOOGLE'?'none':'block';
     if(provider==='GOOGLE'||provider==='PASSWORD_GOOGLE'){
       form.style.display='none';
       info.textContent=provider==='GOOGLE'
