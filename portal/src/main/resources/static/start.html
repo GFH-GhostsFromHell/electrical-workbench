@@ -98,7 +98,7 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
   var q=input.value,shown=0,zone=document.getElementById('catalog');
   zone.replaceChildren();
   var state=store.snapshot();
-  var filtered=tasks.filter(function(task){return(category==='all'||task.category===category)&&match(task,q)&&(viewAll||!!q.trim()||!alternateIds.has(task.id)||state.favourites.includes(task.id));}).sort(function(a,b){
+  var filtered=tasks.filter(function(task){return (task.id!=='advanced-code'||state.favourites.includes(task.id))&&(category==='all'||task.category===category)&&match(task,q)&&(viewAll||!!q.trim()||!alternateIds.has(task.id)||state.favourites.includes(task.id));}).sort(function(a,b){
    var af=state.favourites.includes(a.id)?0:1,bf=state.favourites.includes(b.id)?0:1;
    var ai=featured.indexOf(a.id),bi=featured.indexOf(b.id);ai=ai<0?999:ai;bi=bi<0?999:bi;
    return af-bf||ai-bi||a.name.localeCompare(b.name);
