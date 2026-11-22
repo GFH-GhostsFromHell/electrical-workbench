@@ -18,6 +18,7 @@ struct WorkbenchTools: View {
     @State private var recent: [String] = []
 
     private let categories = ["All tools", "Installation", "Calculations", "Power & Protection", "Troubleshooting", "Projects", "Study & Safety"]
+    private let legacyCalculatorViews: Set<String> = ["guided", "advanced-code"]
 
     // Stable identifiers match the web tool catalog and Android where tools overlap.
     private let tools: [ElectricalTool] = [
@@ -57,6 +58,7 @@ struct WorkbenchTools: View {
         let words = searchText.lowercased().split(whereSeparator: \.isWhitespace).map(String.init)
         return tools.filter { tool in
             (category == "All tools" || category == tool.category) &&
+            (!searchText.isEmpty || !legacyCalculatorViews.contains(tool.id) || favourites.contains(tool.id)) &&
             words.allSatisfy { term in
                 (tool.name + " " + tool.description + " " + tool.terms).lowercased().contains(term)
             }
