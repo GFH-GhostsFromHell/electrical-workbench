@@ -339,9 +339,10 @@
     ]
   }
 ];
- const extra=(g.EWBCalculatorTopics||[]).filter(t=>t.findable).map(t=>({
+ const extra=(g.EWBCalculatorTopics||[]).map(t=>({
    id:'calc-'+t.id, name:t.name, description:t.description, category:'calculations',
    keywords:t.terms+' '+t.group+' calculator', path:t.primary.url,
+   primaryLabel:t.primary.label, alternatives:t.alternatives,
    steps:['Enter the equipment and circuit data.','Confirm applicable CEC/OESC tables and manufacturer data.','Review and save the result.']
  }));
  g.EWBTaskCatalog=Object.freeze(base.concat(extra));
