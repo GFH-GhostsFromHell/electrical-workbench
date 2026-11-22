@@ -60,7 +60,7 @@ private val allTasks = listOf(
     MobileTask("refrigeration", "Refrigeration Motor Sizing", "Compressor RLA/LRA and MCA/MOCP", "Calculations", "hvac compressor", "/guided-calculators.html?tool=refrig"),
     MobileTask("grounding", "Grounding & Bonding", "Conductors and electrodes", "Calculations", "cec section 10", "/guided-calculators.html?tool=ground"),
     MobileTask("fire-pump", "Fire Pump Circuit", "Pump motor and controller worksheet", "Calculations", "jockey locked rotor", "/guided-calculators.html?tool=firepump"),
-    MobileTask("advanced-code", "Specialist CEC Formula Worksheets", "Optional detailed formulas after choosing a job", "Calculations", "advanced cec hvac neutral derating", "/advanced-calculations.html"),
+    MobileTask("advanced-code", "Previous Advanced CEC Shortcut", "Opens unified calculator finder (older favourites)", "Calculations", "legacy advanced cec calculator", "/calculator-center.html"),
     MobileTask("relay", "Protection & Relay Calculators - Offline", "CT/PT ratios and relay pickup", "Power & Protection", "4 20ma", "native:relay", true),
     MobileTask("power", "Power System Analysis - Web", "Per-unit, short-circuit and sequence studies (connection required)", "Power & Protection", "fault impedance", "native:power"),
     MobileTask("fault-offline", "Equipment Troubleshooting - Offline", "Fault isolation and work orders", "Troubleshooting", "vfd plc mine motor", "native:fault", true),
@@ -116,6 +116,7 @@ internal fun MobileToolFinder(username:String,onOpenWeb:(String)->Unit,
     val alternateIds=setOf("bend-guide","advanced-code")
     val filtered=allTasks.filter{ task->
         (group=="All"||group==task.group)&&(!offlineOnly||task.offline)&&
+        (task.id!="advanced-code"||task.id in favourites)&&
         (showAll||query.isNotBlank()||task.id !in alternateIds||task.id in favourites)&&
             query.trim().lowercase().split(Regex("\\s+")).all{word->
                 word.isBlank()||(task.title+" "+task.detail+" "+task.search).lowercase().contains(word)
