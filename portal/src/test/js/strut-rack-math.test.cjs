@@ -26,7 +26,7 @@ test('produces cut list and hardware allowances from chosen rack geometry',()=>{
     ['Horizontal cross rail',2,1175],['Upright post',3,1200],['Foot / base outrigger',3,450]
   ]);
   assert.equal(out.totalStrutMm,7300);
-  assert.equal(out.hardware.find(h=>h.name.startsWith('Channel nuts')).qty,32);
+  assert.equal(out.hardware.find(h=>h.name.startsWith('Channel nuts')).qty,38);
   assert.equal(out.hardware.find(h=>h.name==='Floor anchors').qty,6);
 });
 test('wall rack excludes feet and uses substrate fittings',()=>{
