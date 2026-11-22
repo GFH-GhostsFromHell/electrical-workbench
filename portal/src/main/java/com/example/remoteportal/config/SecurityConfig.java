@@ -40,6 +40,7 @@ public class SecurityConfig {
     ClientRegistration google = CommonOAuth2Provider.GOOGLE.getBuilder("google")
         .clientId(clientId.trim())
         .clientSecret(clientSecret.trim())
+        .redirectUri("{baseUrl}/login/oauth2/code/{registrationId}")
         .scope("openid", "profile", "email")
         .build();
     return new InMemoryClientRegistrationRepository(google);
