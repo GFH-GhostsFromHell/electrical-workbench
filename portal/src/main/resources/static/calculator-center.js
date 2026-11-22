@@ -1,61 +1,124 @@
-/* Task-first calculator search: primary route per job; alternatives are disclosed in each card. */
+/* Electrical Workbench · one task => one recommended calculator.
+ * Related methods are shown only if they solve a distinct problem. */
 (function(root){
 'use strict';
-const tasks=root.EWBCalculatorTopics||[], by=id=>document.getElementById(id);
-const input=by('query'),out=by('results'),clear=by('clear'),groups=Array.from(document.querySelectorAll('[data-group]'));
+const tasks=root.EWBCalculatorTopics||[];
+const by=id=>document.getElementById(id);
+const input=by('query'),results=by('results'),groups=Array.from(document.querySelectorAll('[data-group]'));
 const common=['conductor','voltage','service','transformer','motors','busbar','tap','firealarm'];
-let group='all',browseAll=false;
-function el(tag,cls,value){
+let group='all',browseAll=false,selectedId=null,firstRender=true;
+function el(tag,className,text){
   const node=document.createElement(tag);
-  if(cls)node.className=cls;
-  if(value!==undefined)node.textContent=value;
+  if(className)node.className=className;
+  if(text!==undefined)node.textContent=text;
   return node;
 }
-function words(s){return s.toLowerCase().trim().split(/\s+/).filter(Boolean);}
 function matches(t,q){
-  const hay=(t.name+' '+t.description+' '+t.group+' '+t.terms+' '+t.alternatives.map(x=>x.label).join(' ')).toLowerCase();
-  return words(q).every(x=>hay.includes(x));
+  const words=q.toLowerCase().trim().split(/\s+/).filter(Boolean);
+  const source=(t.name+' '+t.description+' '+t.group+' '+t.terms+' '+
+    t.primary.label+' '+t.alternatives.map(x=>x.label+' '+(x.purpose||'')).join(' ')).toLowerCase();
+  return words.every(w=>source.includes(w));
 }
-function card(t){
-  const article=el('article','topic'),heading=el('h3',null,t.name),tag=el('div','tag',t.group),desc=el('p',null,t.description);
-  const link=el('a','open','Open '+t.primary.label);link.href=t.primary.url;
-  article.append(tag,heading,desc,link);
-  if(t.alternatives&&t.alternatives.length){
-    const details=document.createElement('details'),summary=el('summary',null,'Other methods ('+t.alternatives.length+')');
-    const alternate=el('div','other');
-    t.alternatives.forEach(a=>{const href=el('a',null,a.label);href.href=a.url;alternate.append(href);});
-    details.append(summary,alternate);article.append(details);
-  }
-  return article;
+function labelFor(id){return {busbar:'Busbar',motors:'Motor',service:'Service',voltage:'Voltage drop'}[id]||'Electrical';}
+function currentMatches(){
+  const q=input.value.trim();
+  let visible=tasks.filter(t=>q?matches(t,q):(group==='all'||t.group===group));
+  if(!q&&group==='all'&&!browseAll){
+    visible=visible.filter(t=>common.includes(t.id));
+    visible.sort((a,b)=>common.indexOf(a.id)-common.indexOf(b.id));
+  }else if(q){
+    const rank=t=>{
+      const phrase=t.name.toLowerCase(),needle=q.toLowerCase();
+      if(phrase===needle)return 0;
+      if(phrase.startsWith(needle))return 1;
+      if(phrase.includes(needle))return 2;
+      return 3;
+    };
+    visible.sort((a,b)=>rank(a)-rank(b)||a.name.localeCompare(b.name));
+  }else visible.sort((a,b)=>a.name.localeCompare(b.name));
+  return visible;
 }
-function selectGroup(next){
-  group=next;groups.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.group===next)));render();
+function showDetail(t){
+  by('selected').hidden=!t;by('emptyState').hidden=!!t;
+  if(!t)return;
+  by('selectedGroup').textContent=t.group;
+  by('selectedName').textContent=t.name;
+  by('selectedDescription').textContent=t.description;
+  by('selectedPurpose').textContent=t.primary.purpose||'The recommended calculation for this task. Enter the real job values and review the worked result.';
+  const start=by('selectedLink');
+  start.textContent=t.primary.label;
+  start.href=t.primary.url;
+  const extras=by('extraMethods'),list=by('extraList');
+  list.replaceChildren();
+  // A specialist page is not treated as a separate duplicate tool.
+  // This list contains only distinct related calculations, not different
+  // presentations of the exact same formula.
+  const alternatives=t.alternatives||[];
+  extras.hidden=!alternatives.length;
+  alternatives.forEach(a=>{
+    const link=el('a','calc-branch');
+    link.href=a.url;
+    const words=el('span');
+    words.append(el('strong',null,a.label));
+    if(a.purpose)words.append(el('small',null,a.purpose));
+    link.append(words,el('span','calc-branch-arrow','→'));
+    list.append(link);
+  });
 }
 function render(){
-  const q=input.value.trim();
-  let filtered=tasks.filter(t=>(q?matches(t,q):group==='all'||t.group===group));
-  if(!q&&group==='all'&&!browseAll)filtered=filtered.filter(t=>common.includes(t.id)).sort((a,b)=>common.indexOf(a.id)-common.indexOf(b.id));
-  else if(q)filtered=filtered.sort((a,b)=>{
-    const f=t=> t.name.toLowerCase()===q.toLowerCase()?0:t.name.toLowerCase().startsWith(q.toLowerCase())?1:common.includes(t.id)?2:3;
-    return f(a)-f(b)||a.name.localeCompare(b.name);
+  const q=input.value.trim(),shown=currentMatches();
+  if(!shown.some(t=>t.id===selectedId))selectedId=shown.length?shown[0].id:null;
+  results.replaceChildren();
+  shown.forEach(t=>{
+    const button=el('button','calc-task');
+    button.type='button';
+    button.setAttribute('aria-pressed',String(t.id===selectedId));
+    button.dataset.task=t.id;
+    const labels=el('span');
+    labels.append(el('span','calc-task-name',t.name));
+    labels.append(el('span','calc-task-sub',t.group));
+    button.append(labels,el('span','calc-task-arrow','›'));
+    button.addEventListener('click',()=>{
+      selectedId=t.id;
+      showDetail(t);
+      results.querySelectorAll('button.calc-task').forEach(b=>
+        b.setAttribute('aria-pressed',String(b.dataset.task===selectedId)));
+      const detail=by('detail');
+      if(root.matchMedia&&root.matchMedia('(max-width: 700px)').matches)
+        detail.scrollIntoView({behavior:'auto',block:'start'});
+    });
+    results.append(button);
   });
-  out.replaceChildren();filtered.forEach(t=>out.append(card(t)));
-  by('noResults').hidden=filtered.length>0;
-  by('count').textContent=filtered.length+' matching calculator '+(filtered.length===1?'topic':'topics');
-  by('sectionHeading').textContent=q?'Search results':group==='all'?(browseAll?'All electrical calculations':'Common electrical calculations'):group;
+  by('count').textContent=shown.length+' calculation'+(shown.length===1?'':'s')+' shown';
+  by('noResults').hidden=shown.length>0;
+  by('listHeading').textContent=q?'Matching calculations':group==='all'?(browseAll?'All calculations':'Common calculations'):group;
   by('browseAll').hidden=!!q||group!=='all';
-  by('browseAll').textContent=browseAll?'Show common jobs':'Browse every calculation';
+  by('browseAll').textContent=browseAll?'Show common':'See all '+tasks.length;
+  by('browseAll').setAttribute('aria-expanded',String(browseAll));
+  showDetail(shown.find(t=>t.id===selectedId)||null);
+  firstRender=false;
 }
 input.addEventListener('input',()=>{
-  if(input.value.trim())selectGroup('all');else render();
+  if(input.value.trim())group='all';
+  groups.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.group===group)));
+  render();
 });
-groups.forEach(b=>b.addEventListener('click',()=>{browseAll=false;input.value='';selectGroup(b.dataset.group);}));
-document.querySelectorAll('[data-search]').forEach(b=>b.addEventListener('click',()=>{
-  input.value=b.dataset.search;selectGroup('all');input.focus();
+groups.forEach(button=>button.addEventListener('click',()=>{
+  group=button.dataset.group;
+  browseAll=false;
+  input.value='';
+  groups.forEach(b=>b.setAttribute('aria-pressed',String(b===button)));
+  render();
 }));
 by('browseAll').addEventListener('click',()=>{browseAll=!browseAll;render();});
-clear.addEventListener('click',()=>{input.value='';browseAll=true;selectGroup('all');input.focus();});
-const query=new URLSearchParams(location.search).get('q');
-if(query)input.value=query.slice(0,120);
+by('clear').addEventListener('click',()=>{
+  input.value='';group='all';browseAll=true;
+  groups.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.group==='all')));
+  render();input.focus();
+});
+const params=new URLSearchParams(root.location.search);
+const requested=params.get('topic')||root.location.hash.slice(1);
+if(requested&&tasks.some(t=>t.id===requested)){selectedId=requested;browseAll=true;}
+const query=params.get('q');if(query)input.value=query.slice(0,120);
 render();
 })(window);
