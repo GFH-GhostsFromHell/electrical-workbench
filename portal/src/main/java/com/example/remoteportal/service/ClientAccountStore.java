@@ -40,6 +40,8 @@ public class ClientAccountStore {
     db.execute("alter table client_account add column if not exists avatar_data text");
     db.execute("alter table client_account add column if not exists auth_provider varchar(32) default 'PASSWORD'");
     db.execute("alter table client_account add column if not exists google_subject varchar(255)");
+    db.execute("alter table client_account add column if not exists email_verified boolean default false");
+    db.execute("create unique index if not exists client_account_google_subject_unique on client_account(google_subject)");
     db.update("update client_account set subscription_tier='TIER_1' where subscription_tier is null or subscription_tier='' ");
     db.update("update client_account set auth_provider='PASSWORD' where auth_provider is null or auth_provider='' ");
 
@@ -62,32 +64,103 @@ public class ClientAccountStore {
     return users.getFirst();
   }
 
+  /**
+   * Google identity is bound to the immutable OpenID Connect subject, NOT an email
+   * matching a password account. An unrelated Google identity cannot auto-link to
+   * an existing password account, even if its email address matches.
+   */
   public synchronized String ensureGoogleAccount(String email, String displayName, String googleSubject) {
-    if (email == null || email.isBlank()) throw new IllegalArgumentException("Google account did not provide an email address");
-    String username = email.trim().toLowerCase(Locale.ROOT);
-    String name = displayName == null || displayName.isBlank() ? username : displayName.trim();
+    String verifiedEmail = verifiedGoogleEmail(email);
+    String subject = requireGoogleSubject(googleSubject);
+    String name = (displayName == null || displayName.isBlank()) ? verifiedEmail : displayName.trim();
 
-    List<String> existingBySubject = googleSubject == null || googleSubject.isBlank() ? List.of() :
-        db.query("select username from client_account where google_subject=?", (rs,row)->rs.getString(1), googleSubject);
-    if (!existingBySubject.isEmpty()) {
-      String existing = existingBySubject.getFirst();
-      db.update("update client_account set display_name=?,email=?,enabled=true,auth_provider='GOOGLE' where username=?", name, username, existing);
-      return existing;
+    List<GoogleAccount> matched = db.query(
+        "select username,enabled from client_account where google_subject=?",
+        (rs,row)->new GoogleAccount(rs.getString("username"),rs.getBoolean("enabled")),subject);
+    if (!matched.isEmpty()) {
+      GoogleAccount existing = matched.getFirst();
+      if (!existing.enabled()) throw new IllegalStateException("This account is disabled. Contact support.");
+      Integer collision=db.queryForObject(
+          "select count(*) from client_account where (lower(username)=? or (email is not null and lower(email)=?)) and username<>?",
+          Integer.class,verifiedEmail,verifiedEmail,existing.username());
+      if(collision!=null&&collision>0)
+        throw new IllegalStateException("This Google email is already assigned to another account. Contact support.");
+      db.update("update client_account set display_name=?,email=?,email_verified=true where username=?",
+          name,verifiedEmail,existing.username());
+      return existing.username();
     }
 
-    List<String> existing = db.query("select username from client_account where lower(username)=lower(?)", (rs,row)->rs.getString(1), username);
-    if (!existing.isEmpty()) {
-      String found = existing.getFirst();
-      db.update("update client_account set display_name=?,email=?,enabled=true,auth_provider='GOOGLE',google_subject=? where username=?",
-          name, username, googleSubject, found);
-      return found;
-    }
+    Integer existing=db.queryForObject(
+        "select count(*) from client_account where lower(username)=? or (email is not null and lower(email)=?)",
+        Integer.class,verifiedEmail,verifiedEmail);
+    if(existing!=null&&existing>0)
+      throw new IllegalStateException("An account with this email already exists. Sign in with its current method before connecting Google.");
 
-    String unusablePassword = encoder.encode(UUID.randomUUID() + ":google-only:" + UUID.randomUUID());
-    db.update("insert into client_account(username,display_name,email,password_hash,enabled,subscription_tier,avatar_data,auth_provider,google_subject) values(?,?,?,?,?,?,?,?,?)",
-        username, name, username, unusablePassword, true, "TIER_1", null, "GOOGLE", googleSubject);
-    return username;
+    String unusablePassword=encoder.encode(UUID.randomUUID()+":google-only:"+UUID.randomUUID());
+    db.update("insert into client_account(username,display_name,email,password_hash,enabled,subscription_tier,avatar_data,auth_provider,google_subject,email_verified) values(?,?,?,?,?,?,?,?,?,?)",
+        verifiedEmail,name,verifiedEmail,unusablePassword,true,"TIER_1",null,"GOOGLE",subject,true);
+    return verifiedEmail;
   }
+
+  /**
+   * Called only after a signed-in password user has reauthenticated and completed
+   * Google's OIDC flow in the same short-lived server session.
+   */
+  public synchronized String linkGoogleAccount(String localUsername, String googleEmail, String googleSubject) {
+    String email=verifiedGoogleEmail(googleEmail);
+    String subject=requireGoogleSubject(googleSubject);
+    List<GoogleLinkTarget> targets=db.query(
+        "select username,email,enabled,auth_provider from client_account where lower(username)=lower(?)",
+        (rs,row)->new GoogleLinkTarget(rs.getString("username"),rs.getString("email"),
+            rs.getBoolean("enabled"),rs.getString("auth_provider")),localUsername);
+    if(targets.isEmpty()||!targets.getFirst().enabled())
+      throw new IllegalStateException("This account cannot be linked.");
+    GoogleLinkTarget target=targets.getFirst();
+    if(target.email()==null||!email.equalsIgnoreCase(target.email()))
+      throw new IllegalStateException("The Google account email must match the email on the Electrical Workbench profile.");
+    if(!"PASSWORD".equalsIgnoreCase(target.provider()) && !"PASSWORD_GOOGLE".equalsIgnoreCase(target.provider()))
+      throw new IllegalStateException("This account cannot be linked using a password.");
+    Integer subjectTaken=db.queryForObject(
+        "select count(*) from client_account where google_subject=? and username<>?",
+        Integer.class,subject,target.username());
+    if(subjectTaken!=null&&subjectTaken>0)
+      throw new IllegalStateException("This Google account is already connected to another user.");
+    db.update("update client_account set google_subject=?,auth_provider='PASSWORD_GOOGLE',email_verified=true where username=?",
+        subject,target.username());
+    return target.username();
+  }
+
+  public void requirePasswordForGoogleLink(String username,String password) {
+    List<GoogleLinkTarget> targets=db.query(
+        "select username,email,enabled,auth_provider from client_account where lower(username)=lower(?)",
+        (rs,row)->new GoogleLinkTarget(rs.getString("username"),rs.getString("email"),
+            rs.getBoolean("enabled"),rs.getString("auth_provider")),username);
+    if(targets.isEmpty()||!targets.getFirst().enabled())
+      throw new IllegalArgumentException("Account cannot be linked.");
+    GoogleLinkTarget target=targets.getFirst();
+    if(!"PASSWORD".equalsIgnoreCase(target.provider()) && !"PASSWORD_GOOGLE".equalsIgnoreCase(target.provider()))
+      throw new IllegalArgumentException("Only password accounts can use this linking method.");
+    if(target.email()==null||target.email().isBlank())
+      throw new IllegalArgumentException("Add an email to your profile before connecting Google.");
+    List<String> hashes=db.query("select password_hash from client_account where username=?",
+        (rs,row)->rs.getString(1),target.username());
+    if(hashes.isEmpty()||password==null||!encoder.matches(password,hashes.getFirst()))
+      throw new IllegalArgumentException("The current password is incorrect.");
+  }
+
+  private static String verifiedGoogleEmail(String email) {
+    String normalized=email==null?"":email.trim().toLowerCase(Locale.ROOT);
+    if(normalized.isBlank()||normalized.length()>255||!normalized.matches("^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$"))
+      throw new IllegalArgumentException("Google did not provide a valid verified email.");
+    return normalized;
+  }
+  private static String requireGoogleSubject(String subject) {
+    if(subject==null||subject.isBlank()||subject.length()>255)
+      throw new IllegalArgumentException("Google did not provide a valid account identity.");
+    return subject;
+  }
+  private record GoogleAccount(String username,boolean enabled) {}
+  private record GoogleLinkTarget(String username,String email,boolean enabled,String provider) {}
 
   public List<Map<String,Object>> list() {
     return db.query("select username,display_name,email,enabled,subscription_tier,auth_provider from client_account order by username", (rs,row) -> {
