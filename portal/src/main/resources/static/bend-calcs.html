@@ -63,12 +63,30 @@
 .method-chooser .field{flex:1 1 265px;max-width:460px}.method-chooser p{flex:1 1 230px;margin:0;color:#d5e8f4;font-size:12px;line-height:1.5}
 .bend-action{margin-top:6px;padding:8px 10px;border-radius:8px;border-left:3px solid #5eead4;background:#0d3040;color:#e9faff;font-size:12px;font-weight:750;line-height:1.5}
 @media(max-width:500px){.method-chooser{padding:9px 11px}.method-chooser .field,.method-chooser p{flex-basis:100%}}
+
+.bend-view-switch{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 9px}
+.bend-view-switch button{cursor:pointer;border-radius:10px;padding:10px 15px;min-height:43px;background:#102e45;border:1px solid #46657a;color:#d4e7f4;font-weight:850}
+.bend-view-switch button[aria-pressed="true"]{background:#0e7087;border-color:#63dff0;color:#fff;box-shadow:inset 0 0 0 1px #b2faff}
+.bend3d-panel{min-width:0;border:1px solid #36637b;border-radius:13px;background:#071c2d;overflow:hidden}
+.bend3d-panel canvas{display:block;width:100%;height:clamp(270px,34vw,405px);background:#071827;touch-action:none;outline-offset:3px}
+.bend3d-panel canvas:focus-visible{outline:3px solid #67e8f9}
+.bend3d-panel .bend3d-note{padding:9px 12px;margin:0;color:#c4e0ec;font-size:12px;line-height:1.5}
+.bend3d-controls{display:flex;flex-wrap:wrap;gap:7px;padding:7px 10px}
+.bend3d-controls button{background:#153952;border:1px solid #5c8196;color:#e8f8fc;border-radius:8px;padding:8px 12px;min-width:42px;font-weight:800;cursor:pointer}
+.bend3d-controls button:focus-visible{outline:2px solid #67e8f9}
+.bend3d-panel[hidden],#diagram[hidden],#mb2dPanel[hidden],.bend3d-panel canvas[hidden]{display:none!important}
+.fieldsteps ol{display:grid;gap:8px}
+.fieldsteps li{padding:11px 12px;border:1px solid #365872;border-radius:11px;background:#091f31;line-height:1.45}
+.fieldsteps li::marker{color:#7ff2e9;font-weight:850}
+.fieldsteps li strong{display:block;color:#79f3eb;font-size:13px;margin-bottom:5px}
+.fieldsteps li span{display:block;color:#e4f1f9;font-size:13px;line-height:1.55}
+@media(max-width:600px){.bend3d-panel canvas{height:290px}.bend3d-controls button{min-width:38px;padding:9px 10px}.bend-view-switch button{flex:1 1 auto}}
 </style>
 <link rel="stylesheet" href="/readable-daylight.css?v=1">
 <link rel="stylesheet" href="/workbench-themes.css">
 </head>
 <body>
-<header class="top"><div class="brand"><div class="bolt">ϟ</div><div><b>Conduit Bend Diagrams</b><span>ELECTRICAL WORKBENCH · FIELD MATH</span></div></div><div class="toplinks"><a href="/portal.html">Dashboard</a><a href="/start.html">Find a Tool</a><a href="/calculators.html">CEC Calculators</a><a href="/pull-box-calcs.html">Pull Box Sizing</a><a href="/bender-calibration.html">Bender Calibration</a><a href="/field-suite.html#bend">3D Bend Preview</a></div></header>
+<header class="top"><div class="brand"><div class="bolt">ϟ</div><div><b>Conduit Bend Diagrams</b><span>ELECTRICAL WORKBENCH · FIELD MATH</span></div></div><div class="toplinks"><a href="/portal.html">Dashboard</a><a href="/start.html">Find a Tool</a><a href="/calculators.html">CEC Calculators</a><a href="/pull-box-calcs.html">Pull Box Sizing</a><a href="/bender-calibration.html">Bender Calibration</a></div></header>
 <div class="wrap">
 <div class="card method-chooser"><div class="field"><label for="shoeMethod">Hook and flip method</label><select id="shoeMethod" onchange="setShoeMethod(this.value)"><option value="klein">Klein-style hand bender · floor / air</option><option value="other">Different shoe or method · use its manual</option></select></div><p id="shoeMethodNote">Shown hook arrows use a Klein-style hand bender with tape zero LEFT. Check that your actual tool follows this procedure.</p></div>
 <section id="menuScreen" class="screen active">
@@ -98,7 +116,7 @@
   <div class="warn">Two or more operations are permitted on the same pipe. A 90° entry uses an actual ARROW position, not the finished stub height. Work out the mark with your shoe deduct first. For back-to-back 90s, use the dedicated STAR calculator.</div>
  </div>
  <div class="card" style="margin-top:12px"><h3>2 · Operations on this conduit</h3><div id="mbList" class="advanced-list"></div></div>
- <div class="card" style="margin-top:12px"><h3>3 · Numbered straight conduit marks</h3><div id="mbMarkCanvas"></div><div id="mbWarnings" class="warn" style="margin-top:11px"></div><div class="advanced-actions"><button type="button" id="mbFocusToggle" onclick="toggleMbFocus()">One bend at a time</button></div><div id="mbFocusPanel" class="card" hidden><strong id="mbFocusCount"></strong><div id="mbFocusContent" style="margin-top:10px"></div><div class="advanced-actions"><button type="button" id="mbFocusPrevious" onclick="moveMbFocus(-1)">← Previous</button><button type="button" id="mbFocusNext" onclick="moveMbFocus(1)">Next →</button></div></div><div id="mbSteps" class="advanced-numbered" style="margin-top:12px"></div>
+ <div class="card" style="margin-top:12px"><h3>3 · Numbered straight conduit marks</h3><div class="bend-view-switch" role="group" aria-label="Advanced conduit preview"><button id="mbView2d" aria-pressed="true" type="button" onclick="setMultiBendView('2d')">2D · stock marks</button><button id="mbView3d" aria-pressed="false" type="button" onclick="setMultiBendView('3d')">3D · rotate conduit</button></div><div id="mb2dPanel"><div id="mbMarkCanvas"></div></div><div id="mb3dPanel" class="bend3d-panel" hidden><canvas id="mb3dCanvas">3D conduit model requires canvas support.</canvas><div class="bend3d-controls"><button onclick="BendView3D.adjust('mb3dCanvas','left')" aria-label="Rotate left">↶</button><button onclick="BendView3D.adjust('mb3dCanvas','right')" aria-label="Rotate right">↷</button><button onclick="BendView3D.adjust('mb3dCanvas','up')" aria-label="Tilt up">↑</button><button onclick="BendView3D.adjust('mb3dCanvas','down')" aria-label="Tilt down">↓</button><button onclick="BendView3D.adjust('mb3dCanvas','zoomIn')" aria-label="Zoom in">＋</button><button onclick="BendView3D.adjust('mb3dCanvas','zoomOut')" aria-label="Zoom out">－</button><button onclick="BendView3D.adjust('mb3dCanvas','reset')">Reset</button></div><p id="mb3dNote" class="bend3d-note"></p></div><div id="mbWarnings" class="warn" style="margin-top:11px"></div><div class="advanced-actions"><button type="button" id="mbFocusToggle" onclick="toggleMbFocus()">One bend at a time</button></div><div id="mbFocusPanel" class="card" hidden><strong id="mbFocusCount"></strong><div id="mbFocusContent" style="margin-top:10px"></div><div class="advanced-actions"><button type="button" id="mbFocusPrevious" onclick="moveMbFocus(-1)">← Previous</button><button type="button" id="mbFocusNext" onclick="moveMbFocus(1)">Next →</button></div></div><div id="mbSteps" class="advanced-numbered" style="margin-top:12px"></div>
  <div class="advanced-actions"><button onclick="mbCopy()">Copy all field marks and steps</button></div></div>
  <div class="footer">This is a 2D straight-pipe layout aid, not a verified 3D fabrication, bend-allowance or tool-access simulation. Verify the final formed dimensions, springback, conduit radius, and the permitted bend sum between pulling points.</div>
 </section>
@@ -127,8 +145,34 @@ Exact geometric multiplier = 1 / sin(angle). Exact geometric shrink approximatio
 </section>
 <div class="footer">Geometry is calculated from conduit centerline dimensions. Results are rounded for field layout; rounding can accumulate on multi-bend work. This workspace is a trade-math aid, not a substitute for the bender manufacturer's marks or job-specific layout checks.</div>
 </div>
+<script src="/bend-view-3d.js"></script>
 <script>
-let unit='in',current='offsetFar',angle=30,bendShoeMethod='klein';
+let unit='in',current='offsetFar',angle=30,bendShoeMethod='klein',bendViewMode='2d',multiBendViewMode='2d',multiPreviewData=null;
+function setBendView(mode){bendViewMode=mode==='3d'?'3d':'2d';refreshBendView();}
+function refreshBendView(){
+ const d=document.getElementById('diagram'),panel=document.getElementById('bend3dPanel');if(!d||!panel)return;
+ const three=bendViewMode==='3d';d.hidden=three;panel.hidden=!three;
+ document.getElementById('bendView2d').setAttribute('aria-pressed',String(!three));
+ document.getElementById('bendView3d').setAttribute('aria-pressed',String(three));
+ if(!three)return;
+ const failed=!!document.getElementById('results')?.textContent.includes('CALCULATION NOT POSSIBLE');
+ let model=!failed&&window.BendView3D?BendView3D.single(current,angle,unit,v):null;
+ if(model&&window.BendView3D?.orient)model=BendView3D.orient(model,current,id=>document.getElementById(id)?.value);
+ document.getElementById('bend3dNote').textContent=model?model.status:'No 3D preview available for these measurements. Correct the input or choose 2D.';
+ if(window.BendView3D)BendView3D.mount('bend3dCanvas',model);
+}
+function setMultiBendView(mode){multiBendViewMode=mode==='3d'?'3d':'2d';refreshMultiBendView();}
+function refreshMultiBendView(){
+ const two=document.getElementById('mb2dPanel'),three=document.getElementById('mb3dPanel');if(!two||!three)return;
+ const active=multiBendViewMode==='3d';two.hidden=active;three.hidden=!active;
+ document.getElementById('mbView2d').setAttribute('aria-pressed',String(!active));
+ document.getElementById('mbView3d').setAttribute('aria-pressed',String(active));
+ if(!active)return;
+ const model=multiPreviewData&&window.BendView3D?BendView3D.multi(multiPreviewData.ops,multiPreviewData.stock):null;
+ document.getElementById('mb3dNote').textContent=model?model.status:'No valid 3D preview. Correct stock dimensions or add a bend operation.';
+ if(window.BendView3D)BendView3D.mount('mb3dCanvas',model);
+}
+
 function setShoeMethod(next){
  bendShoeMethod=next==='other'?'other':'klein';
  document.getElementById('shoeMethodNote').textContent=bendShoeMethod==='klein'
@@ -192,7 +236,7 @@ function measureNote(){
   steps.map(function(step){return '<li>'+step+'</li>';}).join('')+
   '</ol><div class="note">Job dimensions are not the ARROW / STAR pencil marks. Replace sample values with field measurements.</div></div>';
 }
-function layout(inputs){return `<div class="grid"><div class="card">${measureNote()}<h3>Enter job measurements</h3>${inputs}<details class="bendfieldhelp"><summary>10 ft EMT stock / minimum shoe spacing</summary><p>Maximum stock: 120 in / 3,048 mm. Marks past stock will be rejected. Minimum shoe spacing depends on the actual bender.</p><div class="field"><label for="singleShoeGap">Minimum separation between marks (${unit}, optional)</label><input id="singleShoeGap" type="number" min="0" step="any" placeholder="Verified bender minimum" oninput="recalc()"></div></details><div class="formula" id="formula"></div><div class="note" id="note"></div></div><div><div class="diagram" id="diagram"></div><div class="results" id="results"></div></div></div><div id="marks"></div><section class="card fieldsteps"><h3>Field sequence · marking and bending</h3><p class="note" style="margin:4px 0 10px">Use the A/B/C/D distances above. All marks are measured from the same reference end unless the bender's star/back-of-90 is specifically called out.</p><div class="advanced-actions"><button type="button" id="fieldFocusToggle" onclick="toggleFieldFocus()">One step at a time</button></div><div id="fieldFocus" class="field-step-focus" hidden><strong id="fieldFocusCount"></strong><p id="fieldFocusText"></p><div class="advanced-actions"><button type="button" id="fieldFocusPrevious" onclick="moveFieldFocus(-1)">← Previous</button><button type="button" id="fieldFocusNext" onclick="moveFieldFocus(1)">Next →</button></div></div><ol id="stepList" style="line-height:1.75;padding-left:23px;margin:0"></ol><div class="warn" id="stepWarning" style="margin-top:12px"></div></section><details class="card bendfieldhelp" open><summary>Bender facing · bend-by-bend help</summary><p id="benderHelp"></p></details>`}
+function layout(inputs){return `<div class="grid"><div class="card">${measureNote()}<h3>Enter job measurements</h3>${inputs}<details class="bendfieldhelp"><summary>10 ft EMT stock / minimum shoe spacing</summary><p>Maximum stock: 120 in / 3,048 mm. Marks past stock will be rejected. Minimum shoe spacing depends on the actual bender.</p><div class="field"><label for="singleShoeGap">Minimum separation between marks (${unit}, optional)</label><input id="singleShoeGap" type="number" min="0" step="any" placeholder="Verified bender minimum" oninput="recalc()"></div></details><div class="formula" id="formula"></div><div class="note" id="note"></div></div><div><div class="bend-view-switch" role="group" aria-label="Conduit preview"><button id="bendView2d" aria-pressed="true" type="button" onclick="setBendView('2d')">2D · drawing</button><button id="bendView3d" aria-pressed="false" type="button" onclick="setBendView('3d')">3D · rotate</button></div><div class="diagram" id="diagram"></div><div id="bend3dPanel" class="bend3d-panel" hidden><canvas id="bend3dCanvas">3D conduit model requires canvas support.</canvas><div class="bend3d-controls"><button onclick="BendView3D.adjust('bend3dCanvas','left')" aria-label="Rotate left">↶</button><button onclick="BendView3D.adjust('bend3dCanvas','right')" aria-label="Rotate right">↷</button><button onclick="BendView3D.adjust('bend3dCanvas','up')" aria-label="Tilt up">↑</button><button onclick="BendView3D.adjust('bend3dCanvas','down')" aria-label="Tilt down">↓</button><button onclick="BendView3D.adjust('bend3dCanvas','zoomIn')" aria-label="Zoom in">＋</button><button onclick="BendView3D.adjust('bend3dCanvas','zoomOut')" aria-label="Zoom out">－</button><button onclick="BendView3D.adjust('bend3dCanvas','reset')">Reset</button></div><p id="bend3dNote" class="bend3d-note"></p></div><div class="results" id="results"></div></div></div><div id="marks"></div><section class="card fieldsteps"><h3>Field sequence · marking and bending</h3><p class="note" style="margin:4px 0 10px">Use the A/B/C/D distances above. All marks are measured from the same reference end unless the bender's star/back-of-90 is specifically called out.</p><div class="advanced-actions"><button type="button" id="fieldFocusToggle" onclick="toggleFieldFocus()">One step at a time</button></div><div id="fieldFocus" class="field-step-focus" hidden><strong id="fieldFocusCount"></strong><p id="fieldFocusText"></p><div class="advanced-actions"><button type="button" id="fieldFocusPrevious" onclick="moveFieldFocus(-1)">← Previous</button><button type="button" id="fieldFocusNext" onclick="moveFieldFocus(1)">Next →</button></div></div><ol id="stepList" style="line-height:1.75;padding-left:23px;margin:0"></ol><div class="warn" id="stepWarning" style="margin-top:12px"></div></section><details class="card bendfieldhelp" open><summary>Bender facing · bend-by-bend help</summary><p id="benderHelp"></p></details>`}
 
 function applySavedCalibration(){
  const status=document.getElementById('calibrationNotice');
