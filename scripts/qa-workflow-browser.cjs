@@ -230,7 +230,13 @@ const server = http.createServer((req, res) => {
     await page.locator('#dist').fill('30');
     await page.locator('#marks .markitem').first().waitFor({state:'visible'});
     const regularMarks=await page.locator('#marks').innerText();
-    assert.ok(regularMarks.includes('HOOK TOWARD TAPE ZERO'),'Offset shows physical hook direction');
+    assert.ok(regularMarks.includes('BENDER HOOK TOWARD START END'),'Offset identifies where the bender shoe hook must face relative to the START END');
+    assert.ok(regularMarks.includes('FROM START END'),'Mark measurements do not rely on unexplained tape-zero jargon');
+    const beginnerStart=await page.locator('.start-quick').first().innerText();
+    assert.ok(beginnerStart.includes('A = 15 in, B = 23 in')&&beginnerStart.includes('Do not measure 23 in from A'),'Beginner example explains measuring each mark from the same end');
+    await page.locator('#toolScreen details.beginner-key summary').click();
+    assert.ok((await page.locator('#toolScreen details.beginner-key').innerText()).includes('Measuring tape hook'),'Jargon glossary distinguishes tape hook from bender hook');
+    assert.ok((await page.locator('#fieldFocusHeading').innerText()).includes('CHOOSE START END'),'Guided mode begins with plain-language measurement setup');
     assert.ok(regularMarks.includes('FLIP bender handle DOWN'),'Offset return identifies when to flip the bender');
     assert.ok(regularMarks.includes('roll conduit 180°'),'Offset return identifies required cradle roll');
     assert.ok(!regularMarks.includes('? VERIFY HOOK'),'No generic verify hook warning');
@@ -261,12 +267,12 @@ const server = http.createServer((req, res) => {
     await page.locator('#shoeMethod').selectOption('klein');
     const stepTotal=await page.locator('#stepList li').count();
     assert.ok(stepTotal>=4,'Working calculator still has the complete field steps');
-    await page.locator('#fieldFocusToggle').click();
     await visible('#fieldFocus');
-    assert.ok((await page.locator('#fieldFocusCount').innerText()).includes('Step 1 of'),'Field focus begins at the first instruction');
-    assert.equal(await page.locator('#stepList').isVisible(),false,'One-step view hides long steps list');
+    assert.ok((await page.locator('#fieldFocusCount').innerText()).includes('Step 1 of'),'Beginner guide is already in one-step mode');
+    assert.equal(await page.locator('#stepList').isVisible(),false,'One-step mode hides the full long list');
     await page.locator('#fieldFocusNext').click();
-    assert.ok((await page.locator('#fieldFocusCount').innerText()).includes('Step 2 of'),'Next advances only the guide');
+    assert.ok((await page.locator('#fieldFocusCount').innerText()).includes('Step 2 of'),'Next advances only the instruction');
+    assert.ok((await page.locator('#fieldFocusText').innerText()).includes('START END'),'Step 2 explains measurements using START END');
     await page.locator('#fieldFocusToggle').click();
     await visible('#stepList');
     assert.equal(await page.locator('#marks').innerText(),regularMarks,'Guided mode never changes the physical mark calculation');
@@ -274,18 +280,23 @@ const server = http.createServer((req, res) => {
     await page.locator('button.bendbtn').filter({hasText:'Three-bend saddle'}).first().click();
     await visible('#toolScreen.screen.active');
     const saddleMarks=await page.locator('#marks').innerText();
-    for(const note of ['B FIRST','A SECOND','C THIRD','HOOK TOWARD FAR END','FLIP bender handle DOWN']){
+    for(const note of ['B FIRST','A SECOND','C THIRD','BENDER HOOK TOWARD OTHER END','FLIP bender handle DOWN']){
       assert.ok(saddleMarks.includes(note),'Saddle must identify correct three-bend sequence: '+note);
     }
     await page.locator('#toolScreen .back').click();
     await page.locator('button.bendbtn').filter({hasText:'Four-bend saddle'}).first().click();
     await visible('#toolScreen.screen.active');
     const fourMarks=await page.locator('#marks').innerText();
-    for(const note of ['A FIRST','B SECOND','C THIRD','D FOURTH','HOOK TOWARD FAR END','TURN bender AROUND']){
+    for(const note of ['A FIRST','B SECOND','C THIRD','D FOURTH','BENDER HOOK TOWARD OTHER END','TURN bender AROUND']){
       assert.ok(fourMarks.includes(note),'Four-point saddle sequence: '+note);
     }
     await page.locator('#toolScreen .back').click();
-
+    await page.locator('button.bendbtn').filter({hasText:'Back-to-back 90s'}).first().click();
+    await visible('#toolScreen.screen.active');
+    await page.locator('#fieldFocusToggle').click();
+    const backSteps=await page.locator('#stepList').innerText();
+    assert.ok(backSteps.includes('BACK of that FINISHED FIRST 90°')&&backSteps.includes('NOT from the original START END'),'Second STAR bend clearly changes measuring reference');
+    await page.locator('#toolScreen .back').click();
     // Multi-bend mark math stays intact; only the step presentation changes.
     await page.locator('button.bendbtn').filter({hasText:'Advanced · multiple bends on one pipe'}).click();
     await visible('#multiScreen.screen.active');
