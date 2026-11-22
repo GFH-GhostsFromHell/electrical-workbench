@@ -205,5 +205,23 @@
   else if(action==='zoomOut')v.zoom=clamp(v.zoom/1.2,.55,3);
   draw(v);
  }
- window.BendView3D={single,multi,mount,adjust};
+ function orient(model,kind,choice){
+  if(!model)return model;
+  const get=id=>choice?.(id)||'';
+  for(const path of model.paths){
+   for(const pt of path.points){
+    const p=pt.p;if(kind==='rollFar'||kind==='rollNear'){
+     if(get('rollVertical')==='Down')p[2]*=-1;
+     if(get('rollSide')==='Left')p[1]*=-1;
+    }else if(['offsetFar','offsetNear','saddle3','round','saddle4','rect','square'].includes(kind)){
+     const plane=kind.startsWith('offset')?get('offsetPlane'):get('saddlePlane');
+     const z=p[2];if(plane==='Down')p[2]=-z;
+     else if(plane==='Left'){p[1]=-z;p[2]=0;}
+     else if(plane==='Right'){p[1]=z;p[2]=0;}
+    }
+   }
+  }
+  return model;
+ }
+ window.BendView3D={single,multi,mount,adjust,orient};
 })();
