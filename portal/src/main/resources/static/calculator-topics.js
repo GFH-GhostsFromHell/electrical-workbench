@@ -19,7 +19,7 @@
   add('voltage','Voltage drop and maximum length','Conductors & Wiring','Find conductor size, circuit drop, maximum run, K factor or circular-mil area.','vd voltage drop d3 k factor appendix d maximum length',
     L('Guided circuit sizing',G('conductor')),[L('K factor / Table D3',G('d3')),L('Circuit worksheet','/circuit-sizing.html')],false);
   add('busbar','Busbar sizing and parallel straps','Conductors & Wiring','Busbar worksheet ampacity, width, thickness and parallel bar quantity.','bus bars busbars straps copper aluminum current density 4-036',
-    L('Busbar ampacity',C('s4',0)),[L('Required dimensions',C('s4',1)),L('Parallel strap count',C('s4',2)),L('Current density',C('s4',3))]);
+    L('Busbar ampacity',C('s4',1)),[L('Required dimensions',C('s4',2)),L('Parallel strap count',C('s4',3)),L('Current density',C('s4',4))]);
   add('neutral','Neutral current / conductor sizing','Conductors & Wiring','Split-phase imbalance and 3-phase 4-wire vector neutral calculations.','347 600 120 240 3phase vector neutral harmonic',
     L('Guided neutral sizing',G('neutral')),[L('Formula worksheet',A('neutral'))],false);
   add('grounding','Grounding and bonding','Conductors & Wiring','Select grounding or bonding path and verify electrode or conductor geometry.','electrode rod plate ring bond ground secondary jumper section 10',
