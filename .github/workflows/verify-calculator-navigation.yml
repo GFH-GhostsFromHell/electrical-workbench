@@ -1,0 +1,43 @@
+name: Verify CEC Calculator Navigation
+on:
+  push:
+    paths:
+      - 'portal/src/main/resources/static/calculator-*.js'
+      - 'portal/src/main/resources/static/calculator-center.html'
+      - 'portal/src/main/resources/static/calculators.html'
+      - 'portal/src/main/resources/static/advanced-calculations.html'
+      - 'portal/src/main/resources/static/guided-calculators.html'
+      - 'portal/src/main/resources/static/tool-catalog.js'
+      - 'portal/src/main/resources/static/start.html'
+      - 'portal/src/main/resources/static/portal.html'
+      - 'portal/src/test/js/calculator-navigation.test.cjs'
+      - '.github/workflows/verify-calculator-navigation.yml'
+  pull_request:
+    paths:
+      - 'portal/src/main/resources/static/calculator-*.js'
+      - 'portal/src/main/resources/static/calculator-center.html'
+      - 'portal/src/main/resources/static/calculators.html'
+      - 'portal/src/main/resources/static/advanced-calculations.html'
+      - 'portal/src/main/resources/static/guided-calculators.html'
+      - 'portal/src/main/resources/static/tool-catalog.js'
+      - 'portal/src/main/resources/static/start.html'
+      - 'portal/src/main/resources/static/portal.html'
+      - 'portal/src/test/js/calculator-navigation.test.cjs'
+      - '.github/workflows/verify-calculator-navigation.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Check search scripts
+        run: |
+          node --check portal/src/main/resources/static/calculator-topics.js
+          node --check portal/src/main/resources/static/calculator-center.js
+          node --check portal/src/main/resources/static/tool-catalog.js
+      - name: Verify link mappings and discoverability
+        run: node --test portal/src/test/js/calculator-navigation.test.cjs
