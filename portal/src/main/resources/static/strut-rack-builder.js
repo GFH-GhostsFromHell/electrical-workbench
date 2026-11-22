@@ -73,7 +73,7 @@ function populate(state){
   by('mount').value=g.mount==='wall'?'wall':'floor';by('section').value=g.section==='41x21'?'41x21':'41x41';
   for(var id of ['gap','side','above','below','maxSpan','foot','kerf'])by(id).value=inputLength(g[id]);
   var st=String(g.stock);by('stock').value=st==='3050'||st==='6100'?st:'custom';
-  by('customStock').value=inputLength(g.stock);by('customStock').disabled=by('stock').value!=='custom';
+  by('customStock').value=inputLength(g.stock);by('customStock').disabled=by('stock').value!=='custom';by('foot').disabled=by('mount').value!=='floor';
   devices=state.devices.map(function(d){return {name:String(d.name||'Enclosure').slice(0,80),type:d.type==='Disconnect'?'Disconnect':'Panel',
     width:Number(d.width),height:Number(d.height),depth:Number(d.depth),qty:Number(d.qty),points:Number(d.points)};});
   renderDevices();update();by('saveStatus').textContent='Project loaded. Save if you want to keep it on this device.';
@@ -95,7 +95,7 @@ function update(){
   }catch(e){
     last=null;by('status').textContent='Check inputs: '+e.message;
     for(var id of ['placementBody','cutBody','hardwareBody','stockBody'])by(id).replaceChildren();
-    by('metrics').replaceChildren();by('warnings').replaceChildren();
+    by('metrics').replaceChildren();by('warnings').replaceChildren();by('frameMarks').textContent='';
     by('cutSummary').textContent='';by('stockSummary').textContent='';
     draw();
   }
@@ -109,6 +109,7 @@ function renderResult(r){
   ];
   by('metrics').replaceChildren();
   metrics.forEach(function(m){var cell=elt('div','metric'),b=elt('b',null,m[1]);cell.append(b,elt('span',null,m[0]));by('metrics').append(cell);});
+  by('frameMarks').textContent='Uprights (X from left end): '+r.postXsMm.map(showLength).join(' · ')+'. Lower horizontal rail centreline: '+showLength(r.lowerRailMm)+' above datum. Upper rail centreline: '+showLength(r.upperRailMm)+' above datum.';
   fillTable('placementBody',r.devices.map(function(d,i){return [
     (i+1)+'. '+d.name,showLength(d.xMm),showLength(d.bottomMm),
     showLength(d.widthMm)+' × '+showLength(d.heightMm)+' × '+showLength(d.depthMm)
