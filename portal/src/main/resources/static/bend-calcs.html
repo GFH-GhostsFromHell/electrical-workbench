@@ -81,6 +81,27 @@
 .fieldsteps li strong{display:block;color:#79f3eb;font-size:13px;margin-bottom:5px}
 .fieldsteps li span{display:block;color:#e4f1f9;font-size:13px;line-height:1.55}
 @media(max-width:600px){.bend3d-panel canvas{height:290px}.bend3d-controls button{min-width:38px;padding:9px 10px}.bend-view-switch button{flex:1 1 auto}}
+
+/* Beginner-friendly, compact field instructions. The "start end" never changes unless explicitly stated. */
+.start-quick{border:1px solid #4c96aa;background:#0d3041;border-radius:12px;padding:12px;margin:0 0 12px;line-height:1.5}
+.start-quick strong{display:block;color:#bcfff4;font-size:15px}
+.start-quick p{margin:5px 0 0;color:#f2fcff;font-size:13px}
+.start-quick .example{background:#041928;border:1px solid #477f91;border-radius:8px;padding:9px 11px;margin-top:9px;font-weight:700;color:#f3fbff}
+.starter-guide{margin:0 0 13px}
+.starter-guide>summary{cursor:pointer;font-weight:850;color:#b6fbf2;font-size:16px;padding:3px 0}
+.starter-guide[open]>summary{margin-bottom:10px}
+.starter-guide p{color:#e7f5fc;font-size:13px;line-height:1.6;margin:8px 0}
+.starter-guide ol{padding-left:22px;line-height:1.6;color:#e7f5fc;font-size:13px}
+.starter-guide li{margin:7px 0}
+.starter-guide strong{color:#9af6ee}
+.starter-guide svg{display:block;max-width:100%;height:auto;background:#071a2b;border:1px solid #3e7287;border-radius:10px}
+.starter-guide svg text{font-family:Inter,Segoe UI,system-ui,sans-serif}
+.beginner-key{border:1px solid #315c71;border-radius:10px;background:#0a2032;padding:9px 12px;margin:10px 0;color:#e8f5fb;font-size:13px;line-height:1.55}
+.beginner-key summary{cursor:pointer;font-weight:850;color:#a4f5ea}
+.beginner-key p{margin:8px 0 0}
+.field-step-focus{border-left:4px solid #5eead4}
+.markitem small{color:#b5cfe0;font-weight:850}
+@media(max-width:560px){.starter-guide{padding:11px}.start-quick{padding:11px}.starter-guide ol{padding-left:19px}}
 </style>
 <link rel="stylesheet" href="/readable-daylight.css?v=1">
 <link rel="stylesheet" href="/workbench-themes.css">
@@ -88,16 +109,17 @@
 <body>
 <header class="top"><div class="brand"><div class="bolt">ϟ</div><div><b>Conduit Bend Diagrams</b><span>ELECTRICAL WORKBENCH · FIELD MATH</span></div></div><div class="toplinks"><a href="/portal.html">Dashboard</a><a href="/start.html">Find a Tool</a><a href="/calculators.html">CEC Calculators</a><a href="/pull-box-calcs.html">Pull Box Sizing</a><a href="/bender-calibration.html">Bender Calibration</a></div></header>
 <div class="wrap">
-<div class="card method-chooser"><div class="field"><label for="shoeMethod">Hook and flip method</label><select id="shoeMethod" onchange="setShoeMethod(this.value)"><option value="klein">Klein-style hand bender · floor / air</option><option value="other">Different shoe or method · use its manual</option></select></div><p id="shoeMethodNote">Shown hook arrows use a Klein-style hand bender with tape zero LEFT. Check that your actual tool follows this procedure.</p></div>
+<div class="card method-chooser"><div class="field"><label for="shoeMethod">Which bending tool are you using?</label><select id="shoeMethod" onchange="setShoeMethod(this.value)"><option value="klein">Klein-style hand bender · floor / air</option><option value="other">Other tool · follow its instruction sheet</option></select></div><p id="shoeMethodNote">The hook-direction pictures are for a matching Klein-style hand bender. “Start end” means the end you measure from. It does not mean putting tape on the conduit.</p></div>
 <section id="menuScreen" class="screen active">
-  <div class="hero"><h1>Conduit bending, explained visually.</h1><p>Choose the bend you are making. Each calculator shows the geometry, field inputs, shrink or spacing, and the actual A/B/C/D marks on a straight conduit before you bend it.</p></div>
+  <div class="hero"><h1>Conduit bending, step by step.</h1><p>Choose the shape you want to make. The app shows where to measure, where to draw pencil lines, which part of the bender to line up, and when to turn the bender for the next bend.</p></div>
+<div class="card starter-guide" id="beginnersStart"><details open><summary>New to conduit bending? Start here</summary><div class="beginner-diagram-host"></div><ol><li><strong>Find the starting end.</strong> Lay a straight conduit on supports. Pick one end and call it the START END. The left side of the app's diagram represents this end; you do not need to hold the conduit physically pointing left.</li><li><strong>Use a measuring tape.</strong> Hook the small metal tip of your tape measure over the START END, pull out the tape along the conduit, and make a short pencil line at each distance the app gives you.</li><li><strong>Draw A and B at the correct places.</strong> Example: A = 15 in and B = 23 in means measure 15 in from the START END for A, then measure 23 in from that <em>same</em> START END for B. Do not measure 23 in from A.</li><li><strong>Position the bender and bend.</strong> The metal tip on a tape measure is not the HOOK on the bending tool. The tool's HOOK holds the conduit in the curved SHOE. Use the listed ARROW, STAR or centre-notch reference on your actual bender.</li><li><strong>Check the result.</strong> Practice on spare conduit first; check the finished shape and clearance before installation. If your bender markings or direction differ from this guide, use that bender's manufacturer instructions.</li></ol><div class="beginner-key"><strong>Not actual tape:</strong> You normally make marks with a pencil or felt marker. “Tape zero” only means the zero-inch/zero-millimetre starting position on a measuring tape.</div></details></div>
   <div class="toolbar"><div class="field"><label>Working units</label><select id="unit" onchange="unit=this.value;renderMenu()"><option value="in">Inches · nearest 1/16</option><option value="mm">Millimetres</option></select></div><div class="warn">Bender take-up/deduct, star marks and shoe radius can vary by tool. Confirm the values stamped on your bender before making final field bends.</div></div>
   <div class="menu" id="menu"></div>
 </section>
 <section id="toolScreen" class="screen"><div class="backrow"><button class="back" onclick="showMenu()">← Bend list</button><div class="tooltitle" id="toolTitle"></div><div class="field" style="min-width:125px;margin-left:auto"><label for="activeUnit">Units</label><select id="activeUnit" onchange="changeUnit(this.value)"><option value="in">Inches</option><option value="mm">Millimetres</option></select></div></div><div id="toolBody"></div></section>
 <section id="multiScreen" class="screen">
  <div class="backrow"><button class="back" onclick="showMenu()">← Bend list</button><div class="tooltitle">Advanced multi-bend · one pipe</div></div>
- <div class="hero"><p>Choose two or more bend operations on one straight conduit. Mark positions are always measured from the LEFT datum end. The app lists a proposed order, shoe reference, facing/flip cue and calculated spacing. Verify springback, shoe clearance and cumulative shrink in the field.</p></div>
+ <div class="start-quick"><strong>Advanced bending: keep one START END for the whole piece</strong><p>Pick one end of the straight conduit. Hook your measuring tape on that end and measure every A/B/C/D location from there—not from the previous pencil mark. “Left” only describes the illustration, not which way you must hold the pipe. The exception is a second 90° that specifically uses the back of the first finished bend as its measuring point.</p><div class="example">Example: A = 15 in and B = 23 in → draw A at 15 in and B at 23 in, both measured from the original START END.</div></div>
  <div class="card">
   <h3>1 · Stock and bend editor</h3>
   <div class="inputs">
@@ -107,7 +129,7 @@
    <div class="field"><label>Bend operation</label><select id="mbKind" onchange="mbKindChange()"><option>Two-bend offset</option><option>Rolling offset</option><option>90° arrow mark</option><option>Single kick</option><option>Three-point saddle</option><option>Four-point saddle</option></select></div>
    <div class="field"><label>Direction / plane</label><select id="mbPlane"><option>Up</option><option>Down</option><option>Left</option><option>Right</option></select></div>
    <div class="field"><label>Angle</label><select id="mbAngle"><option>10</option><option>15</option><option>22.5</option><option selected>30</option><option>45</option><option>60</option></select></div>
-   <div class="field"><label>First arrow / centre mark from LEFT datum</label><input id="mbStart" type="number" min="0" step="any" value="15"></div>
+   <div class="field"><label>Distance to first bend mark (from your START END)</label><input id="mbStart" type="number" min="0" step="any" value="15"></div>
    <div class="field"><label>Offset rise / saddle height</label><input id="mbRise" type="number" min="0" step="any" value="4"></div>
    <div class="field"><label>Horizontal roll (rolling only)</label><input id="mbRoll" type="number" min="0" step="any" value="4"></div>
    <div class="field"><label>Obstacle width (four-point only)</label><input id="mbWidth" type="number" min="0" step="any" value="9"></div>
@@ -176,7 +198,7 @@ function refreshMultiBendView(){
 function setShoeMethod(next){
  bendShoeMethod=next==='other'?'other':'klein';
  document.getElementById('shoeMethodNote').textContent=bendShoeMethod==='klein'
- ? 'Klein-style illustrated procedure: tape zero LEFT; the hook and handle-down flip directions below apply only to a matching shoe.'
+ ? 'START END = the conduit end where you put the tip of your measuring tape. “Hook LEFT” means the bender shoe hook points toward that start end in the diagram; only follow this for a matching Klein-style tool.'
  : 'For a different shoe, use its manufacturer’s hook, arrow/notch and flip procedure. The bend geometry stays available.';
  if(document.getElementById('toolScreen').classList.contains('active'))recalc();
  if(document.getElementById('multiScreen').classList.contains('active'))mbCompute();
@@ -213,6 +235,22 @@ function marks(labels){
  }
 let min=Math.min(0,...entries.map(x=>x[1])),max=Math.max(...entries.map(x=>x[1]));if(max-min<1)max=min+1;return `<div class="markcard card"><h3>Marks on straight conduit</h3><div class="markbar"><div class="pipe"></div>${entries.map(([k,x])=>{let p=5+90*(x-min)/(max-min);return `<div class="tick" style="left:${p}%"><i>${k}</i></div>`}).join('')}</div><div class="marklegend">${entries.map(([k,x])=>`<div class="markitem"><b>${k}</b><div><small>MEASURE FROM ZERO</small><br><span>${L(x)}</span></div></div>`).join('')}</div><div class="note">The pipe drawing only shows mark letters so labels cannot overlap. Use the measurement cards above for the exact distance from the same zero/reference end.</div></div>`}function result(label,value,cls=''){return `<div class="result ${cls}"><small>${label}</small><strong>${value}</strong></div>`}
 function lineSvg(points,labels='',extra=''){return `<svg viewBox="0 0 700 360" role="img" aria-label="Conduit bend diagram"><defs><linearGradient id="pipeMetal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#f7fbff"/><stop offset="24%" stop-color="#dbe4ea"/><stop offset="55%" stop-color="#9aa9b5"/><stop offset="78%" stop-color="#687985"/><stop offset="100%" stop-color="#4d5e69"/></linearGradient><filter id="pipeShadow" x="-20%" y="-20%" width="150%" height="160%"><feDropShadow dx="8" dy="11" stdDeviation="7" flood-color="#1d2a34" flood-opacity=".30"/></filter></defs><rect width="700" height="360" rx="18" fill="#edf4e6"/><g opacity=".20" stroke="#6f8a81" stroke-width="1"><path d="M0 300L700 300M0 250L700 250M0 200L700 200M0 150L700 150M0 100L700 100"/><path d="M80 360L270 0M210 360L400 0M340 360L530 0M470 360L660 0"/></g><path d="${points}" fill="none" stroke="#43535e" stroke-width="31" stroke-linecap="round" stroke-linejoin="round" filter="url(#pipeShadow)"/><path d="${points}" fill="none" stroke="url(#pipeMetal)" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/><path d="${points}" fill="none" stroke="#ffffff" stroke-opacity=".58" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" transform="translate(-2 -4)"/>${extra}${labels}</svg>`}function offsetSvg(o,spacing,shrink,isRoll=false){return lineSvg('M55 280 H220 L420 105 H650',`<text x="70" y="325" fill="#6a3e91">ZERO</text><text x="255" y="72" fill="#087a48">Spacing ${L(spacing)}</text><text x="492" y="155" fill="#075bc7">${isRoll?'True offset':'Offset'} ${L(o)}</text>`,`<line x1="230" y1="270" x2="408" y2="112" stroke="#0b9a5a" stroke-width="3"/><line x1="430" y1="105" x2="430" y2="280" stroke="#0d68c7" stroke-width="3" stroke-dasharray="8 7"/>`)}function rollSvg(rise,roll,T,spacing){return lineSvg('M55 285 H205 L392 116 L650 142',`<text x="250" y="72" fill="#087a48">Spacing ${L(spacing)}</text><text x="485" y="105" fill="#075bc7">True offset ${L(T)}</text>`,`<g fill="none" stroke-width="3" stroke-dasharray="8 7"><line x1="392" y1="116" x2="392" y2="285" stroke="#0d68c7"/><line x1="392" y1="285" x2="520" y2="322" stroke="#8a4db0"/></g><text class="axis-label" x="405" y="205" fill="#075bc7">Rise ${L(rise)}</text><text class="axis-label" x="505" y="335" fill="#713f91">Roll ${L(roll)}</text>`)}function saddle3Svg(h,sp,shift){return lineSvg('M45 260 H190 L350 105 L510 260 H655',`<text x="70" y="318" fill="#d83939" font-size="25">Center reference</text><text x="120" y="90" fill="#15a05a" font-size="28">Spacing ${L(sp)}</text><text x="408" y="80" fill="#075bc7" font-size="27">Height ${L(h)}</text><text x="390" y="320" fill="#111" font-size="23">Center shift ${L(shift)}</text>`,`<line x1="350" y1="105" x2="350" y2="260" stroke="#075bc7" stroke-width="3"/>`)}function saddle4Svg(h,w,sp,sh){return lineSvg('M35 260 H150 L255 125 H445 L550 260 H665',`<text x="65" y="315" fill="#7444aa" font-size="24">Obstacle near face</text><text x="90" y="90" fill="#15a05a" font-size="26">Side spacing ${L(sp)}</text><text x="294" y="112" fill="#d83939" font-size="24">Width ${L(w)}</text><text x="474" y="315" fill="#111" font-size="22">Total shrink ${L(sh*2)}</text>`,`<rect x="270" y="165" width="160" height="95" fill="#cbd9e5" stroke="#6e7d88"/><line x1="255" y1="125" x2="255" y2="260" stroke="#075bc7" stroke-width="3"/>`)}function stubSvg(stub,take){return lineSvg('M245 70 V225 Q245 280 300 280 H640',`<text x="52" y="135" fill="#075bc7" font-size="28">Stub ${L(stub)}</text><text x="340" y="145" fill="#7444aa" font-size="27">Take-up / deduct ${L(take)}</text>`,`<line x1="185" y1="70" x2="185" y2="280" stroke="#075bc7" stroke-width="3"/>`)}
+
+function beginnerStartDiagram(){
+ return '<svg viewBox="0 0 680 148" role="img" aria-label="Straight conduit with the start end on the left. A at 15 inches and B at 23 inches, both measured independently from the same starting end.">'+
+ '<text x="16" y="21" fill="#b6fff2" font-size="14" font-weight="800">EXAMPLE: TWO PENCIL MARKS ON ONE STRAIGHT CONDUIT</text>'+
+ '<rect x="58" y="73" width="555" height="23" rx="9" fill="#b9c6cf" stroke="#ebf6ff" stroke-width="2"/>'+
+ '<rect x="55" y="58" width="8" height="48" rx="2" fill="#64e9d5"/>'+
+ '<text x="15" y="45" fill="#b6fff2" font-size="13" font-weight="800">START END</text>'+
+ '<path d="M59 49 L59 59" stroke="#6ff7e2" stroke-width="3"/>'+
+ '<path d="M58 112 V125 H365" fill="none" stroke="#5eead4" stroke-width="2" stroke-dasharray="5 4"/>'+
+ '<path d="M58 134 H485" fill="none" stroke="#fbbf74" stroke-width="2" stroke-dasharray="5 4"/>'+
+ '<path d="M365 58 V104" stroke="#5eead4" stroke-width="4"/><path d="M485 58 V104" stroke="#fbbf74" stroke-width="4"/>'+
+ '<text x="351" y="48" fill="#a8fff1" font-size="15" font-weight="850">A</text><text x="473" y="48" fill="#ffe1ad" font-size="15" font-weight="850">B</text>'+
+ '<text x="215" y="122" fill="#c9fff3" font-size="12" font-weight="800">15 in from START</text>'+
+ '<text x="340" y="145" fill="#ffe1ad" font-size="12" font-weight="800">23 in from START</text>'+
+ '</svg>';
+}
 function measureNote(){
  const guide={
   offsetFar:['0 = square end of straight pipe.','Measure along the run to the FAR critical-bend reference line.','Rise = centreline-to-centreline perpendicular lift; not merely obstacle height.'],
@@ -634,7 +672,7 @@ function mbRender(){
  document.getElementById('mbList').innerHTML=multiOps.length?multiOps.map((o,i)=>
   '<div class="advanced-op"><div><strong>Operation '+(i+1)+': '+o.kind+'</strong><br><small>'+mbFormat(o.pos)+' from datum · '+o.a+'° · '+o.plane+'</small></div>'+
   '<div class="advanced-actions"><button onclick="mbEdit('+i+')">Edit</button><button onclick="mbDelete('+i+')">Remove</button></div></div>').join(''):
-  '<p class="note">Add two or more operations to create your combined bending layout.</p>';
+  '<p class="note">Add bend operations. Each distance is measured from the same START END of one straight conduit.</p>';
  mbCompute();
 }
 function mbCompute(){
@@ -709,10 +747,10 @@ function mbCompute(){
   ticks+='<div class="tick" style="left:'+left+'%" data-orient="'+(bendShoeMethod==='other'?'SHOE GUIDE':m.face==='left'?'← HOOK':m.face==='right'?'HOOK →':m.face==='kick'?'FREE LEG':'PLAN')+'">'+
     '<i>'+m.order+'</i></div>';
  });
- canvas.innerHTML='<div class="markbar">'+ticks+'</div><div class="note">Left = datum end. Mark positions are schematic; exact values follow below. Numbered circles show a proposed forming order.</div>';
+ canvas.innerHTML='<div class="markbar">'+ticks+'</div><div class="note">START END = the end where you hooked the measuring tape. All straight-stock marks are measured from that same end. Numbered circles show bend order (not physical tape labels).</div>';
  const hookSetup=m=>bendShoeMethod==='other'&&['left','right'].includes(m.face)?'Use your shoe manufacturer’s hook and flip procedure':m.hook;
  steps.innerHTML=all.map(m=>
-  '<div class="advanced-mark"><b>'+m.order+'</b><div><strong>'+m.group+' · mark '+m.name+' · '+mbFormat(m.position)+' from datum</strong>'+
+  '<div class="advanced-mark"><b>'+m.order+'</b><div><strong>'+m.group+' · mark '+m.name+' · '+mbFormat(m.position)+' measured from START END</strong>'+
   '<div class="bend-action">'+m.align+' | '+hookSetup(m)+'</div>'+hookFaceBadge(m.face)+'<div style="margin-top:4px">'+m.action+'</div></div></div>').join('');
   mbFocusUpdate();
  multiPreviewData={ops:multiOps.map(o=>({...o})),stock};refreshMultiBendView();
@@ -726,5 +764,6 @@ function mbCopy(){
  navigator.clipboard.writeText(multiReport).then(()=>alert('Combined bend schedule copied.')).catch(()=>alert('Clipboard unavailable.'));
 }
 renderMenu();
+document.querySelectorAll(".beginner-diagram-host").forEach(el=>el.innerHTML=beginnerStartDiagram());
 </script>
 </body></html>
