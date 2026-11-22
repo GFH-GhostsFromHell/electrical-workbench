@@ -46,7 +46,19 @@ for(const token of ['id="shoeMethod"','function setShoeMethod(','B FIRST · hook
 if(stableBender.includes('? VERIFY HOOK DIRECTION')||stableBender.includes("'? VERIFY'")){
  console.error('Old ambiguous hook warning has returned');failed=true;
 }
-console.log('Stable bender: physical marks, formulas, calibration, explicit shoe method and flip steps validated');
+const viewer=fs.readFileSync(path.join(root,'bend-view-3d.js'),'utf8');
+new vm.Script(viewer,{filename:'bend-view-3d.js'});
+for(const id of ['bendView2d','bendView3d','bend3dCanvas','mbView2d','mbView3d','mb3dCanvas','offsetPlane','rollVertical','rollSide']){
+ if(!stableBender.includes(id)){console.error('2D/3D field view missing '+id);failed=true}
+}
+for(const token of ["BendView3D.single(","BendView3D.multi(","BendView3D.mount(","refreshBendView()","refreshMultiBendView()",
+ '3D · rotate','FLIP, THEN BEND B','TURN BENDER & BEND C']){
+ if(!stableBender.includes(token)){console.error('Missing integrated 3D/precise guide: '+token);failed=true}
+}
+for(const token of ['pointerdown','pointermove','touch','canvas','function orient(','function single(','function multi(']){
+ if(!viewer.includes(token)){console.error('3D viewer regression: '+token);failed=true}
+}
+console.log('Stable bender: formulas, calibrated marks, 2D/3D orbit viewer and precise field steps validated');
 const kb=fs.readFileSync(path.join(root,'troubleshooting-kb.html'),'utf8');
 const procedures=[...kb.matchAll(/\btopic\('[a-z0-9-]+'/g)].length;
 if(procedures<20){console.error('Expected >=20 troubleshooting procedures, found '+procedures);failed=true}
