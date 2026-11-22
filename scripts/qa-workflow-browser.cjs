@@ -233,7 +233,8 @@ const server = http.createServer((req, res) => {
     assert.ok(regularMarks.includes('BENDER HOOK TOWARD START END'),'Offset identifies where the bender shoe hook must face relative to the START END');
     assert.ok(regularMarks.includes('FROM START END'),'Mark measurements do not rely on unexplained tape-zero jargon');
     const beginnerStart=await page.locator('.start-quick').first().innerText();
-    assert.ok(beginnerStart.includes('A = 15 in, B = 23 in')&&beginnerStart.includes('NOT 23 in from A'),'Beginner example explains measuring each mark from the same end');
+    assert.ok(beginnerStart.includes('A = 15 in, B = 23 in')&&beginnerStart.includes('Do not measure 23 in from A'),'Beginner example explains measuring each mark from the same end');
+    await page.locator('.beginner-key summary').first().click();
     assert.ok((await page.locator('.beginner-key').first().innerText()).includes('Measuring tape hook'),'Jargon glossary distinguishes tape hook from bender hook');
     assert.ok((await page.locator('#fieldFocusHeading').innerText()).includes('CHOOSE START END'),'Guided mode begins with plain-language measurement setup');
     assert.ok(regularMarks.includes('FLIP bender handle DOWN'),'Offset return identifies when to flip the bender');
