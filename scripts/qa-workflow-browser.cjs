@@ -321,6 +321,15 @@ const server = http.createServer((req, res) => {
     for(const width of [320,390,768,1280]){
       await page.setViewportSize({width,height:820});
       await checkNoOverflow('Stable conduit bender at '+width);
+      if(width===320||width===390){
+        await page.locator('#mbView3d').click();
+        await visible('#mb3dCanvas');
+        await checkNoOverflow('Rotatable 3D conduit preview at '+width);
+        const ratio=await page.locator('#mb3dCanvas').evaluate(el=>el.getBoundingClientRect().width/window.innerWidth);
+        assert.ok(ratio>0&&ratio<=1,'3D preview remains within the mobile viewport');
+        if(width===390)await take('conduit-bender-3d-mobile.png');
+        await page.locator('#mbView2d').click();
+      }
       if(width===390)await take('conduit-bender-stable-mobile.png');
       if(width===1280)await take('conduit-bender-stable-desktop.png');
     }
