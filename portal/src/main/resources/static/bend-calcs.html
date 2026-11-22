@@ -467,9 +467,9 @@ function renderSteps(){
  if(current==='offsetFar'||current==='offsetNear'){
   const plane=read('offsetPlane')||'Up';
   put('1 · CHOOSE START END & BEND DIRECTION',datum+' Desired offset direction: '+plane.toUpperCase()+'. '+preflight);
-  put('2 · DRAW PENCIL LINES A AND B','Place pencil mark A at '+mark('A')+' and mark B at '+mark('B')+'. Confirm the spacing and whether the near or far bend is the critical obstacle reference.');
-  put('3 · BEND A FIRST',klein?'Shoe ARROW on A; HOOK LEFT, away from B and toward tape zero. Keep the pipe in the '+plane.toUpperCase()+' bending plane. Foot on heel; FLOOR-bend '+a+' toward the required offset.':instructions);
-  put('4 · FLIP, THEN BEND B',klein?'Keep conduit and bender together; turn bender HANDLE DOWN and roll the conduit 180° in the shoe cradle. Slide until ARROW is on B; HOOK still LEFT in the original tape-zero drawing. AIR-bend '+a+' to return the far straight section parallel to the first.':instructions);
+  put('2 · DRAW PENCIL LINES A AND B','From START END, draw pencil line A at '+mark('A')+'. Measure again from the SAME START END to draw line B at '+mark('B')+'. Do not add B to A. Confirm which bend is closest to the obstacle.');
+  put('3 · BEND A FIRST',klein?'Shoe ARROW on A; HOOK LEFT, away from B and toward START END. Keep the pipe in the '+plane.toUpperCase()+' bending plane. Foot on heel; FLOOR-bend '+a+' toward the required offset.':instructions);
+  put('4 · FLIP, THEN BEND B',klein?'Keep conduit and bender together; turn bender HANDLE DOWN and roll the conduit 180° in the shoe cradle. Slide until ARROW is on B; HOOK still LEFT in the original START END drawing. AIR-bend '+a+' to return the far straight section parallel to the first.':instructions);
   put('5 · CHECK YOUR FINISHED BEND','Sight both ends: they must be parallel with no dogleg. Measure finished perpendicular offset, the critical obstacle reference, springback and clearances before fixing the conduit.');
  }else if(current==='rollFar'||current==='rollNear'){
   const rise=read('rollVertical')||'Up',side=read('rollSide')||'Right',phi=Math.atan2(v('roll'),v('rise'))*180/Math.PI;
@@ -482,12 +482,12 @@ function renderSteps(){
  }else if(['saddle3','round'].includes(current)){
   const ca=Number(read('centerAngle')||45),traditional=read('saddleMethod').startsWith('Traditional'),verified=klein&&traditional&&ca===45;
   put('1 · MEASURE THE OBSTACLE',datum+' Measure obstacle CENTRE, required centreline lift and clearance; for round obstacles check actual diameter plus the chosen clearance.');
-  put('2 · DRAW THREE PENCIL LINES','A: '+mark('A')+'; B centre: '+mark('B')+'; C: '+mark('C')+'. The outside marks flank B. Confirm the centre-notch and outer-arrow convention on the shoe.');
+  put('2 · DRAW THREE PENCIL LINES','Measure from the SAME START END for each: draw A at '+mark('A')+', the middle line B at '+mark('B')+', and C at '+mark('C')+'. Match the centre-notch and arrow positions to your actual bender.');
   if(!verified){
    put('3 · SHOE SETUP NOT ISSUED',traditional&&ca!==45?'The selected '+ca+'° centre saddle uses a layout factor, but this app does not establish physical 30°/60° notch and outer-arrow orientation for your shoe. These are planning measurements only.':instructions);
    put('4 · VERIFY BEFORE BENDING','Use a manufacturer-supported method or calibrated scrap for the selected centre angle; do not assume bend-centre positions are physical ARROW marks.');
   }else{
-   put('3 · BEND CENTRE B FIRST','Align the 45° saddle/CENTRE NOTCH to mark B. HOOK LEFT toward tape zero. Make the 45° centre bend using the documented Klein-style floor method.');
+   put('3 · BEND CENTRE B FIRST','Align the 45° saddle/CENTRE NOTCH to mark B. HOOK LEFT toward START END. Make the 45° centre bend using the documented Klein-style floor method.');
    put('4 · FLIP & BEND A SECOND','Keep the bender on the conduit; HANDLE DOWN, roll the pipe 180° in the cradle. Move to A and align shoe ARROW. HOOK RIGHT toward centre B; AIR-bend 22.5° opposite the centre bend.');
    put('5 · REPOSITION & BEND C THIRD','Move the bender across centre B to mark C. HOOK LEFT toward centre B. Align shoe ARROW and make the second 22.5° outside bend in the SAME plane.');
    put('6 · FIT & SIGHT','Check the saddle clears the obstacle and the two end legs share one line. Confirm centre lift, both return angles, and springback.');
@@ -495,16 +495,16 @@ function renderSteps(){
  }else if(['saddle4','rect','square'].includes(current)){
   const plane=read('saddlePlane')||'Up';
   put('1 · CHOOSE START END & MEASURE CLEARANCE',datum+' Measure obstacle near face, width and centreline clearance. The first offset rises '+plane.toUpperCase()+'; the second returns in the opposite direction.');
-  put('2 · DRAW FOUR PENCIL LINES','A '+mark('A')+', B '+mark('B')+', C '+mark('C')+', D '+mark('D')+'. Compare both A–B and C–D spacings with the calculated values and your shoe minimum.');
-  put('3 · BEND A',klein?'HOOK LEFT toward tape zero. Align ARROW with A; FLOOR-bend '+a+' toward '+plane.toUpperCase()+' to start the first offset.':instructions);
+  put('2 · DRAW FOUR PENCIL LINES','Measure every pencil line from the SAME START END: A '+mark('A')+', B '+mark('B')+', C '+mark('C')+', D '+mark('D')+'. Confirm your bender has enough room to make each bend.');
+  put('3 · BEND A',klein?'HOOK LEFT toward START END. Align ARROW with A; FLOOR-bend '+a+' toward '+plane.toUpperCase()+' to start the first offset.':instructions);
   put('4 · FLIP & BEND B',klein?'Turn HANDLE DOWN and roll the conduit 180° in the cradle; HOOK LEFT. Align ARROW at B and AIR-bend '+a+' back to a level top section.':instructions);
-  put('5 · TURN BENDER & BEND C',klein?'Face the shoe HOOK RIGHT, away from tape zero. Align ARROW at C and bend '+a+' in the OPPOSITE offset direction, keeping the same plane.':instructions);
+  put('5 · TURN BENDER & BEND C',klein?'Face the shoe HOOK RIGHT, away from START END. Align ARROW at C and bend '+a+' in the OPPOSITE offset direction, keeping the same plane.':instructions);
   put('6 · FLIP & BEND D',klein?'Turn HANDLE DOWN and roll the conduit 180° in its cradle; HOOK RIGHT. Align ARROW at D and return the final straight run to the original line.':instructions);
   put('7 · VERIFY CLEARANCE','Confirm the top straight section clears the full obstacle, entrance and exit are parallel and in the same plane, and the actual shoe fits between bends.');
  }else if(current==='stub'){
   put('1 · CHOOSE START END','START END is the conduit end that becomes the SHORT upright leg. Check your shoe-stamped deduct for the exact conduit material and size.');
-  put('2 · DRAW PENCIL LINE A','Desired finished stub '+L(v('stub'))+' minus shoe deduct '+L(v('take'))+' gives ARROW mark A at '+mark('A')+'.');
-  put('3 · HOOK & BEND',klein?'Insert conduit with HOOK facing the SHORT / tape-zero end. Line up the shoe ARROW on A. Keep the bend plane square, apply firm heel foot pressure and FLOOR-bend to 90°.':instructions);
+  put('2 · DRAW PENCIL LINE A','Take the desired finished height '+L(v('stub'))+' and subtract the deduct stamped on your bender '+L(v('take'))+'. From your START END, draw pencil line A at '+mark('A')+'. The next step aligns the bender shoe ARROW with this line.');
+  put('3 · HOOK & BEND',klein?'Insert conduit with HOOK facing the SHORT / START END end. Line up the shoe ARROW on A. Keep the bend plane square, apply firm heel foot pressure and FLOOR-bend to 90°.':instructions);
   put('4 · CHECK','Measure the completed stub from the specified end and check it is square; correct for measured springback before repeated bends.');
  }else if(current==='kick90'){
   put('1 · MAKE THE FIRST 90°','Draw a pencil line A at '+mark('A')+' from the short START END. Use your confirmed deduct and bend the first 90° with hook toward that short end.');
