@@ -55,7 +55,7 @@ for(const token of ["BendView3D.single(","BendView3D.multi(","BendView3D.mount("
  '3D · rotate','FLIP, THEN BEND B','TURN BENDER & BEND C']){
  if(!stableBender.includes(token)){console.error('Missing integrated 3D/precise guide: '+token);failed=true}
 }
-for(const token of ['pointerdown','pointermove','touch','canvas','function orient(','function single(','function multi(']){
+for(const token of ['pointerdown','pointermove','pointercancel','canvas','function orient(','function single(','function multi(']){
  if(!viewer.includes(token)){console.error('3D viewer regression: '+token);failed=true}
 }
 console.log('Stable bender: formulas, calibrated marks, 2D/3D orbit viewer and precise field steps validated');
