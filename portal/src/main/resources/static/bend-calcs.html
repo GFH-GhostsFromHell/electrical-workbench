@@ -113,7 +113,7 @@
 <section id="menuScreen" class="screen active">
   <div class="hero"><h1>Conduit bending, step by step.</h1><p>Choose the shape you want to make. The app shows where to measure, where to draw pencil lines, which part of the bender to line up, and when to turn the bender for the next bend.</p></div>
 <div class="card starter-guide" id="beginnersStart"><details open><summary>New to conduit bending? Start here</summary><div class="beginner-diagram-host"></div><ol><li><strong>Find the starting end.</strong> Lay a straight conduit on supports. Pick one end and call it the START END. The left side of the app's diagram represents this end; you do not need to hold the conduit physically pointing left.</li><li><strong>Use a measuring tape.</strong> Hook the small metal tip of your tape measure over the START END, pull out the tape along the conduit, and make a short pencil line at each distance the app gives you.</li><li><strong>Draw A and B at the correct places.</strong> Example: A = 15 in and B = 23 in means measure 15 in from the START END for A, then measure 23 in from that <em>same</em> START END for B. Do not measure 23 in from A.</li><li><strong>Position the bender and bend.</strong> The metal tip on a tape measure is not the HOOK on the bending tool. The tool's HOOK holds the conduit in the curved SHOE. Use the listed ARROW, STAR or centre-notch reference on your actual bender.</li><li><strong>Check the result.</strong> Practice on spare conduit first; check the finished shape and clearance before installation. If your bender markings or direction differ from this guide, use that bender's manufacturer instructions.</li></ol><div class="beginner-key"><strong>Not actual tape:</strong> You normally make marks with a pencil or felt marker. “Tape zero” only means the zero-inch/zero-millimetre starting position on a measuring tape.</div></details></div>
-  <div class="toolbar"><div class="field"><label>Working units</label><select id="unit" onchange="unit=this.value;renderMenu()"><option value="in">Inches · nearest 1/16</option><option value="mm">Millimetres</option></select></div><div class="warn">Bender take-up/deduct, star marks and shoe radius can vary by tool. Confirm the values stamped on your bender before making final field bends.</div></div>
+  <div class="toolbar"><div class="field"><label>Working units</label><select id="unit" onchange="unit=this.value;renderMenu()"><option value="in">Inches · nearest 1/16</option><option value="mm">Millimetres</option></select></div><div class="warn">Your actual bending tool controls the shoe markings, minimum bend radius and take-up (deduct). Use the matching size shoe, practise on scrap, and check the finished conduit before installation.</div></div>
   <div class="menu" id="menu"></div>
 </section>
 <section id="toolScreen" class="screen"><div class="backrow"><button class="back" onclick="showMenu()">← Bend list</button><div class="tooltitle" id="toolTitle"></div><div class="field" style="min-width:125px;margin-left:auto"><label for="activeUnit">Units</label><select id="activeUnit" onchange="changeUnit(this.value)"><option value="in">Inches</option><option value="mm">Millimetres</option></select></div></div><div id="toolBody"></div></section>
@@ -363,8 +363,8 @@ function calcGainCut(){
 function hookFaceCaption(side){
  if(bendShoeMethod==='other'&&['left','right'].includes(side))return 'USE MANUFACTURER SHOE PROCEDURE';
  return side==='other'?'USE MANUFACTURER SHOE PROCEDURE':
-        side==='left'?'← HOOK TOWARD TAPE ZERO (LEFT)':
-        side==='right'?'HOOK TOWARD FAR END (RIGHT) →':
+        side==='left'?'← BENDER HOOK TOWARD START END':
+        side==='right'?'BENDER HOOK TOWARD OTHER END →':
         side==='kick'?'HOOK TOWARD FREE LEG BEING RAISED':
         side==='plane'?'KEEP SAME BEND PLANE · NO FLIP':
         'GEOMETRY ONLY · NO PHYSICAL SHOE MARK';
@@ -379,7 +379,7 @@ function bendReference(currentBend,mark,index){
  let ref;
  if(saddle&&!verified)ref=[index+1,'BEND CENTRE ONLY','Geometric layout only for this angle or shoe convention. No Klein notch/arrow sequence is established.','GEOMETRY','none'];
  else if(saddle){
-  if(mark==='B')ref=[1,'45° CENTRE NOTCH','B FIRST · hook LEFT toward tape zero. Align the 45° centre-notch and floor-bend 45°.','← HOOK','left'];
+  if(mark==='B')ref=[1,'45° CENTRE NOTCH','B FIRST · hook LEFT toward START END. Align the 45° centre-notch and floor-bend 45°.','← HOOK','left'];
   else if(mark==='A')ref=[2,'ARROW','A SECOND · FLIP bender handle DOWN; roll conduit 180° in its cradle. Align ARROW at A, hook RIGHT toward centre B; air-bend 22.5°.','HOOK →','right'];
   else ref=[3,'ARROW','C THIRD · move bender to the far side of centre B; hook LEFT toward B. Align ARROW at C; air-bend 22.5° in same plane.','← HOOK','left'];
  }else if(['offsetFar','offsetNear','rollFar','rollNear'].includes(currentBend)){
@@ -390,7 +390,7 @@ function bendReference(currentBend,mark,index){
   const seq={
    A:[1,'ARROW · PAIRED OFFSET','A FIRST · hook LEFT; make the first offset bend to rise.','← HOOK','left'],
    B:[2,'ARROW · PAIRED OFFSET','B SECOND · FLIP handle DOWN and roll conduit 180°; hook LEFT. Return to the upper flat.','← HOOK','left'],
-   C:[3,'ARROW · PAIRED OFFSET','C THIRD · TURN bender AROUND to face the hook RIGHT (away from tape zero). Begin the second, opposite offset in the SAME plane.','HOOK →','right'],
+   C:[3,'ARROW · PAIRED OFFSET','C THIRD · TURN bender AROUND to face the hook RIGHT (away from START END). Begin the second, opposite offset in the SAME plane.','HOOK →','right'],
    D:[4,'ARROW · PAIRED OFFSET','D FOURTH · FLIP handle DOWN and roll conduit 180° in the cradle; hook RIGHT, returning to the original run.','HOOK →','right']
   };
   ref=seq[mark]||[index+1,'GEOMETRY ONLY','No physical shoe alignment mark was produced.','GEOMETRY','none'];
@@ -426,7 +426,7 @@ function decorateBendMarks(){
   }
  });
  const list=document.querySelector('#marks .marklegend');
- if(list&&current==='back2back')list.insertAdjacentHTML('beforeend','<div class="markitem"><b>2</b><div><strong>STAR · SECOND 90° (relative mark)</strong><div class="bend-action">SECOND 90° · reposition the shoe with hook toward remaining FREE END (right of tape zero); align STAR with the distance measured from the BACK of the finished first 90. Do not align a second ARROW.</div>'+hookFaceBadge('right')+'<div class="hook-facing-info">Tight U bends require separate bender-specific clearance checks.</div></div></div>');
+ if(list&&current==='back2back')list.insertAdjacentHTML('beforeend','<div class="markitem"><b>2</b><div><strong>STAR · SECOND 90° (relative mark)</strong><div class="bend-action">SECOND 90° · reposition the shoe with hook toward remaining FREE END (right of START END); align STAR with the distance measured from the BACK of the finished first 90. Do not align a second ARROW.</div>'+hookFaceBadge('right')+'<div class="hook-facing-info">Tight U bends require separate bender-specific clearance checks.</div></div></div>');
  if(list&&current==='kick90')list.insertAdjacentHTML('beforeend','<div class="markitem"><b>2</b><div><strong>KICK · MARK FROM JOB REFERENCE</strong><div class="bend-action">KICK SECOND · measure the kick position independently. Set the hook toward the FREE LEG being raised; bend in the selected plane. Do not flip or roll automatically.</div>'+hookFaceBadge('kick')+'</div></div>');
  const help=document.getElementById('benderHelp');if(help)help.textContent=benderHelpText(current);
 }
@@ -439,8 +439,8 @@ function benderHelpText(which){
   rollNear:'Rolling offset: use true offset for spacing. Bend A first, B second. Do not twist the plane between bends or the final run will not be parallel.',
   saddle3:'Three-point saddle: bend B (centre) FIRST, using the saddle/centre notch. Bend A SECOND and C THIRD using appropriate outer ARROW marks, each at half centre angle.',
   round:'Round saddle: B centre FIRST with notch, A SECOND and C THIRD with outside reference. Verify diameter and over-obstacle clearance.',
-  saddle4:'Four-point saddle: A/B form the first offset with hook toward tape zero. Turn the bender around for C/D, so hook points toward the far end. Flip/roll before the return bends B and D; keep both offsets coplanar.',
-  rect:'Rectangular saddle: A/B hook toward tape zero; reverse hook toward far end for C/D. Flip/roll for B and D. Check top flat clearance and tool access.',
+  saddle4:'Four-point saddle: A/B form the first offset with hook toward START END. Turn the bender around for C/D, so hook points toward the far end. Flip/roll before the return bends B and D; keep both offsets coplanar.',
+  rect:'Rectangular saddle: A/B hook toward START END; reverse hook toward far end for C/D. Flip/roll for B and D. Check top flat clearance and tool access.',
   square:'Square-obstacle saddle: A/B form first offset, reverse bender hook for C/D; flip/roll before return bends B and D, maintaining the same plane.',
   stub:'90° stub: ARROW mark = requested stub height − verified head deduct. Hook faces the short free end. Bend first 90 and check actual stub height.',
   kick90:'Kicked 90: bend the 90 using ARROW first. The kick location is a separate measurement; rise alone does not determine an absolute shoe mark.',
@@ -622,7 +622,7 @@ function mbKindChange(){
 function mbRead(){
  const k=document.getElementById('mbKind').value;
  const pos=mbNum('mbStart'),h=mbNum('mbRise'),r=mbNum('mbRoll'),w=mbNum('mbWidth');
- if(pos<=0)throw Error('First arrow or centre must be greater than zero from the left datum.');
+ if(pos<=0)throw Error('The first bend mark must be farther than 0 from the START END of your straight conduit.');
  if(!['90° arrow mark','Single kick'].includes(k)&&h<=0)throw Error('Rise / saddle height must be greater than zero.');
  if(k==='Rolling offset'&&r<=0)throw Error('Rolling offset requires positive lateral roll.');
  if(k==='Four-point saddle'&&w<=0)throw Error('Four-point saddle needs positive obstacle width.');
@@ -705,19 +705,19 @@ function mbCompute(){
   switch(o.kind){
    case 'Two-bend offset':
     put(o.pos,'A','ARROW','A FIRST · HOOK ← away from B; FLOOR bend','+'+o.a+'° '+o.plane,'left');
-    put(o.pos+span,'B','ARROW','B SECOND · FLIP handle DOWN + ROLL conduit 180° in cradle; HOOK ← toward datum','−'+o.a+'° AIR bend back to parallel','left');break;
+    put(o.pos+span,'B','ARROW','B SECOND · FLIP handle DOWN + ROLL conduit 180° in cradle; HOOK ← toward START END','−'+o.a+'° AIR bend back to parallel','left');break;
    case 'Rolling offset':
     {const trueRise=Math.hypot(o.h,o.r),plane=Math.atan2(o.r,o.h)*180/Math.PI;
      put(o.pos,'A','ARROW','A FIRST · HOOK ←; set roll plane '+plane.toFixed(1)+'° from vertical','First '+o.a+'° toward '+o.plane+' (floor bend)','left');
      put(o.pos+trueRise/Math.sin(rad),'B','ARROW','B SECOND · FLIP handle DOWN, ROLL conduit 180° in cradle, HOOK ←; preserve plane','Return '+o.a+'° (air bend)','left');}break;
    case '90° arrow mark':
-    put(o.pos,'A','ARROW','HOOK ← toward short datum end; no flip for first 90°','90° toward '+o.plane+'; verify deduct','left');break;
+    put(o.pos,'A','ARROW','HOOK ← toward short START END; no flip for first 90°','90° toward '+o.plane+'; verify deduct','left');break;
    case 'Single kick':
     put(o.pos,'A','USER-PLACED KICK MARK','HOOK toward free end being raised; no automatic flip / 180° roll','Kick '+o.a+'° toward '+o.plane,'kick');break;
    case 'Three-point saddle':
     {const side=o.a/2,fieldMethod=o.a===45,multiplier=o.a===45?2.5:o.a===30?3.8:1/Math.sin(side*Math.PI/180),flank=o.h*multiplier;
      const centreRef=fieldMethod?'45° CENTRE NOTCH':'BEND CENTRE ONLY',outerRef=fieldMethod?'ARROW':'BEND CENTRE ONLY';
-     put(o.pos,'B',centreRef,fieldMethod?'B FIRST · HOOK ← toward datum; floor bend centre 45°':'Geometry only: choose a calibrated shoe method','Centre '+o.a+'° toward '+o.plane,fieldMethod?'left':'none');
+     put(o.pos,'B',centreRef,fieldMethod?'B FIRST · HOOK ← toward START END; floor bend centre 45°':'Geometry only: choose a calibrated shoe method','Centre '+o.a+'° toward '+o.plane,fieldMethod?'left':'none');
      put(o.pos-flank,'A',outerRef,fieldMethod?'A SECOND · FLIP handle DOWN and ROLL conduit 180° in cradle; HOOK → toward B':'Geometry only: outer ARROW position not issued','Outer '+side+'° opposite '+o.plane,fieldMethod?'right':'none');
      put(o.pos+flank,'C',outerRef,fieldMethod?'C THIRD · move bender across B; HOOK ← toward B; same plane':'Geometry only: outer ARROW position not issued','Outer '+side+'° opposite '+o.plane,fieldMethod?'left':'none');
      if(!fieldMethod)issues.push('Three-point saddle: geometric bend centres only at this angle; use shoe-specific notch/arrow positions before bending.');}break;
@@ -725,12 +725,12 @@ function mbCompute(){
     {const A=o.pos,B=A+span,C=B+o.w,D=C+span;
      put(A,'A','ARROW · PAIRED OFFSET','A FIRST · HOOK ←; first rise','Rise '+o.a+'° '+o.plane,'left');
      put(B,'B','ARROW · PAIRED OFFSET','B SECOND · FLIP handle DOWN + ROLL conduit 180°; HOOK ←','Level '+o.a+'° at top','left');
-     put(C,'C','ARROW · PAIRED OFFSET','C THIRD · TURN bender AROUND; HOOK → away from datum; opposite offset in same plane','Return '+o.a+'° toward original line','right');
+     put(C,'C','ARROW · PAIRED OFFSET','C THIRD · TURN bender AROUND; HOOK → away from START END; opposite offset in same plane','Return '+o.a+'° toward original line','right');
      put(D,'D','ARROW · PAIRED OFFSET','D FOURTH · FLIP handle DOWN + ROLL conduit 180°; HOOK →','Level '+o.a+'° on original run','right');
      issues.push('Four-point setup uses two paired offsets, not a universal shoe-approved hook sequence. Confirm shoe access, arrow marks and bend direction on your own tool.');}break;
   }
   sequence.forEach(m=>{m.order=all.length+1;all.push(m);
-    if(m.position<0)hardIssues.push(m.group+' mark '+m.name+' is before datum.');
+    if(m.position<0)hardIssues.push(m.group+' mark '+m.name+' is before START END.');
     if(m.position>stock)hardIssues.push('CALCULATION NOT POSSIBLE: '+m.group+' mark '+m.name+' at '+mbFormat(m.position)+' is beyond the '+mbFormat(stock)+' stock.');
     totalAngles+=o.kind==='90° arrow mark'?90:o.kind==='Three-point saddle'&&m.name!=='B'?o.a/2:o.a;
   });
