@@ -21,14 +21,14 @@ assert.ok(!dashboard.includes('id="toolDirectory"'), 'Dashboard must not duplica
 includes(dashboard, 'action="/start.html"', 'Dashboard search delegates to canonical task finder');
 includes(dashboard, 'class="card workbench-shortcuts"', 'Personal shortcuts are collapsible');
 for (const link of [
-  '/bend-calcs.html', '/guided-calculators.html',
+  '/bend-calcs.html', '/calculator-center.html',
   '/troubleshooting-kb.html', '/account-records.html'
 ]) includes(dashboard, 'class="workflow-link" href="' + link + '"', 'Quick task route');
 includes(dashboard, '.nav .label{display:inline!important', 'Mobile navigation must keep labels');
 includes(dashboard, 'id="dashboardTaskSearch"', 'Task search delegated to one finder');
 assert.ok(!dashboard.includes('<h2>Reports & statistics</h2>'), 'Do not bring back empty dashboard placeholders');
 includes(calc, 'id="sectionFinder"', 'Section-based calculator search');
-includes(guided, '<h1>Step-by-Step Electrical Calculators</h1>', 'Guided calculator title');
+includes(guided, '<h1>Guided Electrical Worksheets</h1>', 'Guided worksheet title');
 includes(guided, 'id="findCalculator"', 'Guided task search');
 includes(guided, 'function filterCalculators()', 'Guided filters wired');
 includes(field, '<h1>Jobsite Tools</h1>', 'Field tools title');
@@ -41,7 +41,7 @@ for (const area of ['LEARN','FIELD','PROJECTS','CAREER']) {
   includes(android, 'onOpenMore(MoreArea.' + area + ')', 'Android section deep link');
 }
 includes(ios, 'name: "Step-by-Step Calculators"', 'iOS tool naming');
-includes(desktop, 'navButton("🧮  Electrical Calculators")', 'Desktop tool naming');
+includes(desktop, 'navButton("🧮  Find a Calculator")', 'Desktop calculator finder naming');
 const mobileCatalog = read('android-client/app/src/main/java/com/gfh/electricalworkbench/MobileToolFinder.kt');
 includes(mobileCatalog, 'Search tools by job or calculation', 'Native Android task search');
 includes(mobileCatalog, 'getSharedPreferences("ewb.tool.shortcuts.v1."', 'Account-scoped Android favourites');
@@ -86,6 +86,8 @@ includes(read(root+'motor-starter-selector.html'),'/workbench-themes.css','Motor
 includes(start, 'new URLSearchParams(window.location.search)', 'Dashboard query reaches canonical finder');
 includes(start, 'alternateIds=new Set(', 'Specialist views are grouped instead of duplicated');
 includes(start, 'Show specialist and alternate tools', 'Full catalog remains accessible');
+includes(start, '/calculator-topics.js', 'Shared calculator topic directory loaded into Find a Tool');
+includes(read(root+'calculator-center.html'), '/calculator-topics.js', 'One central calculator directory');
 includes(dashboard, '/workbench-flow.css', 'Readable shared UI styles');
 includes(start, '/workbench-flow.css', 'Readable styles are shared with task finder');
 const androidHome = read('android-client/app/src/main/java/com/gfh/electricalworkbench/MainActivity.kt');
