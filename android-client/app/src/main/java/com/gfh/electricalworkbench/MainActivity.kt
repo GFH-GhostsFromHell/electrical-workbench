@@ -527,7 +527,7 @@ private fun DashboardScreen(session: Session, onOpenWeb: (String) -> Unit) {
             Text("COMMON WORKFLOWS", color = ElectricCyan, fontWeight = FontWeight.ExtraBold, fontSize = 12.sp)
             Spacer(Modifier.height(9.dp))
             OutlinedButton(onClick = { onOpenWeb("/bend-calcs.html") }, modifier = Modifier.fillMaxWidth()) { Text("Conduit bends & tape marks") }
-            OutlinedButton(onClick = { onOpenWeb("/calculator-center.html") }, modifier = Modifier.fillMaxWidth()) { Text("Find an electrical calculator") }
+            OutlinedButton(onClick = { onOpenWeb("/start.html?category=calculations") }, modifier = Modifier.fillMaxWidth()) { Text("Find an electrical calculator") }
             OutlinedButton(onClick = { onOpenWeb("/troubleshooting-kb.html") }, modifier = Modifier.fillMaxWidth()) { Text("Troubleshoot equipment") }
             OutlinedButton(onClick = { onOpenWeb("/account-records.html") }, modifier = Modifier.fillMaxWidth()) { Text("Resume saved work") }
         }
@@ -560,7 +560,7 @@ private fun CalculatorsScreen(onOpenWeb: (String) -> Unit) {
             Text("ALL ELECTRICAL CALCULATORS", color = ElectricCyan,
                 fontSize = 12.sp, fontWeight = FontWeight.ExtraBold)
             Spacer(Modifier.height(8.dp))
-            Button(onClick = { onOpenWeb("/calculator-center.html") }, modifier = Modifier.fillMaxWidth()) {
+            Button(onClick = { onOpenWeb("/start.html?category=calculations") }, modifier = Modifier.fillMaxWidth()) {
                 Text("Search all calculations", fontWeight = FontWeight.Bold)
             }
             Text("One recommended worksheet per task, with optional detailed formulas and CEC section methods.",
