@@ -53,6 +53,19 @@
     ]
   },
   {
+    "id": "burial-depth",
+    "name": "Underground Burial Depth · Low & High Voltage",
+    "description": "CEC 2024 Table 53 cover for underground cables and conduits; plan trench bottom depth, high-voltage checks and utility requirements.",
+    "category": "installation",
+    "keywords": "underground burial depth cover trench dig excavation pvc conduit cable armoured unarmoured teck90 electrical duct bank high voltage 4160 13800 27600 44kv 600 347 table 53 12-012 section 36 utility underground feeder",
+    "path": "/burial-depth.html",
+    "steps": [
+      "Select voltage, location and burial wiring method.",
+      "Compare CEC Table 53 cover with site or utility requirements.",
+      "Estimate trench depth and review excavation safety before installation."
+    ]
+  },
+  {
     "id": "strut-rack",
     "name": "3D Strut Rack Builder",
     "description": "Lay out panel and disconnect racks in 3D, with a channel cut list, stock cutting plan and hardware estimate.",
