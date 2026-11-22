@@ -39,7 +39,7 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
 <div class="step"><b>4 · Save or export</b>Keep a record of your work</div>
 </div>
 <section class="panel">
-<label for="query">Find an electrical tool</label><input id="query" type="search" placeholder="Try offset bend, motor fuse, voltage drop or hospital service" autocomplete="off">
+<label for="query">Find an electrical tool</label><input id="query" type="search" placeholder="Try busbar, welder, transformer, hospital service or offset bend" autocomplete="off">
 <div class="filters" role="group" aria-label="Task category">
 <button type="button" class="filter" data-category="all" aria-pressed="true">All tools</button>
 <button type="button" class="filter" data-category="installation" aria-pressed="false">Bending & layout</button>
@@ -59,15 +59,15 @@ footer{font-size:12px;color:#496174;margin-top:24px;line-height:1.5}
 <section aria-label="Available electrical tools"><h2>Choose your next step</h2><div id="catalog" class="cards"></div><button class="secondary" id="showAllTools" type="button">Show all tools</button><div id="none" hidden>No matching tools. Try a simpler task name or select All tools.</div></section>
 <footer>Favourites and recently opened tools use only task identifiers and are stored on this device, separately for each signed-in account. They are not cloud-synced. Electrical calculations remain advisory: confirm the applicable CEC/OESC edition, equipment ratings and site requirements.</footer>
 </main>
-<script src="/tool-catalog.js"></script><script src="/tool-state.js"></script>
+<script src="/calculator-topics.js"></script><script src="/tool-catalog.js"></script><script src="/tool-state.js"></script>
 <script>
 (function(){
  'use strict';
  var tasks=window.EWBTaskCatalog||[];
  var store=window.EWBToolState;
  var input=document.getElementById('query'), category='all', current=null, viewAll=false;
- var alternateIds=new Set(["bend-guide","advanced-code","cec-sections"]);
- var featured=['conduit-marks','conductor-drop','motor','service-demand','pull-box','fault','jobsite','saved'];
+ var alternateIds=new Set(["bend-guide","advanced-code"]);
+ var featured=['cec-sections','conduit-marks','conductor-drop','motor','service-demand','pull-box','fault','jobsite'];
  var filters=Array.from(document.querySelectorAll('button.filter'));
  function el(name,cls,txt){var n=document.createElement(name);if(cls)n.className=cls;if(txt!==undefined)n.textContent=txt;return n;}
  function link(item,txt){var a=el('a',null,txt||item.name);a.href=item.path;a.addEventListener('click',function(){store.visit(item.id);});return a;}
