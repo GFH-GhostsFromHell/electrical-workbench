@@ -45,6 +45,7 @@ private val allTasks = listOf(
     MobileTask("bend-guide", "Conduit Bend Diagrams", "Bend layouts and mark instructions", "Installation", "emt pipe bend offset saddle", "/bend-calcs.html"),
     MobileTask("bender-calibrate", "Calibrate a Conduit Bender", "Measure shoe deduct and gain", "Installation", "shoe profile", "/bender-calibration.html"),
     MobileTask("pull-box", "Pull Box Dimensions - Offline", "Straight, angle and U-pull sizing", "Installation", "junction box wall", "native:pull", true),
+    MobileTask("strut-rack", "3D Strut Rack Builder", "Panel and disconnect frames, channel cuts, hardware estimates and 3D layout (online)", "Installation", "unistrut channel rack panel disconnect frame stand cut list", "/strut-rack-builder.html"),
     MobileTask("conductor-drop", "Circuit Sizing & Voltage Drop - Offline", "Ampacity, derating, voltage drop and length", "Calculations", "wire cable table d3", "native:circuit", true),
     MobileTask("service-demand", "Service Load Calculations", "Demand for hospital, schools, apartments and homes", "Calculations", "residential hotel feeder demand", "/guided-calculators.html?tool=service"),
     MobileTask("transformer", "Transformer & Load Sizing - Offline", "Transformer currents and loads", "Calculations", "kva primary secondary", "native:transformer", true),
