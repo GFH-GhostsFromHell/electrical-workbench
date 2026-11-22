@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Underground Burial Depth · Electrical Workbench</title>
+<script src="/workbench-theme.js"></script>
+<style>
+:root{font:15px/1.5 Inter,Segoe UI,system-ui,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ewb-bg,#eef4f8);color:var(--ewb-text,#172d43)}
+a{color:var(--ewb-accent,#075985)}
+header{display:flex;gap:12px;justify-content:space-between;align-items:center;flex-wrap:wrap;background:var(--ewb-nav,#102f43);color:var(--ewb-nav-text,#fff);padding:12px max(13px,calc((100vw - 1330px)/2))}
+header strong{font-size:16px}header a{color:var(--ewb-nav-text,#fff);font-weight:750;text-decoration:none;font-size:13px}header nav{display:flex;gap:15px;flex-wrap:wrap}
+main{max-width:1360px;margin:auto;padding:17px 14px 50px}
+h1{font-size:clamp(24px,3vw,33px);margin:0 0 5px;line-height:1.24}
+h2{font-size:19px;margin:0 0 11px}
+h3{font-size:15px;margin:4px 0 9px}
+p{margin:5px 0 12px;color:var(--ewb-muted,#4b6074)}
+.lead{max-width:1000px;font-size:14px}
+.main-grid{display:grid;grid-template-columns:minmax(325px,450px) minmax(0,1fr);gap:14px;align-items:start}
+.panel{background:var(--ewb-surface,#fff);border:1px solid var(--ewb-border,#c5d8e4);border-radius:15px;padding:17px;min-width:0;margin:0 0 14px;box-shadow:0 4px 15px #1230470c}
+.form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+label{display:block;font-size:13px;font-weight:800;color:var(--ewb-text,#172d43);margin:0 0 5px}
+input,select{width:100%;min-height:43px;padding:10px;border:1px solid var(--ewb-border,#95a9bc)!important;border-radius:9px;background:var(--ewb-surface,#fff)!important;color:var(--ewb-text,#172d43)!important;font:inherit}
+input::placeholder{color:var(--ewb-muted,#526879)}
+input:focus-visible,select:focus-visible,button:focus-visible,a:focus-visible{outline:3px solid var(--ewb-focus,#16a0d0);outline-offset:2px}
+.helper{font-size:12px;color:var(--ewb-muted,#4b6074);line-height:1.45}
+.compact{font-size:12px}
+.field{min-width:0}
+.full{grid-column:1/-1}
+.controls{display:flex;flex-wrap:wrap;gap:7px;align-items:center}
+button{font:inherit;font-weight:780;min-height:41px;cursor:pointer;border-radius:9px;padding:8px 12px;border:1px solid var(--ewb-border,#94aabf);background:var(--ewb-raised,#edf6fa);color:var(--ewb-text,#183148)}
+button.primary{background:var(--ewb-accent,#075985);color:var(--ewb-accent-text,#fff);border-color:var(--ewb-accent,#075985)}
+button[data-volt][aria-pressed=true]{background:var(--ewb-accent,#075985);color:var(--ewb-accent-text,#fff)}
+.result-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.metric{background:var(--ewb-raised,#eff6fa);border:1px solid var(--ewb-border,#c5d8e4);border-radius:11px;padding:11px;min-width:0}
+.metric b{display:block;color:var(--ewb-text,#172d43);font-size:clamp(19px,2.3vw,27px);line-height:1.15;font-variant-numeric:tabular-nums}
+.metric small{color:var(--ewb-muted,#4b6074);font-size:11px}
+.flag{display:inline-flex;align-items:center;border-radius:8px;padding:6px 9px;margin:2px 0 10px;font-size:12px;font-weight:800;border:1px solid var(--ewb-border,#bccfdd);background:var(--ewb-raised,#e9f2f8);color:var(--ewb-text,#172d43)}
+.flag.notice{border-color:#b48e37;color:#9a6818;background:#fff7e7}
+#diagram{width:100%;height:auto;max-height:340px;display:block;background:#e4f2f9;border-radius:12px;border:1px solid #bed4e4}
+#diagram text{font:13px Inter,Segoe UI,sans-serif;fill:#123047}
+#diagram .big{font-weight:850;font-size:16px}
+#diagram .soil{fill:#b8895c}
+#diagram .under{fill:#98714f}
+#diagram .grass{fill:#4d9e79}
+#diagram .wire{fill:#1b556b;stroke:#092b3c;stroke-width:3}
+#diagram .cover{stroke:#115b80;stroke-width:3;marker-start:url(#endArrow);marker-end:url(#endArrow)}
+#diagram .dimension{stroke:#145b76;stroke-width:1.7;stroke-dasharray:5 4}
+#diagram .bedding{fill:#e5d9b4}
+#diagram .warn{fill:#f1d55e}
+#diagram .outline{stroke:#754c27;stroke-width:1.4;stroke-dasharray:5 4;fill:none}
+#alerts{margin:6px 0 0;padding-left:20px;color:var(--ewb-text,#172d43);font-size:13px}
+#alerts li{padding:4px 0}
+#status{font-size:13px;font-weight:800;color:var(--ewb-text,#172d43);margin:4px 0}
+.grid-2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+dl{margin:0;display:grid;grid-template-columns:1fr auto;gap:6px 15px;font-size:13px}
+dt{color:var(--ewb-muted,#4b6074)}dd{margin:0;color:var(--ewb-text,#172d43);font-weight:750;text-align:right}
+ul.references{padding-left:19px;font-size:13px}
+.references li{padding-bottom:5px}
+code{overflow-wrap:anywhere}
+@media(max-width:1020px){.main-grid{grid-template-columns:1fr}.panel{padding:14px}.result-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:610px){main{padding:12px 10px 40px}.form-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.result-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-2{grid-template-columns:1fr}.metric b{font-size:21px}}
+@media print{header,.no-print{display:none!important}body{background:white;color:black}main{padding:0}.main-grid{display:block}.panel{break-inside:avoid;box-shadow:none;border:1px solid #888}#diagram{max-height:270px}.result-summary{grid-template-columns:repeat(3,1fr)}}
+</style>
+<link rel="stylesheet" href="/workbench-themes.css">
+</head>
+<body>
+<header><strong>⚡ Electrical Workbench · Underground Cable Planner</strong><nav><a href="/start.html">Find a Tool</a><a href="/field-suite.html">Jobsite Tools</a><a href="/portal.html">Dashboard</a></nav></header>
+<main>
+<h1>Underground Burial Depth</h1>
+<p class="lead">Plan low-voltage and high-voltage electrical trenches using the 2024 CEC / Ontario Electrical Safety Code Table 53 baseline. Compare the required <b>cover to the top of the cable or conduit</b> with a practical excavation estimate. High-voltage and utility standards may require more.</p>
+<div class="main-grid">
+<div>
+<section class="panel">
+<h2>1 · What are you burying?</h2>
+<div class="form-grid">
+<div class="field full">
+<label for="voltage">System voltage (V)</label>
+<input id="voltage" type="number" value="600" min="0" max="500000" step="1" inputmode="decimal">
+<div class="controls no-print" aria-label="Common voltage presets" style="margin-top:7px">
+<button type="button" data-volt="240">240 V</button><button type="button" data-volt="600" aria-pressed="true">600 V</button><button type="button" data-volt="4160">4.16 kV</button><button type="button" data-volt="13800">13.8 kV</button><button type="button" data-volt="27600">27.6 kV</button>
+</div>
+</div>
+<div class="field"><label for="kind">Supply type</label><select id="kind"><option value="ac">AC</option><option value="dc">DC</option></select></div>
+<div class="field"><label for="area">Surface / traffic</label><select id="area"><option value="ordinary">No vehicle traffic</option><option value="vehicular">Vehicle area / driveway</option></select></div>
+<div class="field full"><label for="method">Installation wiring method</label>
+<select id="method">
+<option value="raceway">Approved underground raceway / conduit</option>
+<option value="armoured">Direct buried, metal sheath or armour (e.g. TECK90 when suitable)</option>
+<option value="unarmoured">Direct buried, no metal armour (approved underground cable)</option>
+</select>
+</div>
+<div class="field"><label for="owner">Who owns the circuit?</label><select id="owner"><option value="private">Private / customer</option><option value="utility">Utility / distributor</option></select></div>
+<div class="field"><label for="condition">Installation condition</label><select id="condition">
+<option value="normal">Ordinary earth trench</option>
+<option value="rock">Rock / shallow rock</option>
+<option value="concrete">Slab / encased / under building</option>
+<option value="pool">Near pool or spa</option>
+<option value="shared">Shared trench / utility crossing</option>
+<option value="other">Other special installation</option>
+</select></div>
+</div>
+</section>
+<section class="panel">
+<h2>2 · Trench dimensions</h2>
+<div class="form-grid">
+<div class="field"><label for="diameter">Cable or raceway outside diameter (mm)</label><input id="diameter" type="number" inputmode="decimal" min="1" max="1000" value="63" step="1"></div>
+<div class="field"><label for="bedding">Bedding below cable / raceway (mm)</label><input id="bedding" type="number" inputmode="decimal" min="0" max="1000" value="75" step="1"><span class="helper">Enter project-approved bedding thickness.</span></div>
+<div class="field"><label for="approvedMinimum">Approved utility/site minimum cover (mm)</label><input id="approvedMinimum" type="number" min="0" max="5000" step="1" inputmode="decimal" placeholder="Optional"></div>
+<div class="field"><label for="plannedCover">Actual or planned cover (mm)</label><input id="plannedCover" type="number" min="0" max="6000" step="1" inputmode="decimal" placeholder="Optional"></div>
+</div>
+<p class="helper">No automatic depth reductions for protective plates, concrete, rock, or special exceptions. Enter the stricter project minimum when verified. All measurements are based on finished grade, not current rough grade.</p>
+<div class="controls no-print"><button type="button" id="print" class="primary">Print field worksheet</button><button type="button" id="csv">Export CSV</button><button type="button" id="reset">Reset</button></div>
+</section>
+</div>
+<div>
+<section class="panel">
+<h2>3 · Cover and excavation estimate</h2>
+<div id="status" role="status" aria-live="polite"></div>
+<div id="flag" class="flag">CEC Table 53 planning reference · verify design</div>
+<div class="result-summary">
+<div class="metric"><b id="codeCover">—</b><small>CEC Table 53 reference cover</small></div>
+<div class="metric"><b id="requiredCover">—</b><small>Planning cover (greater of table / approved site depth)</small></div>
+<div class="metric"><b id="trenchBottom">—</b><small>Estimated trench bottom below finished grade</small></div>
+</div>
+<div class="grid-2" style="margin-top:14px">
+<div>
+<h3>Calculation details</h3>
+<dl>
+<dt>Voltage classification</dt><dd id="classification">—</dd>
+<dt>Area</dt><dd id="areaOut">—</dd>
+<dt>Cover measurement</dt><dd>Grade to top</dd>
+<dt>Outside diameter</dt><dd id="diameterOut">—</dd>
+<dt>Bedding allowance</dt><dd id="beddingOut">—</dd>
+<dt>Planned-cover difference</dt><dd id="difference">Not entered</dd>
+</dl>
+</div>
+<div>
+<h3>Trench cross-section</h3>
+<svg id="diagram" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 310" role="img" aria-label="Section diagram showing finished grade, warning marker, cover distance to the top of cable, outside diameter, bedding and excavation bottom">
+<defs><marker id="endArrow" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto-start-reverse"><path d="M0 0 L6 3 L0 6 Z" fill="#115b80"/></marker></defs>
+<rect width="500" height="310" fill="#d3e9f5"/>
+<rect x="0" y="53" width="500" height="257" class="soil"/>
+<path d="M0 53H500" stroke="#1b654e" stroke-width="5"/>
+<text x="16" y="31" class="big">Finished grade</text>
+<rect x="77" y="105" width="266" height="5" class="warn"/>
+<text x="352" y="110">Marker tape*</text>
+<rect x="107" y="221" width="208" height="73" class="bedding"/>
+<rect x="107" y="221" width="208" height="73" class="outline"/>
+<ellipse cx="210" cy="243" rx="65" ry="21" class="wire"/>
+<line x1="69" y1="53" x2="69" y2="221" class="cover"/>
+<text x="7" y="170" class="big" id="diagramCover">Cover</text>
+<line x1="100" y1="221" x2="330" y2="221" class="dimension"/>
+<line x1="100" y1="294" x2="330" y2="294" class="dimension"/>
+<text x="340" y="244" id="diagramDiameter">Ø —</text>
+<text x="340" y="284" id="diagramBedding">Bedding —</text>
+<text x="17" y="305" id="diagramBottom" style="font-size:11px">Trench bottom —</text>
+</svg>
+<p class="helper">*Illustrative marker placement. Confirm actual marking tape and backfill requirements from Rule 12-012 and approved drawings. Diagram is schematic, not to scale.</p>
+</div>
+</div>
+</section>
+<section class="panel">
+<h2>4 · Field checks before burial</h2>
+<ul id="alerts"></ul>
+</section>
+</div>
+</div>
+<section class="panel">
+<h2>Reference and limitations</h2>
+<div class="grid-2">
+<div>
+<p class="compact">This planning aid uses the ordinary earth-trench reference values associated with <b>2024 CEC Rule 12-012 and Table 53</b>, including the high-voltage columns. Ontario adopted the 2024 OESC effective May 1, 2025. The figures are not a final design approval or a substitute for licensed Code material. <b>High-voltage installations also require Section 36 review.</b></p>
+<ul class="references">
+<li><a target="_blank" rel="noopener" href="https://www.nexans.ca/en/dam/jcr%3Ac0f7292e-3b97-4743-8578-24c0ee4fe0c2/2024%20CE%20Code%20Changes%20Presentation.pdf">Nexans — 2024 CEC changes, Table 53 comparison (page 59)</a></li>
+<li><a target="_blank" rel="noopener" href="https://esasafe.com/role/oesc/">ESA — Ontario Electrical Safety Code</a></li>
+<li><a target="_blank" rel="noopener" href="https://ontariodigauthority.ca/locates-overview/">Ontario Dig Authority — request utility locates</a></li>
+</ul>
+</div>
+<div>
+<p class="compact"><b>Important:</b> The table reference covers minimum burial protection for the selected basic case, not all requirements for cable ratings, duct banks, load capacity, separations, trench stability, restoration or engineered utility design. A proposed cover that meets the reference value is <b>not automatically code-compliant</b>. Excavation must not start before required locates and safe-work arrangements are complete.</p>
+<p class="helper">Source basis: CSA C22.1:24, Section 0 voltage definitions; Rule 12-012/Table 53; Sections 36 and 68 as applicable; the actual 2024 Ontario amendments and relevant distributor construction standards.</p>
+</div>
+</div>
+</section>
+</main>
+<script src="/burial-depth-math.js"></script><script src="/burial-depth.js"></script>
+</body></html>
