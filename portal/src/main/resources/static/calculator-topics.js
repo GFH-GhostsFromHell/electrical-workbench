@@ -23,7 +23,7 @@
   add('neutral','Neutral current / conductor sizing','Conductors & Wiring','Split-phase imbalance and 3-phase 4-wire vector neutral calculations.','347 600 120 240 3phase vector neutral harmonic',
     L('Guided neutral sizing',G('neutral')),[],false);
   add('grounding','Grounding and bonding','Conductors & Wiring','Select grounding or bonding path and verify electrode or conductor geometry.','electrode rod plate ring bond ground secondary jumper section 10',
-    L('Guided grounding and bonding',G('ground')),[L('Rod, ground plate and ring geometry',A('ground'),'Calculate physical electrode dimensions and area; this is different from conductor sizing.')],false);
+    L('Guided grounding and bonding',G('ground')),[L('Rod, ground plate and ring geometry',A('ground')+'&focus=electrode','Calculate physical electrode dimensions and area; this is different from conductor sizing.')],false);
   add('conduit-fill','Conduit fill','Conductors & Wiring','Find conductor and raceway fill calculation worksheets.','pipe pvc emt fill conductor count wiring raceway',
     L('Conduit fill',C('s12',0)));
   add('box-fill','Outlet and junction box fill','Conductors & Wiring','Calculate conductor volume and box-fill allowances.','junction box cubic volume conductor device fill',
@@ -47,9 +47,9 @@
   add('service','Service demand / occupancy','Services & Equipment','Residential, apartment, hotel, school, hospital and industrial demand.','dwelling apartments hotel school hospital section 8 commercial industrial',
     L('Guided service demand',G('service')),[L('Occupancy-specific demand (Section 8)',C('s8',0),'Use when the occupancy has dedicated demand factors or additional load rules.')],false);
   add('refrigeration','Refrigeration / HVAC compressors','Services & Equipment','RLA, LRA, MCA and MOCP worksheets for compressors and refrigeration equipment.','air conditioner compressor refrigeration hvac mca mocp',
-    L('Guided refrigeration',G('refrig')),[L('Verify marked MCA and MOCP',A('hvac'),'Use the equipment nameplate instead of estimating a group of compressors.')],false);
+    L('Guided refrigeration',G('refrig')),[L('Verify marked MCA and MOCP',A('hvac')+'&focus=nameplate','Use the equipment nameplate instead of estimating a group of compressors.')],false);
   add('heating','Electric heating / continuous load','Services & Equipment','Electric heater current, continuous-load factor and protection.','electric heater watts space heating 208 volt section 62',
-    L('Electric heating worksheet',A('hvac')),[]);
+    L('Electric heating worksheet',A('hvac')+'&focus=heating'),[]);
   add('firepump','Fire pump feeder','Services & Equipment','Motor and jockey-pump conductor plus controller/protection checks.','fire pumps jockey locked rotor section 32',
     L('Guided fire pump',G('firepump')),[],false);
   add('firealarm','Fire-alarm power / EOL','Services & Equipment','End-of-line resistor, NAC device current, battery and voltage drop.','fire alarm class a class b nac 24v 3.9k battery standby resistor',
