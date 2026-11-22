@@ -33,7 +33,11 @@ public final class ConduitBendingFieldPane extends BorderPane {
         VBox page = new VBox(12); page.setPadding(new Insets(14));
         Label title = new Label("Detailed conduit marks");
         title.setStyle("-fx-font-size:21px;-fx-font-weight:bold;-fx-text-fill:#0f172a;");
-        Label intro = note("Select bend · enter job dimensions · verify marks");
+        Label intro = note("Choose bend · measure from the START END · draw pencil marks · follow steps");
+        Label beginnerText=note("START END = the conduit end where you put the metal tab of your measuring tape. You do NOT stick adhesive tape onto the conduit.\n\nExample: A = 15 in, B = 23 in means draw a pencil line at 15 in from START for A and another at 23 in from the SAME START for B. Never measure 23 in from A.\n\nTAPE HOOK = the metal tip on the measuring tape. BENDER HOOK = the curved lip that holds the conduit in the bender SHOE. Line up the correct ARROW, STAR or centre-notch on the bender shoe with your pencil line.\n\nFLIP = reposition the bender handle. ROLL 180 degrees = rotate the pipe one half-turn around its own length. Different bends and shoes require different methods. Practice on scrap and follow your actual tool instructions.");
+        beginnerText.setStyle("-fx-text-fill:#124154;-fx-font-size:13px;-fx-background-color:#e8f7fa;-fx-padding:12px;-fx-border-color:#619baa;-fx-border-radius:8px;-fx-background-radius:8px;");
+        TitledPane beginnerHelp=new TitledPane("NEW? How to measure and mark conduit",beginnerText);
+        beginnerHelp.setExpanded(true);
         HBox selectors = new HBox(10,label("Bend type"),type,label("Units"),units);
         selectors.setAlignment(Pos.CENTER_LEFT); type.setPrefWidth(240);
         HBox settings = new HBox(10,label("Hand bender"),bender,label("Angle"),angle);
@@ -46,11 +50,11 @@ public final class ConduitBendingFieldPane extends BorderPane {
         VBox inputs = new VBox(9);
         put(inputs,"rise","Rise / obstacle height",rise);
         put(inputs,"roll","Horizontal roll",roll);
-        put(inputs,"distance","Distance from datum to obstacle reference",distance);
+        put(inputs,"distance","Distance from START END to obstacle",distance);
         put(inputs,"stub","Desired 90° stub height",stub);
         put(inputs,"takeup","Bender take-up / deduct",takeup);
         put(inputs,"width","Obstacle width / back-to-back separation",width);
-        put(inputs,"center","Obstruction centre from reference end",center);
+        put(inputs,"center","Distance from START END to obstacle centre",center);
         put(inputs,"correction","Star/back-of-90 mark correction",correction);
         put(inputs,"segments","Number of segments",segments);
         Button calculate = new Button("Calculate & show bending steps");
@@ -76,7 +80,7 @@ public final class ConduitBendingFieldPane extends BorderPane {
         TitledPane bendHelp=new TitledPane("Help · exact marking, shoe reference, bender orientation & order",help);
         bendHelp.setExpanded(false);
         bendHelp.setCollapsible(true);
-        page.getChildren().addAll(title,intro,selectors,settings,fieldSettings,saddleSettings,inputs,new HBox(10,useCalibration,calculate,copy),visual,bendHelp,answer,
+        page.getChildren().addAll(title,intro,beginnerHelp,selectors,settings,fieldSettings,saddleSettings,inputs,new HBox(10,useCalibration,calculate,copy),visual,bendHelp,answer,
             note("Hand-bender arrows, star/back-of-90 marks, saddle notches, deduct, minimum stub and springback vary by manufacturer, conduit size and type. Field shrink charts are rounded; this calculator shows geometric values. Measure conduit on its centreline, keep bends in the intended plane, and check a test piece before cutting production runs."));
         ScrollPane scroll = new ScrollPane(page);scroll.setFitToWidth(true);scroll.setStyle("-fx-background:transparent;-fx-background-color:transparent;");
         TabPane screens=new TabPane();
@@ -146,7 +150,7 @@ public final class ConduitBendingFieldPane extends BorderPane {
             List<BendMarkStripPane.Mark> visualMarks=new ArrayList<>();
             double a=angle.getValue(), rad=Math.toRadians(a), mult=1/Math.sin(rad), shrinkFactor=Math.tan(rad/2);
             String t=type.getValue();StringBuilder s=new StringBuilder();
-            s.append("FIELD BEND: ").append(t).append("\n\n");
+            s.append("FIELD BEND: ").append(t).append("\n\n").append("HOW TO MEASURE: Hook the metal tab of your measuring tape over your chosen START END of the straight conduit. Each A/B/C/D pencil line is measured from the SAME end, not from the previous pencil line. No adhesive tape is needed. Only the second STAR bend uses the back of the first finished 90 as a new measuring reference.\n\n");
             if(t.equals("Two-bend offset")||t.equals("Rolling offset")){
                 double vertical=positive(rise,"rise"), lateral=t.equals("Rolling offset")?nonNegative(roll,"horizontal roll"):0;
                 double h=Math.hypot(vertical,lateral), spacing=h*mult,shrink=h*shrinkFactor,ref=nonNegative(distance,"reference distance");
