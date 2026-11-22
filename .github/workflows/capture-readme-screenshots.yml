@@ -14,6 +14,10 @@ on:
       - 'portal/src/main/resources/static/calculator-center.js'
       - 'portal/src/main/resources/static/calculator-topics.js'
       - 'scripts/verify-calculator-visual.cjs'
+      - 'portal/src/main/resources/static/burial-depth.html'
+      - 'portal/src/main/resources/static/burial-depth-math.js'
+      - 'portal/src/main/resources/static/burial-depth.js'
+      - 'scripts/verify-burial-depth-visual.cjs'
   workflow_dispatch:
 
 permissions:
@@ -44,6 +48,7 @@ jobs:
           done
           node scripts/capture-readme-screenshots.cjs
           node scripts/verify-calculator-visual.cjs
+          node scripts/verify-burial-depth-visual.cjs
       - name: Commit original UI screenshots
         shell: bash
         run: |
