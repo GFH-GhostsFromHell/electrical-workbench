@@ -45,25 +45,41 @@ test('corrected Section 4 labels match all five actual worksheets',()=>{
  assert.equal(info(b.primary.url).params.tab,'1');
  assert.equal(info(b.alternatives[2].url).params.tab,'4');
 });
-test('Find a Tool indexes job-specific calculators and the primary hub',()=>{
+test('Find a Tool indexes all 25 calculator families without a second search UI',()=>{
  const context={window:{EWBCalculatorTopics:topics}};
  vm.runInNewContext(read('tool-catalog.js'),context);
  const tasks=context.window.EWBTaskCatalog;
  assert.equal(new Set(tasks.map(t=>t.id)).size,tasks.length);
- const hub=tasks.find(t=>t.id==='cec-sections');
- assert.equal(hub.path,'/calculator-center.html');
- for(const id of ['busbar','capacitor','heating','welders','tap','conduit-fill']){
-  assert.ok(tasks.some(t=>t.id==='calc-'+id),'Missing search entry '+id);
+ const calculatorEntries=tasks.filter(t=>t.id.startsWith('calc-'));
+ assert.equal(calculatorEntries.length,topics.length);
+ for(const topic of topics) {
+  const task=calculatorEntries.find(t=>t.id==='calc-'+topic.id);
+  assert.ok(task,'Missing canonical calculator '+topic.id);
+  assert.equal(task.path,topic.primary.url);
+  assert.equal(task.category,'calculations');
+  assert.equal(task.alternatives.length,topic.alternatives.length);
  }
+ const formerHub=tasks.find(t=>t.id==='cec-sections');
+ assert.equal(formerHub.path,'/start.html?category=calculations');
 });
-test('Calculator hub loads shared directory and global search loads it before tool catalog',()=>{
- const start=read('start.html'),portal=read('portal.html'),center=read('calculator-center.html'),controller=read('calculator-center.js');
- for(const page of [start,portal]){
-  const a=page.indexOf('/calculator-topics.js'),b=page.indexOf('/tool-catalog.js');
-  assert.ok(a>=0&&b>a,'shared catalog must load first');
- }
- assert.ok(center.includes('/calculator-topics.js'));
- assert.ok(center.includes('/calculator-center.js'));
- assert.ok(controller.includes('t.alternatives'));
- assert.ok(controller.includes('matches(t,q)'));
+test('old calculator link redirects to the one finder, preserving search and topic',()=>{
+ const old=read('calculator-center.html');
+ assert.ok(old.includes("window.location.replace('/start.html?'"));
+ assert.ok(old.includes("next.set('category','calculations')"));
+ assert.ok(old.includes("next.set('topic',old.get('topic'))"));
+ assert.ok(old.includes("next.set('q',old.get('q'))"));
+ assert.ok(!old.includes('id="results"'),'Old page must not maintain a duplicate search UI');
+});
+test('single finder supports direct calculator category, descriptions and supplemental methods',()=>{
+ const start=read('start.html');
+ assert.ok(start.includes('/calculator-topics.js'));
+ assert.ok(start.includes('/tool-catalog.js'));
+ assert.ok(start.indexOf('/calculator-topics.js')<start.indexOf('/tool-catalog.js'));
+ assert.ok(start.includes("initialParams.get('category')"));
+ assert.ok(start.includes("initialParams.get('topic')"));
+ assert.ok(start.includes('Different calculations ('));
+ assert.ok(start.includes('legacyCalculatorIds'),'Old duplicate tasks should only appear in existing favourites');
+ const portal=read('portal.html');
+ assert.ok(portal.includes('href="/start.html?category=calculations"'));
+ assert.ok(!portal.includes('href="/calculator-center.html"'));
 });
