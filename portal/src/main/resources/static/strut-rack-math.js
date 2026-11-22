@@ -66,13 +66,14 @@
     ];
     if(kind==='floor')pieces.push({name:'Foot / base outrigger',qty:posts,cutMm:foot});
     var strutTotalMm=mm(pieces.reduce(function(total,p){return total+p.qty*p.cutMm;},0));
-    var joints=posts*2,mountFasteners=items.reduce(function(n,d){return n+d.points;},0),brackets=joints*2;
+    var joints=posts*2,mountFasteners=items.reduce(function(n,d){return n+d.points;},0),brackets=joints*2,baseFasteners=posts*2;
     var hardware=[
       {name:'90° strut angle fittings (2 per rail/post joint)',qty:brackets,kind:'estimated'},
-      {name:'Channel nuts to suit selected channel',qty:brackets*2+mountFasteners,kind:'estimated'},
-      {name:'Compatible machine bolts + flat washers',qty:brackets*2+mountFasteners,kind:'estimated'},
+      {name:'Channel nuts to suit selected channel',qty:brackets*2+mountFasteners+baseFasteners,kind:'estimated'},
+      {name:'Compatible machine bolts + flat washers',qty:brackets*2+mountFasteners+baseFasteners,kind:'estimated'},
       {name:kind==='floor'?'Base plates / foot fittings':'Wall fixing plates / brackets',qty:posts,kind:'estimated'},
       {name:kind==='floor'?'Floor anchors':'Substrate anchors',qty:posts*2,kind:'estimated'},
+      {name:'Post-to-base/wall fitting bolts (included in above bolts)',qty:baseFasteners,kind:'reference'},
       {name:'Equipment mounting bolt sets (included in above bolts)',qty:mountFasteners,kind:'reference'}
     ];
     var plan=buildStockPlan(pieces,stockMm,kerf);
