@@ -27,6 +27,10 @@
         <div class="grid">
           <div class="card">
             <h2>Create account</h2>
+             <div id="googleSignup" style="display:none;margin:14px 0;padding:13px;border:1px solid var(--ewb-border,#c7d3e0);border-radius:12px;background:var(--ewb-raised,#edf6fb)">
+               <a href="/oauth2/authorization/google" class="btn ghost" style="width:100%;text-align:center;box-sizing:border-box">Continue with Google</a>
+               <p class="muted" style="margin:8px 0 0;font-size:12px">Create a Tier 1 account with a verified Google email. Already have a password account? Sign in first and connect Google in Profile &amp; Settings to preserve your work and subscription.</p>
+             </div>
             <p class="muted">Your account starts on Tier 1. If you choose Tier 2 or Tier 3, you can continue to the configured checkout after your email is verified.</p>
             <div class="field"><label>Username</label><input id="signupUsername" autocomplete="username" placeholder="3–40 letters, numbers, dot, dash or underscore"></div>
             <div class="field"><label>Display name</label><input id="signupName" autocomplete="name" placeholder="Your name"></div>
@@ -78,6 +82,14 @@
 </div>
 <script>
 let selectedTier='TIER_1',accountOptions={emailConfigured:false,tiers:[]};
+(async function(){
+ try{
+   const response=await fetch('/api/public/auth-options',{credentials:'same-origin'});
+   if(response.ok&&Boolean((await response.json()).google))
+     document.getElementById('googleSignup').style.display='block';
+ }catch(e){}
+})();
+
 function status(id,msg,ok=true){const e=document.getElementById(id);e.textContent=msg;e.className='status '+(ok?'good':'bad')}
 async function api(url,opt={}){
   let r;
