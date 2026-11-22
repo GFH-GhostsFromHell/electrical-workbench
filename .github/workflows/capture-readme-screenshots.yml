@@ -9,6 +9,11 @@ on:
       - 'portal/src/main/resources/static/start.html'
       - 'portal/src/main/resources/static/portal.html'
       - 'portal/src/main/resources/static/workbench-flow.css'
+      - 'portal/src/main/resources/static/calculator-center.html'
+      - 'portal/src/main/resources/static/calculator-center.css'
+      - 'portal/src/main/resources/static/calculator-center.js'
+      - 'portal/src/main/resources/static/calculator-topics.js'
+      - 'scripts/verify-calculator-visual.cjs'
   workflow_dispatch:
 
 permissions:
@@ -38,6 +43,7 @@ jobs:
             sleep 1
           done
           node scripts/capture-readme-screenshots.cjs
+          node scripts/verify-calculator-visual.cjs
       - name: Commit original UI screenshots
         shell: bash
         run: |
