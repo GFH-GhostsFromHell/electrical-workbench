@@ -53,6 +53,19 @@
     ]
   },
   {
+    "id": "strut-rack",
+    "name": "3D Strut Rack Builder",
+    "description": "Lay out panel and disconnect racks in 3D, with a channel cut list, stock cutting plan and hardware estimate.",
+    "category": "installation",
+    "keywords": "unistrut strut channel panelboard disconnect rack stand wall floor frame bracket cut length 3d",
+    "path": "/strut-rack-builder.html",
+    "steps": [
+      "Enter enclosure sizes, quantities and the rack mounting arrangement.",
+      "Rotate the 3D frame and verify mounting holes, supports and clearances.",
+      "Export the cut list and estimated hardware bill of materials."
+    ]
+  },
+  {
     "id": "conductor-drop",
     "name": "Circuit Sizing & Voltage Drop",
     "description": "Check conductor ampacity, grouping, ambient and voltage drop.",
