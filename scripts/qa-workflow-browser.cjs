@@ -291,8 +291,6 @@ const server = http.createServer((req, res) => {
       assert.ok(fourMarks.includes(note),'Four-point saddle sequence: '+note);
     }
     await page.locator('#toolScreen .back').click();
-
-    await page.locator('#toolScreen .back').click();
     await page.locator('button.bendbtn').filter({hasText:'Back-to-back 90s'}).first().click();
     await visible('#toolScreen.screen.active');
     await page.locator('#fieldFocusToggle').click();
