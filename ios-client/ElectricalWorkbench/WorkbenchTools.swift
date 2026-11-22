@@ -38,7 +38,7 @@ struct WorkbenchTools: View {
         .init(id: "transformer", name: "Transformer Sizing", description: "Current, ratio and protection worksheets", category: "Calculations", terms: "primary secondary kva", icon: "bolt", path: "/guided-calculators.html?tool=xfmr"),
         .init(id: "motor", name: "Motor Protection & Starter Sizing", description: "Motor fuses, breakers and overloads", category: "Calculations", terms: "flc ocpd starter", icon: "gearshape", path: "/calculators.html?section=s28"),
         .init(id: "motor-drive-select", name: "Motor Starter & Drive Selector", description: "DOL, wye–delta, soft starters, VFDs and AC/DC controls", category: "Calculations", terms: "motor starter vfd soft start capacitor dc ac", icon: "gearshape.2", path: "/motor-starter-selector.html"),
-        .init(id: "advanced-code", name: "Specialist CEC Formula Worksheets", description: "Optional detailed formulas for experienced users", category: "Calculations", terms: "ground neutral fire pump hvac", icon: "function", path: "/advanced-calculations.html"),
+        .init(id: "advanced-code", name: "Previous Advanced CEC Shortcut", description: "Opens the unified calculator finder", category: "Calculations", terms: "legacy advanced cec", icon: "function", path: "/calculator-center.html"),
         .init(id: "cec-sections", name: "All Electrical Calculators · Find by Job", description: "Search CEC calculations by task, then open the best worksheet", category: "Calculations", terms: "cec advanced regular guided conductor busbar welder motor transformer capacitor hospital hotel service conduit fill", icon: "magnifyingglass", path: "/calculator-center.html"),
         .init(id: "relay", name: "Protection & Relay Calculators - Offline", description: "CT/PT, relay pickup and instrument scaling", category: "Power & Protection", terms: "ct pt 4-20ma current transformer", icon: "waveform.path.ecg", path: nil),
         .init(id: "power", name: "Power System Analysis", description: "Per-unit and short-circuit studies", category: "Power & Protection", terms: "sequence components faults", icon: "bolt.horizontal.circle", path: "/engineering-power.html"),
@@ -58,7 +58,7 @@ struct WorkbenchTools: View {
         let words = searchText.lowercased().split(whereSeparator: \.isWhitespace).map(String.init)
         return tools.filter { tool in
             (category == "All tools" || category == tool.category) &&
-            (!searchText.isEmpty || !legacyCalculatorViews.contains(tool.id) || favourites.contains(tool.id)) &&
+            (!legacyCalculatorViews.contains(tool.id) || favourites.contains(tool.id)) &&
             words.allSatisfy { term in
                 (tool.name + " " + tool.description + " " + tool.terms).lowercased().contains(term)
             }
