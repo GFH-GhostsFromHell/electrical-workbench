@@ -236,7 +236,7 @@ function measureNote(){
   steps.map(function(step){return '<li>'+step+'</li>';}).join('')+
   '</ol><div class="note">Job dimensions are not the ARROW / STAR pencil marks. Replace sample values with field measurements.</div></div>';
 }
-function layout(inputs){return `<div class="grid"><div class="card">${measureNote()}<h3>Enter job measurements</h3>${inputs}<details class="bendfieldhelp"><summary>10 ft EMT stock / minimum shoe spacing</summary><p>Maximum stock: 120 in / 3,048 mm. Marks past stock will be rejected. Minimum shoe spacing depends on the actual bender.</p><div class="field"><label for="singleShoeGap">Minimum separation between marks (${unit}, optional)</label><input id="singleShoeGap" type="number" min="0" step="any" placeholder="Verified bender minimum" oninput="recalc()"></div></details><div class="formula" id="formula"></div><div class="note" id="note"></div></div><div><div class="bend-view-switch" role="group" aria-label="Conduit preview"><button id="bendView2d" aria-pressed="true" type="button" onclick="setBendView('2d')">2D · drawing</button><button id="bendView3d" aria-pressed="false" type="button" onclick="setBendView('3d')">3D · rotate</button></div><div class="diagram" id="diagram"></div><div id="bend3dPanel" class="bend3d-panel" hidden><canvas id="bend3dCanvas">3D conduit model requires canvas support.</canvas><div class="bend3d-controls"><button onclick="BendView3D.adjust('bend3dCanvas','left')" aria-label="Rotate left">↶</button><button onclick="BendView3D.adjust('bend3dCanvas','right')" aria-label="Rotate right">↷</button><button onclick="BendView3D.adjust('bend3dCanvas','up')" aria-label="Tilt up">↑</button><button onclick="BendView3D.adjust('bend3dCanvas','down')" aria-label="Tilt down">↓</button><button onclick="BendView3D.adjust('bend3dCanvas','zoomIn')" aria-label="Zoom in">＋</button><button onclick="BendView3D.adjust('bend3dCanvas','zoomOut')" aria-label="Zoom out">－</button><button onclick="BendView3D.adjust('bend3dCanvas','reset')">Reset</button></div><p id="bend3dNote" class="bend3d-note"></p></div><div class="results" id="results"></div></div></div><div id="marks"></div><section class="card fieldsteps"><h3>Field sequence · marking and bending</h3><p class="note" style="margin:4px 0 10px">Use the A/B/C/D distances above. All marks are measured from the same reference end unless the bender's star/back-of-90 is specifically called out.</p><div class="advanced-actions"><button type="button" id="fieldFocusToggle" onclick="toggleFieldFocus()">One step at a time</button></div><div id="fieldFocus" class="field-step-focus" hidden><strong id="fieldFocusCount"></strong><p id="fieldFocusText"></p><div class="advanced-actions"><button type="button" id="fieldFocusPrevious" onclick="moveFieldFocus(-1)">← Previous</button><button type="button" id="fieldFocusNext" onclick="moveFieldFocus(1)">Next →</button></div></div><ol id="stepList" style="line-height:1.75;padding-left:23px;margin:0"></ol><div class="warn" id="stepWarning" style="margin-top:12px"></div></section><details class="card bendfieldhelp" open><summary>Bender facing · bend-by-bend help</summary><p id="benderHelp"></p></details>`}
+function layout(inputs){return `<div class="grid"><div class="card">${measureNote()}<h3>Enter job measurements</h3>${inputs}<details class="bendfieldhelp"><summary>10 ft EMT stock / minimum shoe spacing</summary><p>Maximum stock: 120 in / 3,048 mm. Marks past stock will be rejected. Minimum shoe spacing depends on the actual bender.</p><div class="field"><label for="singleShoeGap">Minimum separation between marks (${unit}, optional)</label><input id="singleShoeGap" type="number" min="0" step="any" placeholder="Verified bender minimum" oninput="recalc()"></div></details><div class="formula" id="formula"></div><div class="note" id="note"></div></div><div><div class="bend-view-switch" role="group" aria-label="Conduit preview"><button id="bendView2d" aria-pressed="true" type="button" onclick="setBendView('2d')">2D · drawing</button><button id="bendView3d" aria-pressed="false" type="button" onclick="setBendView('3d')">3D · rotate</button></div><div class="diagram" id="diagram"></div><div id="bend3dPanel" class="bend3d-panel" hidden><canvas id="bend3dCanvas">3D conduit model requires canvas support.</canvas><div class="bend3d-controls"><button onclick="BendView3D.adjust('bend3dCanvas','left')" aria-label="Rotate left">↶</button><button onclick="BendView3D.adjust('bend3dCanvas','right')" aria-label="Rotate right">↷</button><button onclick="BendView3D.adjust('bend3dCanvas','up')" aria-label="Tilt up">↑</button><button onclick="BendView3D.adjust('bend3dCanvas','down')" aria-label="Tilt down">↓</button><button onclick="BendView3D.adjust('bend3dCanvas','zoomIn')" aria-label="Zoom in">＋</button><button onclick="BendView3D.adjust('bend3dCanvas','zoomOut')" aria-label="Zoom out">－</button><button onclick="BendView3D.adjust('bend3dCanvas','reset')">Reset</button></div><p id="bend3dNote" class="bend3d-note"></p></div><div class="results" id="results"></div></div></div><div id="marks"></div><section class="card fieldsteps"><h3>Field sequence · marking and bending</h3><p class="note" style="margin:4px 0 10px">Use the A/B/C/D distances above. All marks are measured from the same reference end unless the bender's star/back-of-90 is specifically called out.</p><div class="advanced-actions"><button type="button" id="fieldFocusToggle" onclick="toggleFieldFocus()">One step at a time</button></div><div id="fieldFocus" class="field-step-focus" hidden><strong id="fieldFocusCount"></strong><p id="fieldFocusText"></p><div class="advanced-actions"><button type="button" id="fieldFocusPrevious" onclick="moveFieldFocus(-1)">← Previous</button><button type="button" id="fieldFocusNext" onclick="moveFieldFocus(1)">Next →</button></div></div><ol id="stepList" style="line-height:1.75;padding-left:23px;margin:0"></ol><div class="warn" id="stepWarning" style="margin-top:12px"></div></section><details class="card bendfieldhelp"><summary>Additional bending reference</summary><p id="benderHelp"></p></details>`}
 
 function applySavedCalibration(){
  const status=document.getElementById('calibrationNotice');
@@ -407,76 +407,92 @@ function benderHelpText(which){
 
 function renderSteps(){
  const ol=document.getElementById('stepList'),warning=document.getElementById('stepWarning');if(!ol||!warning)return;
- const mark=document.getElementById('marks')?.textContent||'';
- const make=(...steps)=>steps;
- let steps;
+ const rows=[],put=(label,detail)=>rows.push({label,detail}),klein=bendShoeMethod==='klein';
+ const read=id=>document.getElementById(id)?.value||'';
+ const mark=letter=>{
+  const cards=Array.from(document.querySelectorAll('#marks .marklegend .markitem'));
+  return cards.find(el=>el.querySelector('b')?.textContent.trim()===letter)?.querySelector('span')?.textContent.trim()||'see mark card';
+ };
+ const instructions='This shoe has a different procedure: follow the exact manufacturer ARROW / STAR / CENTRE NOTCH, hook-facing and reverse-bend instructions. Do not borrow Klein hand-bender flip directions.';
+ const datum='Tape ZERO is the original left/short reference end. All straight-stock distances are measured from that same end unless STAR/back-of-90 is specified.';
+ const preflight='Confirm conduit size, matching bender shoe, bend angle, shoe clearance and measured deduct if applicable. Mark a reference line along the pipe so you can identify accidental twisting.';
+ const a=angle+'°';
  if(current==='offsetFar'||current==='offsetNear'){
-  steps=make('Measure the required rise and the reference distance from your chosen datum end; verify whether the near or far bend is the critical reference.',
-  'Measure mark A and mark B from that SAME end using the calculated marks above. Recheck the mark spacing against the bend multiplier.',
-  'Align your bender ARROW to mark A; make the first '+angle+'° bend, applying firm foot pressure and keeping the shoe square.',
-   'B SECOND: flip bender handle DOWN with the conduit in place; roll the conduit 180° in the shoe cradle. Slide to B and align ARROW, with hook LEFT toward tape zero in the drawing; air-bend '+angle+'° back to parallel.',
-  'Check the two straight sections are parallel and level; test the obstacle clearance before cutting or securing.');
+  const plane=read('offsetPlane')||'Up';
+  put('1 · SET DATUM & PLANE',datum+' Desired offset direction: '+plane.toUpperCase()+'. '+preflight);
+  put('2 · MARK A / B','Place pencil mark A at '+mark('A')+' and mark B at '+mark('B')+'. Confirm the spacing and whether the near or far bend is the critical obstacle reference.');
+  put('3 · BEND A FIRST',klein?'Shoe ARROW on A; HOOK LEFT, away from B and toward tape zero. Keep the pipe in the '+plane.toUpperCase()+' bending plane. Foot on heel; FLOOR-bend '+a+' toward the required offset.':instructions);
+  put('4 · FLIP, THEN BEND B',klein?'Keep conduit and bender together; turn bender HANDLE DOWN and roll the conduit 180° in the shoe cradle. Slide until ARROW is on B; HOOK still LEFT in the original tape-zero drawing. AIR-bend '+a+' to return the far straight section parallel to the first.':instructions);
+  put('5 · FIELD CHECK','Sight both ends: they must be parallel with no dogleg. Measure finished perpendicular offset, the critical obstacle reference, springback and clearances before fixing the conduit.');
  }else if(current==='rollFar'||current==='rollNear'){
-  const rise=v('rise'),roll=v('roll');const rot=Math.atan2(roll,rise)*180/Math.PI;
-  steps=make('Measure the vertical rise and lateral roll separately. Combine them into the true offset shown above.',
-  'Orient the conduit bending plane about '+num(rot)+'° from vertical to produce the required roll direction; mark your orientation on the pipe.',
-  'Measure A and B from the same reference end. Use the calculated mark spacing, not the vertical rise alone.',
-   'A FIRST: floor-bend '+angle+'° with hook LEFT away from B. B SECOND: flip handle DOWN, roll the conduit 180° in its cradle and align ARROW at B; hook LEFT toward tape zero. Air-bend back to parallel in the SAME rolled plane.',
-  'Test both vertical rise and horizontal roll before installing.');
- }else if(current==='saddle3'||current==='round'){
-  const ca=parseFloat(document.getElementById('centerAngle')?.value)||45;
-   const verified=document.getElementById('saddleMethod')?.value.startsWith('Traditional')&&ca===45;
-  steps=make('Measure the centre of the obstruction from your marked datum. Add the calculated centre shift and make the centre mark B.',
-  'Measure the outside marks A and C equally to either side of B using the computed side spacing.',
-   'For the documented 45° saddle: B FIRST, align the 45° centre-notch with hook LEFT toward tape zero; bend the centre '+ca+'°. For other angles these are layout points, not an issued shoe procedure.',
-   'A SECOND: flip bender handle DOWN and roll conduit 180° in cradle; hook RIGHT toward B, align ARROW at A and air-bend '+(ca/2)+'°. C THIRD: move bender across B, hook LEFT toward B, align ARROW at C and air-bend '+(ca/2)+'°.',
-  'Test-fit the saddle. '+(verified?'Use centre-notch and outer-arrow positions only with your calibrated bender.':'BEND-CENTRE PLANNING positions only; they must NOT be treated as physical arrow/notch marks.'));
+  const rise=read('rollVertical')||'Up',side=read('rollSide')||'Right',phi=Math.atan2(v('roll'),v('rise'))*180/Math.PI;
+  put('1 · SET DATUM','Tape ZERO at the marked left end. Measure vertical rise '+rise.toUpperCase()+' and horizontal roll '+side.toUpperCase()+' independently, not as a diagonal.');
+  put('2 · MARK THE ROLL PLANE','True offset is calculated from both components. Orient the first bend plane '+num(phi)+'° from vertical toward '+side.toUpperCase()+', with the rise '+rise.toUpperCase()+'. Draw a long alignment stripe to track this plane.');
+  put('3 · MARK A / B','Mark A at '+mark('A')+' and B at '+mark('B')+' from tape zero. Use the true-offset bend spacing, not the vertical rise alone.');
+  put('4 · BEND A',klein?'Align shoe ARROW with A, HOOK LEFT away from B. FLOOR-bend '+a+' in the marked diagonal rise/roll plane.':instructions);
+  put('5 · FLIP, THEN BEND B',klein?'Turn handle DOWN, roll the pipe 180° in the cradle and move to B. Align ARROW at B, HOOK LEFT in the datum view. AIR-bend '+a+' back to parallel while retaining the same diagonal plane.':instructions);
+  put('6 · VERIFY','Check both vertical rise and sideways roll in position. Sight along both straight legs: no unintended twist or dogleg.');
+ }else if(['saddle3','round'].includes(current)){
+  const ca=Number(read('centerAngle')||45),traditional=read('saddleMethod').startsWith('Traditional'),verified=klein&&traditional&&ca===45;
+  put('1 · MEASURE THE OBSTACLE',datum+' Measure obstacle CENTRE, required centreline lift and clearance; for round obstacles check actual diameter plus the chosen clearance.');
+  put('2 · MARK A, B, C','A: '+mark('A')+'; B centre: '+mark('B')+'; C: '+mark('C')+'. The outside marks flank B. Confirm the centre-notch and outer-arrow convention on the shoe.');
+  if(!verified){
+   put('3 · SHOE SETUP NOT ISSUED',traditional&&ca!==45?'The selected '+ca+'° centre saddle uses a layout factor, but this app does not establish physical 30°/60° notch and outer-arrow orientation for your shoe. These are planning measurements only.':instructions);
+   put('4 · VERIFY BEFORE BENDING','Use a manufacturer-supported method or calibrated scrap for the selected centre angle; do not assume bend-centre positions are physical ARROW marks.');
+  }else{
+   put('3 · BEND CENTRE B FIRST','Align the 45° saddle/CENTRE NOTCH to mark B. HOOK LEFT toward tape zero. Make the 45° centre bend using the documented Klein-style floor method.');
+   put('4 · FLIP & BEND A SECOND','Keep the bender on the conduit; HANDLE DOWN, roll the pipe 180° in the cradle. Move to A and align shoe ARROW. HOOK RIGHT toward centre B; AIR-bend 22.5° opposite the centre bend.');
+   put('5 · REPOSITION & BEND C THIRD','Move the bender across centre B to mark C. HOOK LEFT toward centre B. Align shoe ARROW and make the second 22.5° outside bend in the SAME plane.');
+   put('6 · FIT & SIGHT','Check the saddle clears the obstacle and the two end legs share one line. Confirm centre lift, both return angles, and springback.');
+  }
  }else if(['saddle4','rect','square'].includes(current)){
-  steps=make('Measure the actual obstacle height and width, including chosen clearances. Use all four calculated marks A, B, C and D.',
-   'A: hook LEFT and bend the first rise. B: flip handle DOWN and roll conduit 180° in the cradle, hook LEFT, and return to the upper flat using the paired-offset method.',
-   'C: TURN the bender AROUND so hook faces RIGHT, away from tape zero; start the opposite offset in the same plane. D: FLIP handle DOWN and roll conduit 180° in the cradle; hook RIGHT, returning to the original run.',
-  'Keep all bends in one plane, inspect the horizontal section across the obstruction, and verify total shrink and shoe-radius clearance.');
+  const plane=read('saddlePlane')||'Up';
+  put('1 · SET DATUM & CLEARANCE',datum+' Measure obstacle near face, width and centreline clearance. The first offset rises '+plane.toUpperCase()+'; the second returns in the opposite direction.');
+  put('2 · MARK ALL FOUR','A '+mark('A')+', B '+mark('B')+', C '+mark('C')+', D '+mark('D')+'. Compare both A–B and C–D spacings with the calculated values and your shoe minimum.');
+  put('3 · BEND A',klein?'HOOK LEFT toward tape zero. Align ARROW with A; FLOOR-bend '+a+' toward '+plane.toUpperCase()+' to start the first offset.':instructions);
+  put('4 · FLIP & BEND B',klein?'Turn HANDLE DOWN and roll the conduit 180° in the cradle; HOOK LEFT. Align ARROW at B and AIR-bend '+a+' back to a level top section.':instructions);
+  put('5 · TURN BENDER & BEND C',klein?'Face the shoe HOOK RIGHT, away from tape zero. Align ARROW at C and bend '+a+' in the OPPOSITE offset direction, keeping the same plane.':instructions);
+  put('6 · FLIP & BEND D',klein?'Turn HANDLE DOWN and roll the conduit 180° in its cradle; HOOK RIGHT. Align ARROW at D and return the final straight run to the original line.':instructions);
+  put('7 · VERIFY CLEARANCE','Confirm the top straight section clears the full obstacle, entrance and exit are parallel and in the same plane, and the actual shoe fits between bends.');
  }else if(current==='stub'){
-  steps=make('Check the stamped take-up/deduct on the EXACT bender and conduit type; the preset is only a starting value.',
-  'Square the end of the conduit and mark A at desired stub height minus deduct.',
-  'Insert pipe under the bender hook and align the ARROW at A. Hold firm foot pressure on the heel and bend a full 90°.',
-  'Remove the pipe and measure the completed stub from the reference end; adjust for springback if necessary.');
+  put('1 · SET TAPE ZERO','TAPE ZERO is the conduit end that becomes the SHORT stub. Check your shoe-stamped deduct for the exact conduit material and size.');
+  put('2 · MARK A','Desired finished stub '+L(v('stub'))+' minus shoe deduct '+L(v('take'))+' gives ARROW mark A at '+mark('A')+'.');
+  put('3 · HOOK & BEND',klein?'Insert conduit with HOOK facing the SHORT / tape-zero end. Line up the shoe ARROW on A. Keep the bend plane square, apply firm heel foot pressure and FLOOR-bend to 90°.':instructions);
+  put('4 · CHECK','Measure the completed stub from the specified end and check it is square; correct for measured springback before repeated bends.');
  }else if(current==='kick90'){
-  steps=make('Make the 90° stub with the correct ARROW mark and measured take-up first.',
-  'Choose and mark where the kick should START on the straight leg. The calculated kick travel is geometry, not an automatic absolute second mark.',
-   'Set the hook toward the free straight leg you need to raise. Bend '+angle+'° in the intended plane; do not perform an automatic 180° roll or flip for this single kick.',
-  'Confirm overall rise and installed orientation against the obstruction.');
+  put('1 · MAKE THE FIRST 90°','Mark ARROW at '+mark('A')+' from the short tape-zero end. Use your confirmed deduct and bend the first 90° with hook toward that short end.');
+  put('2 · LOCATE THE KICK','Choose the actual kick position from a separate installed-run or obstacle reference; kick rise alone does NOT identify a physical second ARROW mark.');
+  put('3 · SET KICK DIRECTION','Position the hook toward the FREE straight leg to be raised. Select the kick plane, align the shoe-specific reference and bend '+a+'. Do not automatically roll or flip 180° for a single kick.');
+  put('4 · CHECK','Measure the finished kick rise and 90° squareness in position; the calculated travel is not a calibrated bender mark.');
  }else if(current==='back2back'){
-  steps=make('Make the first 90° at arrow mark A using the confirmed stub deduct.',
-  'Measure desired back-to-back leg spacing from the BACK of the first completed bend, not from the conduit end.',
-   'For the second 90°, position the hook toward the remaining free end and align the STAR at the back-of-first-90 dimension (not another ARROW). Do not flip the conduit unless your method specifies it.',
-  'Bend the second 90° in the proper plane and verify finished clear distance between legs.');
- }else if(current==='gainCut'){
-  steps=make('Bend matching scrap through 90°; measure its original unbent length and its two finished straight legs.',
-  'Determine measured gain = both finished legs added together, minus the original straight stock length.',
-  'Enter the desired finished leg dimensions. Add the back-to-back span when making two 90s.',
-  'Calculate straight cut length = finished dimension sum minus number of 90s × gain per bend.',
-  'Use the dedicated 90° stub and back-to-back tools for ARROW and STAR physical marks, then verify the finished dimensions.');
+  put('1 · BEND THE FIRST STUB','Measure from tape zero and mark A at '+mark('A')+'. With hook toward the short end, align ARROW and make the first 90° using the calibrated deduct.');
+  put('2 · USE A NEW REFERENCE','After the first 90°, measure '+L(v('backdist')+v('star'))+' for the next STAR reference from the BACK of the FINISHED bend; do NOT measure again from the original straight tape zero.');
+  put('3 · BEND THE SECOND 90°',klein?'Position the shoe hook toward the REMAINING FREE END. Align STAR / back-of-90 at that new reference, not ARROW; bend in the same intended plane.':instructions);
+  put('4 · CHECK','Confirm parallel finished legs, actual spacing and shoe access. A very tight U requires its own manufacturer-supported method.');
  }else if(current==='segment90'){
-  steps=make('Choose your target centreline radius and number of equal segments. Verify the bender can safely form each small bend.',
-  'Set out the calculated approximate station spacing, adjusted for the actual shoe tangent/centre-of-bend convention.',
-  'Form each segment to its individual calculated angle, checking that every bend remains in the same plane.',
-  'Check the overall 90°, centreline radius and springback with a trial piece.');
- }else {
-  steps=make('Choose the actual centre-to-centre spacing of the conduit bank and the bend angle.',
-  'Mark the first conduit and stagger each following conduit by the calculated adjacent offset.',
-  'Make equal-angle bends in matching planes and maintain the same bend radius where possible.',
-  'Confirm the finished pipes stay parallel without touching, leaving room for couplings and clamps.');
+  put('1 · CALIBRATE FIRST','Target centreline radius is '+L(v('radius'))+'. These equal stations are geometric, NOT verified arrow/centre marks for a specific shoe.');
+  put('2 · MEASURE STATIONS','Mark every calculated station along the conduit from the same datum only after applying your manufacturer’s bend-centre/station reference.');
+  put('3 · FORM EQUAL BENDS','Make '+read('segments')+' small bends of '+num(90/Number(read('segments')||6))+'° each, all in the SAME plane. Do not flip between segments.');
+  put('4 · CHECK','Measure final radius and total 90° arc on a test piece, verify shoe access and adjust for springback.');
+ }else if(current==='parallel'){
+  put('1 · LAYOUT EACH CONDUIT','Use '+read('count')+' separate conduits, centre-to-centre spacing '+L(v('sep'))+' and equal bend angle '+a+'. Do not treat these as bends on one pipe.');
+  put('2 · MARK STAGGER','Adjacent bend layout stagger is shown in the results. Repeat with a fixed tape-zero and bend plane on each conduit.');
+  put('3 · BEND & CHECK','Use a matching shoe/radius for each conduit. Keep bank bends parallel with sufficient OD spacing, coupling access and support clearance.');
+ }else if(current==='gainCut'){
+  put('1 · MAKE A SCRAP TEST','Use the SAME shoe to bend scrap through 90°. Measure unbent stock and both finished legs using consistent back-of-bend datums.');
+  put('2 · ENTER MEASURED GAIN','Gain is the sum of both finished legs minus the original stock. This is different from the shoe ARROW deduct.');
+  put('3 · CALCULATE CUT LENGTH','Enter desired finished legs and optional back-to-back span. This tool issues a cut-length result, not physical arrow/star pencil marks.');
+  put('4 · FABRICATE SEPARATELY','After cutting, open the 90° stub or back-to-back calculator for its separate shoe-specific bending instructions.');
  }
- if(bendShoeMethod==='other'&&['offsetFar','offsetNear','rollFar','rollNear','saddle3','round','saddle4','rect','square','back2back','kick90'].includes(current)){
-  steps=steps.map(text=>/\b(?:HOOK|hook|FLIP|flip|ROLL|roll conduit|centre-notch)\b/.test(text)?'Use the arrow/notch, hook direction and flip/roll procedure in the manual for YOUR shoe; Klein directions are not transferable to different tools.':text);
- }
- ol.innerHTML=steps.map(s=>'<li>'+s+'</li>').join('');
+ ol.replaceChildren();
+ rows.forEach(({label,detail})=>{
+  const li=document.createElement('li'),strong=document.createElement('strong'),span=document.createElement('span');
+  strong.textContent=label+' — ';span.textContent=detail;li.append(strong,span);ol.appendChild(li);
+ });
  fieldFocusUpdate();
  const bad=Array.from(document.querySelectorAll('#marks .markitem span')).some(el=>el.textContent.trim().startsWith('−'));
- warning.textContent=(bad?'Warning: one or more bend marks are before the reference end; increase lead length or revise the layout. ':'')+'Safety: use the correct-size shoe and conduit type, avoid kinking, allow for springback, and confirm all measurements against manufacturer instructions. For angles and saddles, the actual shoe radius can shift bend marks.';
+ warning.textContent=(bad?'Warning: one or more bend marks are before the reference end. ':'')+'2D and 3D drawings show idealized geometry, NOT the physical shoe radius or exact tangent station. Confirm conduit type, marked bend angle, shoe reference, springback and clearances on a test piece.';
 }
-
 let fieldFocusMode=false,fieldFocusIndex=0;
 function fieldFocusUpdate(){
  const list=document.getElementById('stepList'),panel=document.getElementById('fieldFocus'),button=document.getElementById('fieldFocusToggle');
