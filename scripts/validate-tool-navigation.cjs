@@ -40,7 +40,7 @@ includes(more, 'remember(initialArea)', 'Android direct target selection');
 for (const area of ['LEARN','FIELD','PROJECTS','CAREER']) {
   includes(android, 'onOpenMore(MoreArea.' + area + ')', 'Android section deep link');
 }
-includes(ios, 'name: "Step-by-Step Calculators"', 'iOS tool naming');
+includes(ios, 'name: "Guided CEC Worksheets"', 'iOS guided worksheet naming');
 includes(desktop, 'navButton("🧮  Find a Calculator")', 'Desktop calculator finder naming');
 const mobileCatalog = read('android-client/app/src/main/java/com/gfh/electricalworkbench/MobileToolFinder.kt');
 includes(mobileCatalog, 'Search tools by job or calculation', 'Native Android task search');
