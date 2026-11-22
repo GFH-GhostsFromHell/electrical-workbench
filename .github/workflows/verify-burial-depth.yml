@@ -1,0 +1,30 @@
+name: Verify Burial Depth Planner
+on:
+  push:
+    paths:
+      - 'portal/src/main/resources/static/burial-depth*.js'
+      - 'portal/src/main/resources/static/burial-depth.html'
+      - 'portal/src/test/js/burial-depth.test.cjs'
+      - '.github/workflows/verify-burial-depth.yml'
+  pull_request:
+    paths:
+      - 'portal/src/main/resources/static/burial-depth*.js'
+      - 'portal/src/main/resources/static/burial-depth.html'
+      - 'portal/src/test/js/burial-depth.test.cjs'
+      - '.github/workflows/verify-burial-depth.yml'
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify JS syntax
+        run: |
+          node --check portal/src/main/resources/static/burial-depth-math.js
+          node --check portal/src/main/resources/static/burial-depth.js
+      - name: Verify CEC reference selection and geometric planning
+        run: node --test portal/src/test/js/burial-depth.test.cjs
