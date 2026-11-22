@@ -1,86 +1,19 @@
 <!doctype html>
-<html lang="en">
-<head>
+<html lang="en"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Find an Electrical Calculator · Electrical Workbench</title>
-<script src="/workbench-theme.js"></script>
-<style>
-*{box-sizing:border-box}
-body{margin:0;min-height:100vh;font:15px/1.5 Inter,Segoe UI,system-ui,sans-serif;}
-header.calc-header{background:var(--ewb-nav);color:var(--ewb-nav-text);border-bottom:1px solid var(--ewb-border);padding:12px max(16px,calc((100vw - 1210px)/2));display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
-header.calc-header strong{font-size:16px;color:var(--ewb-nav-text);}
-header.calc-header nav{display:flex;gap:13px;align-items:center;flex-wrap:wrap}
-header.calc-header nav a{color:var(--ewb-nav-text);font-size:13px;text-decoration:none;font-weight:700;}
-@media(max-width:700px){header.calc-header{padding:10px 12px;gap:6px}header.calc-header nav{gap:10px}}
-</style>
-<link rel="stylesheet" href="/workbench-themes.css">
-<link rel="stylesheet" href="/calculator-center.css">
-</head>
-<body>
-<header class="calc-header">
-<strong>⚡ Electrical Workbench · Calculators</strong>
-<nav aria-label="Workspace navigation">
-<a href="/start.html">Find a tool</a>
-<a href="/field-suite.html">Jobsite tools</a>
-<a href="/portal.html">Dashboard</a>
-</nav>
-</header>
-<main id="calc-hub">
-<section class="calc-intro">
-<h1>What do you need to calculate?</h1>
-<p>Pick the electrical task, then open its worksheet. You won't need to choose between separate regular, guided and specialist calculator libraries.</p>
-<div class="calc-steps" aria-label="Three-step workflow"><span>1 · Choose a calculation</span><span>2 · Enter job values</span><span>3 · Verify the result</span></div>
-</section>
-<div class="calc-workspace">
-<section class="calc-browser" aria-labelledby="pick-heading">
-<h2 id="pick-heading">Choose a calculation</h2>
-<p class="calc-small">Search by equipment, calculation, or CEC subject.</p>
-<label for="query">Search calculations</label>
-<input id="query" type="search" autocomplete="off" spellcheck="false" placeholder="e.g. voltage drop, hospital service, busbar" aria-controls="results">
-<div class="calc-categories" aria-label="Filter calculation category">
-<button class="calc-filter" type="button" data-group="all" aria-pressed="true">All</button>
-<button class="calc-filter" type="button" data-group="Conductors & Wiring" aria-pressed="false">Wiring</button>
-<button class="calc-filter" type="button" data-group="Motors & Protection" aria-pressed="false">Motors</button>
-<button class="calc-filter" type="button" data-group="Services & Equipment" aria-pressed="false">Services</button>
-<button class="calc-filter" type="button" data-group="Code & Reference" aria-pressed="false">Reference</button>
-</div>
-<div class="calc-list-head">
-<h3 id="listHeading">Common calculations</h3>
-<button id="browseAll" class="calc-all" type="button" aria-expanded="false" aria-controls="results">See all 25</button>
-</div>
-<div id="results" class="calc-result-list" aria-label="Matching calculations"></div>
-<p id="count" class="calc-small" role="status" aria-live="polite" style="margin-top:9px"></p>
-<div id="noResults" class="calc-empty" hidden>
-No matching calculation. Try one term, such as <b>motor</b>, <b>bonding</b>, or <b>welder</b>.
-<button type="button" id="clear" class="calc-all">Clear search</button>
-</div>
-</section>
-<section class="calc-detail" id="detail" aria-labelledby="selectedName">
-<div id="selected">
-<div id="selectedGroup" class="calc-tag">Conductors &amp; wiring</div>
-<h2 id="selectedName">Select a calculation</h2>
-<p id="selectedDescription"></p>
-<div class="calc-start">
-<h3>Start here</h3>
-<p id="selectedPurpose">Open the recommended worksheet for this job.</p>
-<a id="selectedLink" class="calc-launch open" href="/guided-calculators.html">Open calculation</a>
-</div>
-<div id="extraMethods" class="calc-branches" hidden>
-<h3>Need a different calculation?</h3>
-<p>Only genuinely different calculation types for this job are listed here, not copies of the same formula.</p>
-<div id="extraList"></div>
-</div>
-<div class="calc-guidance">
-<h3>Using the result on site</h3>
-<p>Confirm the equipment nameplate, conductor and installation details, applicable CEC/OESC tables, and manufacturer instructions. A worksheet is not a substitute for the official Code or engineering review.</p>
-</div>
-</div>
-<div id="emptyState" class="calc-empty" hidden>No task selected. Clear the search to browse the full calculator list.</div>
-</section>
-</div>
-<p class="calc-footer">The original calculation worksheets and saved links still work. Duplicate menu entries have been consolidated here; distinct specialist calculations remain available when they do something different.</p>
-</main>
-<script src="/calculator-topics.js"></script>
-<script src="/calculator-center.js"></script>
-</body>
-</html>
+<title>Electrical Calculators moved to Find a Tool</title>
+<script>
+/* Preserve old bookmarks without maintaining a second, competing tool finder. */
+(function(){
+  'use strict';
+  var old=new URLSearchParams(window.location.search);
+  var next=new URLSearchParams();
+  next.set('category','calculations');
+  if(old.has('q'))next.set('q',old.get('q'));
+  if(old.has('topic'))next.set('topic',old.get('topic'));
+  window.location.replace('/start.html?'+next.toString()+window.location.hash);
+})();
+</script>
+</head><body>
+<p>Electrical calculators are now inside <a href="/start.html?category=calculations">Find a Tool → CEC Calculators</a>.</p>
+</body></html>
