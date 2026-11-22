@@ -56,6 +56,7 @@ async function verifyContrast(page,label,foreground,background){
    await page.fill('#query','busbar');
    assert.ok(await page.locator('#catalog article.task').count()>=1);
    assert.match(await page.locator('#catalog').innerText(),/Busbar sizing/);
+   await page.locator('#catalog .calc-options summary').first().click();
    assert.match(await page.locator('#catalog').innerText(),/Number of parallel bars/);
    await page.fill('#query','fire pump');
    assert.equal(await page.locator('#catalog article.task').count(),1);
